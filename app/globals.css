@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+@theme {
+  /* Earth-tone palette — no pure white, black, or gray anywhere */
+  --color-paper: #f5eddc;
+  --color-paper-deep: #ece0c6;
+  --color-cream: #fbf6ea;
+  --color-ink: #4a3b2a;
+  --color-ink-soft: #7a6a52;
+  --color-moss: #7c8a4d;
+  --color-moss-deep: #5b6b3c;
+  --color-terracotta: #c4704b;
+  --color-terracotta-soft: #d99a7e;
+  --color-gold: #d9a441;
+  --color-gold-soft: #ecd9a8;
+
+  --font-sans: var(--font-baloo);
+  --font-pixel: var(--font-pixelify);
+
+  --radius-card: 1.25rem;
+  --shadow-card: 0 2px 0 0 color-mix(in srgb, #4a3b2a 18%, transparent),
+    0 8px 16px -8px color-mix(in srgb, #4a3b2a 30%, transparent);
+  --shadow-pressed: 0 1px 0 0 color-mix(in srgb, #4a3b2a 18%, transparent);
+}
+
+body {
+  background-color: var(--color-paper);
+  /* subtle paper grain */
+  background-image: radial-gradient(
+    color-mix(in srgb, var(--color-ink) 5%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 22px 22px;
+  color: var(--color-ink);
+  font-family: var(--font-sans), ui-rounded, system-ui, sans-serif;
+}
+
+/* Hand-drawn wobble for cards and buttons */
+.wobbly {
+  border-radius: 255px 18px 225px 18px / 18px 225px 18px 255px;
+}
+.wobbly-sm {
+  border-radius: 18px 6px 16px 8px / 8px 16px 6px 18px;
+}
+
+.pixelated {
+  image-rendering: pixelated;
+}
