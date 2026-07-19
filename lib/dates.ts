@@ -36,6 +36,13 @@ export function addDays(iso: string, days: number): string {
   return d.toISOString().slice(0, 10);
 }
 
+// Days from b to a (positive when a is later).
+export function diffDays(a: string, b: string): number {
+  return Math.round(
+    (Date.parse(a + "T12:00:00Z") - Date.parse(b + "T12:00:00Z")) / 86400000,
+  );
+}
+
 export function friendlyDate(iso: string, tz: string): string {
   return new Intl.DateTimeFormat("en-US", {
     timeZone: tz,

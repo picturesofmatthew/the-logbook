@@ -4,7 +4,7 @@ import { useMemo, useState, useTransition } from "react";
 import { logEntry } from "@/app/log/actions";
 import { hallInfo } from "@/lib/halls";
 import type { Meal, Specimen } from "@/lib/meals";
-import { DonateFlow } from "./donate-flow";
+import { DonateFlow, type LogResult } from "./donate-flow";
 
 const inputCls =
   "wobbly-sm border-2 border-ink/30 bg-cream px-3 py-2 outline-none focus:border-gold w-full";
@@ -12,6 +12,7 @@ const inputCls =
 export function LogDrawer({
   meal,
   day,
+  donorName,
   specimens,
   recents,
   onClose,
@@ -19,10 +20,11 @@ export function LogDrawer({
 }: {
   meal: Meal;
   day: string;
+  donorName: string;
   specimens: Specimen[];
   recents: Specimen[];
   onClose: () => void;
-  onLogged: (message: string) => void;
+  onLogged: (result: LogResult) => void;
 }) {
   const [mode, setMode] = useState<"pick" | "donate">("pick");
   const [search, setSearch] = useState("");
@@ -51,7 +53,9 @@ export function LogDrawer({
       if (result.error) {
         setError(result.error);
       } else {
-        onLogged(`${chosen.icon} ${chosen.name} — logged to ${meal}.`);
+        onLogged({
+          message: `${chosen.icon} ${chosen.name} — logged to ${meal}.`,
+        });
       }
     });
   }
@@ -69,7 +73,8 @@ export function LogDrawer({
           <DonateFlow
             meal={meal}
             day={day}
-            onDone={(msg) => onLogged(msg)}
+            donorName={donorName}
+            onDone={onLogged}
             onBack={() => setMode("pick")}
           />
         ) : chosen ? (

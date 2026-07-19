@@ -4,6 +4,8 @@ import { useState, useTransition } from "react";
 import { removeEntry } from "@/app/log/actions";
 import { totalOf } from "@/lib/engine/totals";
 import { MEALS, type JournalEntry, type Meal, type Specimen, type Target } from "@/lib/meals";
+import { Ceremony, type CeremonyData } from "./ceremony";
+import type { LogResult } from "./donate-flow";
 import { MacroBars } from "./macro-bars";
 import { LogDrawer } from "./log-drawer";
 
@@ -24,16 +26,21 @@ export function OwnColumn({
 }) {
   const [drawerMeal, setDrawerMeal] = useState<Meal | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const [ceremony, setCeremony] = useState<CeremonyData | null>(null);
   const [, startTransition] = useTransition();
 
   const total = totalOf(
     entries.map((e) => ({ ...e.food, servings: e.servings })),
   );
 
-  function handleLogged(message: string) {
+  function handleLogged(result: LogResult) {
     setDrawerMeal(null);
-    setToast(message);
-    setTimeout(() => setToast(null), 3500);
+    if (result.ceremony) {
+      setCeremony(result.ceremony);
+    } else {
+      setToast(result.message);
+      setTimeout(() => setToast(null), 3500);
+    }
   }
 
   return (
@@ -108,11 +115,16 @@ export function OwnColumn({
         <LogDrawer
           meal={drawerMeal}
           day={day}
+          donorName={displayName}
           specimens={specimens}
           recents={recents}
           onClose={() => setDrawerMeal(null)}
           onLogged={handleLogged}
         />
+      ) : null}
+
+      {ceremony ? (
+        <Ceremony data={ceremony} onClose={() => setCeremony(null)} />
       ) : null}
     </section>
   );

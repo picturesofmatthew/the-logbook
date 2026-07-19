@@ -1,7 +1,8 @@
-import { and, desc, eq, inArray, lte, max } from "drizzle-orm";
+import { and, countDistinct, desc, eq, inArray, lte, max, min } from "drizzle-orm";
 import { db } from "@/db";
-import { entries, foods, targets } from "@/db/schema";
+import { dayMeta, entries, foods, pet, targets } from "@/db/schema";
 import { PROFILES, type Profile } from "@/lib/auth";
+import { addDays, diffDays } from "@/lib/dates";
 import type { JournalEntry, Specimen, Target } from "@/lib/meals";
 
 export type JournalDay = Record<
@@ -53,6 +54,90 @@ export async function getJournalDay(day: string): Promise<JournalDay> {
 export async function getAllSpecimens(): Promise<Specimen[]> {
   const rows = await db.select().from(foods).orderBy(foods.name);
   return rows as Specimen[];
+}
+
+export type PetStateRaw = {
+  name: string | null;
+  adoptedAt: Date;
+  lifetimeDays: number;
+  currentRun: number;
+  loggedToday: Profile[];
+  daysSinceAnyEntry: number | null;
+};
+
+export async function getPetState(today: string): Promise<PetStateRaw> {
+  const [petRow] = await db.select().from(pet).where(eq(pet.id, 1));
+
+  const dayRows = await db
+    .select({ day: entries.day, n: countDistinct(entries.profileId) })
+    .from(entries)
+    .groupBy(entries.day);
+
+  const bothDays = new Set(
+    dayRows.filter((r) => Number(r.n) >= 2).map((r) => r.day),
+  );
+  const lifetimeDays = bothDays.size;
+
+  // Run of consecutive both-logged days. An unfinished today doesn't break
+  // it — the run just waits.
+  let currentRun = 0;
+  let cursor = bothDays.has(today) ? today : addDays(today, -1);
+  while (bothDays.has(cursor)) {
+    currentRun += 1;
+    cursor = addDays(cursor, -1);
+  }
+
+  const todayRows = await db
+    .selectDistinct({ p: entries.profileId })
+    .from(entries)
+    .where(eq(entries.day, today));
+  const loggedToday = todayRows
+    .map((r) => r.p)
+    .filter((p): p is Profile => PROFILES.includes(p as Profile));
+
+  const lastDay = dayRows.reduce((mx, r) => (r.day > mx ? r.day : mx), "");
+  const daysSinceAnyEntry = lastDay ? diffDays(today, lastDay) : null;
+
+  return {
+    name: petRow?.name ?? null,
+    adoptedAt: petRow?.adoptedAt ?? new Date(),
+    lifetimeDays,
+    currentRun,
+    loggedToday,
+    daysSinceAnyEntry,
+  };
+}
+
+export type DayMetaRow = {
+  training: "lift" | "cardio" | "rest" | null;
+  waterCups: number;
+  note: string | null;
+  mood: string | null;
+};
+
+export async function getDayExtras(day: string): Promise<{
+  meta: Record<Profile, DayMetaRow>;
+  newSpecimens: number;
+}> {
+  const metaRows = await db.select().from(dayMeta).where(eq(dayMeta.day, day));
+
+  const firstDays = await db
+    .select({ foodId: entries.foodId, first: min(entries.day) })
+    .from(entries)
+    .groupBy(entries.foodId);
+  const newSpecimens = firstDays.filter((r) => r.first === day).length;
+
+  const meta = {} as Record<Profile, DayMetaRow>;
+  for (const profile of PROFILES) {
+    const row = metaRows.find((m) => m.profileId === profile);
+    meta[profile] = {
+      training: row?.training ?? null,
+      waterCups: row?.waterCups ?? 0,
+      note: row?.note ?? null,
+      mood: row?.mood ?? null,
+    };
+  }
+  return { meta, newSpecimens };
 }
 
 // The specimens this person logs most recently — the quick-tap grid.

@@ -2,8 +2,11 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import { donateSpecimen } from "@/app/log/actions";
-import { HALLS, type Hall } from "@/lib/halls";
+import { HALLS, hallInfo, type Hall } from "@/lib/halls";
 import type { Meal } from "@/lib/meals";
+import type { CeremonyData } from "./ceremony";
+
+export type LogResult = { message: string; ceremony?: CeremonyData };
 
 type SearchResult = {
   fdcId: number;
@@ -23,12 +26,14 @@ const labelCls = "font-pixel text-[10px] tracking-wide text-ink-soft";
 export function DonateFlow({
   meal,
   day,
+  donorName,
   onDone,
   onBack,
 }: {
   meal: Meal;
   day: string;
-  onDone: (message: string) => void;
+  donorName: string;
+  onDone: (result: LogResult) => void;
   onBack: () => void;
 }) {
   const [query, setQuery] = useState("");
@@ -120,9 +125,19 @@ export function DonateFlow({
       if (result.error) {
         setError(result.error);
       } else if (result.alreadyKnown) {
-        onDone(`Already in the museum — logged it for ${meal}.`);
+        onDone({ message: `Already in the museum — logged it for ${meal}.` });
       } else {
-        onDone(`✦ New specimen donated: ${name}`);
+        onDone({
+          message: `✦ New specimen donated: ${name}`,
+          ceremony: {
+            icon: icon || (hall ? hallInfo(hall).emoji : "🍽"),
+            name,
+            hallLabel: hall ? hallInfo(hall).label : "",
+            donorName,
+            servingLabel,
+            calories: Number(calories) || 0,
+          },
+        });
       }
     });
   }

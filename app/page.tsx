@@ -1,14 +1,18 @@
 import Link from "next/link";
-import { eq } from "drizzle-orm";
 import { OwnColumn } from "@/components/journal/own-column";
 import { PartnerColumn } from "@/components/journal/partner-column";
-import { PixelSprite } from "@/components/pixel-sprite";
-import { PET_KIT, PET_PALETTE } from "@/components/sprites";
-import { db } from "@/db";
-import { pet } from "@/db/schema";
-import { DISPLAY_NAMES, partnerOf } from "@/lib/auth";
-import { getAllSpecimens, getJournalDay, getRecentSpecimens } from "@/lib/data";
-import { addDays, currentTz, friendlyDate, todayIso } from "@/lib/dates";
+import { FoxHeader } from "@/components/pet/fox-header";
+import { DISPLAY_NAMES, PROFILES, partnerOf } from "@/lib/auth";
+import {
+  getAllSpecimens,
+  getDayExtras,
+  getJournalDay,
+  getPetState,
+  getRecentSpecimens,
+} from "@/lib/data";
+import { addDays, currentTz, diffDays, friendlyDate, todayIso } from "@/lib/dates";
+import { totalOf } from "@/lib/engine/totals";
+import { stampsForDay } from "@/lib/engine/stamps";
 import { currentProfile } from "@/lib/session";
 
 export default async function Home({
@@ -26,48 +30,34 @@ export default async function Home({
   const day = requested > today ? today : requested;
   const isToday = day === today;
 
-  const [journal, specimens, recents, [petRow]] = await Promise.all([
+  const [journal, specimens, recents, petState, extras] = await Promise.all([
     getJournalDay(day),
     getAllSpecimens(),
     getRecentSpecimens(profile),
-    db.select().from(pet).where(eq(pet.id, 1)),
+    getPetState(today),
+    getDayExtras(day),
   ]);
 
-  const adopted = petRow?.adoptedAt ?? new Date();
   const dayNumber =
-    Math.floor(
-      (new Date(day + "T12:00:00Z").getTime() -
-        new Date(adopted.toISOString().slice(0, 10) + "T12:00:00Z").getTime()) /
-        86400000,
-    ) + 1;
+    diffDays(day, petState.adoptedAt.toISOString().slice(0, 10)) + 1;
+
+  const stamps = stampsForDay({
+    people: PROFILES.map((p) => ({
+      name: DISPLAY_NAMES[p],
+      total: totalOf(
+        journal[p].entries.map((e) => ({ ...e.food, servings: e.servings })),
+      ),
+      target: journal[p].target,
+      loggedAny: journal[p].entries.length > 0,
+      training: extras.meta[p].training,
+      waterCups: extras.meta[p].waterCups,
+    })),
+    newSpecimens: extras.newSpecimens,
+  });
 
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-4 p-4 pb-24">
-      <header className="wobbly flex items-center gap-3 border-2 border-ink/20 bg-cream/70 p-3 shadow-card">
-        <PixelSprite
-          map={PET_KIT}
-          palette={PET_PALETTE}
-          className="h-14 w-14 shrink-0"
-          title="A small arctic fox kit"
-        />
-        <div className="min-w-0 flex-1">
-          <p className="truncate font-pixel text-sm tracking-wide">
-            {petRow?.name ?? "the little fox"}
-          </p>
-          <p className="text-xs text-ink-soft">
-            waiting by the museum door
-          </p>
-        </div>
-        <div className="text-right">
-          <p className="font-pixel text-sm">day {Math.max(dayNumber, 1)}</p>
-          <Link
-            href="/settings"
-            className="text-xs text-ink-soft underline decoration-dotted underline-offset-2"
-          >
-            settings
-          </Link>
-        </div>
-      </header>
+      <FoxHeader petState={petState} today={today} dayNumber={dayNumber} />
 
       <nav className="flex items-center justify-between">
         <Link
@@ -105,6 +95,20 @@ export default async function Home({
         )}
       </nav>
 
+      {stamps.length > 0 ? (
+        <div className="flex flex-wrap items-center justify-center gap-1.5">
+          {stamps.map((s) => (
+            <span
+              key={s.id}
+              title={s.label}
+              className="wobbly-sm border border-gold bg-gold-soft px-2 py-0.5 text-xs"
+            >
+              {s.emoji} {s.label}
+            </span>
+          ))}
+        </div>
+      ) : null}
+
       <div className="wobbly grid grid-cols-2 gap-4 border-2 border-ink/20 bg-cream/70 p-4 shadow-card">
         <OwnColumn
           displayName={DISPLAY_NAMES[profile]}
@@ -133,7 +137,18 @@ export default async function Home({
       ) : null}
 
       <footer className="mt-2 flex items-center justify-center gap-5 text-sm text-ink-soft">
-        <span className="opacity-50">museum (soon)</span>
+        <Link
+          href="/museum"
+          className="underline decoration-dotted underline-offset-4"
+        >
+          🏛 museum
+        </Link>
+        <Link
+          href="/settings"
+          className="underline decoration-dotted underline-offset-4"
+        >
+          settings
+        </Link>
         <Link
           href="/enter"
           className="underline decoration-dotted underline-offset-4"

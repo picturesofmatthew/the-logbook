@@ -46,3 +46,47 @@ body {
 .pixelated {
   image-rendering: pixelated;
 }
+
+/* The fox's idle bounce — steps() keeps it snappy and pixel-toy-like */
+.idle-bounce {
+  animation: idle-bounce 2.4s steps(2, jump-none) infinite;
+}
+@keyframes idle-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4%);
+  }
+}
+
+/* Donation ceremony card pop-in */
+.ceremony-card {
+  animation: ceremony-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes ceremony-in {
+  from {
+    transform: scale(0.5) rotate(-8deg);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* Specimen card flip */
+.card-flip {
+  animation: card-flip 0.3s ease-out both;
+}
+@keyframes card-flip {
+  from {
+    transform: rotateY(80deg);
+    opacity: 0.3;
+  }
+  to {
+    transform: rotateY(0deg);
+    opacity: 1;
+  }
+}
