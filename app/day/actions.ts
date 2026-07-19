@@ -1,6 +1,5 @@
 "use server";
 
-import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { db } from "@/db";
 import { dayMeta, weighIns } from "@/db/schema";

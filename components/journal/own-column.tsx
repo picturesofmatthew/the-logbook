@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { removeEntry } from "@/app/log/actions";
+import { ceremonyChime, logChime } from "@/lib/sounds";
 import { totalOf } from "@/lib/engine/totals";
 import { MEALS, type JournalEntry, type Meal, type Specimen, type Target } from "@/lib/meals";
 import { Ceremony, type CeremonyData } from "./ceremony";
@@ -36,8 +37,10 @@ export function OwnColumn({
   function handleLogged(result: LogResult) {
     setDrawerMeal(null);
     if (result.ceremony) {
+      ceremonyChime();
       setCeremony(result.ceremony);
     } else {
+      logChime();
       setToast(result.message);
       setTimeout(() => setToast(null), 3500);
     }

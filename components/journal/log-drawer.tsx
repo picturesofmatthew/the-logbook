@@ -5,6 +5,7 @@ import { logEntry } from "@/app/log/actions";
 import { hallInfo } from "@/lib/halls";
 import type { Meal, Specimen } from "@/lib/meals";
 import { DonateFlow, type LogResult } from "./donate-flow";
+import { RecipeBuilder } from "./recipe-builder";
 
 const inputCls =
   "wobbly-sm border-2 border-ink/30 bg-cream px-3 py-2 outline-none focus:border-gold w-full";
@@ -26,7 +27,7 @@ export function LogDrawer({
   onClose: () => void;
   onLogged: (result: LogResult) => void;
 }) {
-  const [mode, setMode] = useState<"pick" | "donate">("pick");
+  const [mode, setMode] = useState<"pick" | "donate" | "dish">("pick");
   const [search, setSearch] = useState("");
   const [chosen, setChosen] = useState<Specimen | null>(null);
   const [servings, setServings] = useState(1);
@@ -74,6 +75,15 @@ export function LogDrawer({
             meal={meal}
             day={day}
             donorName={donorName}
+            onDone={onLogged}
+            onBack={() => setMode("pick")}
+          />
+        ) : mode === "dish" ? (
+          <RecipeBuilder
+            meal={meal}
+            day={day}
+            donorName={donorName}
+            specimens={specimens}
             onDone={onLogged}
             onBack={() => setMode("pick")}
           />
@@ -224,6 +234,15 @@ export function LogDrawer({
             >
               ✦ donate a new specimen
             </button>
+            {specimens.filter((s) => !s.isRecipe).length >= 2 ? (
+              <button
+                type="button"
+                onClick={() => setMode("dish")}
+                className="wobbly-sm cursor-pointer border-2 border-dashed border-ink/30 bg-transparent px-3 py-2 text-ink-soft hover:border-gold"
+              >
+                🍲 assemble a dish
+              </button>
+            ) : null}
           </div>
         )}
       </div>

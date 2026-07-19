@@ -58,8 +58,16 @@ export function DonateFlow({
 
   const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
+    return () => {
+      if (debounce.current) clearTimeout(debounce.current);
+    };
+  }, []);
+
+  function handleQueryChange(value: string) {
+    setQuery(value);
     if (debounce.current) clearTimeout(debounce.current);
-    if (query.trim().length < 2) {
+    const q = value.trim();
+    if (q.length < 2) {
       setResults([]);
       setSearching(false);
       return;
@@ -67,9 +75,7 @@ export function DonateFlow({
     setSearching(true);
     debounce.current = setTimeout(async () => {
       try {
-        const res = await fetch(
-          `/api/food-search?q=${encodeURIComponent(query.trim())}`,
-        );
+        const res = await fetch(`/api/food-search?q=${encodeURIComponent(q)}`);
         const data = (await res.json()) as {
           results: SearchResult[];
           error?: string;
@@ -82,10 +88,7 @@ export function DonateFlow({
         setSearching(false);
       }
     }, 450);
-    return () => {
-      if (debounce.current) clearTimeout(debounce.current);
-    };
-  }, [query]);
+  }
 
   function pickResult(r: SearchResult) {
     setName(r.brand ? `${r.name} (${r.brand})` : r.name);
@@ -158,7 +161,7 @@ export function DonateFlow({
         <input
           autoFocus
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => handleQueryChange(e.target.value)}
           placeholder="Search the field guide (USDA)..."
           className={inputCls}
         />

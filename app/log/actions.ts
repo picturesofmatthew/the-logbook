@@ -1,9 +1,9 @@
 "use server";
 
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { db } from "@/db";
-import { entries, foods } from "@/db/schema";
+import { entries, foods, recipeItems } from "@/db/schema";
 import { todayIso } from "@/lib/dates";
 import { currentProfile } from "@/lib/session";
 import type { Hall } from "@/lib/halls";
@@ -138,4 +138,91 @@ export async function donateSpecimen(
 
   revalidatePath("/");
   return { foodId, alreadyKnown };
+}
+
+export async function createRecipe(input: {
+  name: string;
+  icon: string;
+  servingLabel: string;
+  items: { foodId: number; servings: number }[];
+  logAs: { meal: Meal; servings: number; day: string } | null;
+}): Promise<{ error?: string; foodId?: number }> {
+  const profileId = await currentProfile();
+
+  const name = input.name.trim().slice(0, 80);
+  if (name.length < 2) return { error: "Give the dish a name." };
+  if (input.items.length < 2) {
+    return { error: "A dish needs at least two ingredients." };
+  }
+  if (input.items.some((i) => !validServings(i.servings))) {
+    return { error: "Ingredient servings look off." };
+  }
+
+  const [existing] = await db
+    .select({ id: foods.id })
+    .from(foods)
+    .where(sql`lower(${foods.name}) = ${name.toLowerCase()}`);
+  if (existing) {
+    return { error: "The museum already has a specimen by that name." };
+  }
+
+  const ingredients = await db
+    .select()
+    .from(foods)
+    .where(
+      inArray(
+        foods.id,
+        input.items.map((i) => i.foodId),
+      ),
+    );
+  if (ingredients.length !== input.items.length) {
+    return { error: "An ingredient is missing from the museum." };
+  }
+
+  const sum = { calories: 0, proteinG: 0, carbsG: 0, fatG: 0 };
+  for (const item of input.items) {
+    const f = ingredients.find((x) => x.id === item.foodId)!;
+    sum.calories += f.calories * item.servings;
+    sum.proteinG += f.proteinG * item.servings;
+    sum.carbsG += f.carbsG * item.servings;
+    sum.fatG += f.fatG * item.servings;
+  }
+  const r1 = (n: number) => Math.round(n * 10) / 10;
+
+  const [created] = await db
+    .insert(foods)
+    .values({
+      name,
+      hall: "dishes",
+      icon: (input.icon || "🍲").slice(0, 8),
+      servingLabel: input.servingLabel.trim().slice(0, 40) || "1 serving",
+      calories: Math.round(sum.calories),
+      proteinG: r1(sum.proteinG),
+      carbsG: r1(sum.carbsG),
+      fatG: r1(sum.fatG),
+      isRecipe: true,
+      discoveredBy: profileId,
+    })
+    .returning({ id: foods.id });
+
+  await db.insert(recipeItems).values(
+    input.items.map((i) => ({
+      recipeFoodId: created.id,
+      ingredientFoodId: i.foodId,
+      servings: i.servings,
+    })),
+  );
+
+  if (input.logAs) {
+    const result = await logEntry({
+      foodId: created.id,
+      meal: input.logAs.meal,
+      servings: input.logAs.servings,
+      day: input.logAs.day,
+    });
+    if (result.error) return { error: result.error };
+  }
+
+  revalidatePath("/");
+  return { foodId: created.id };
 }

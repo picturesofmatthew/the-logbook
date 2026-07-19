@@ -7,25 +7,32 @@ import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
-// Keep in sync with components/sprites.ts (PET_KIT) — the arctic fox kit.
-// TODO(ship): regenerate with the antlered adult fox once its sprite exists.
+// Keep in sync with components/sprites.ts (PET_ADULT) — the antlered fox.
 const SPRITE = [
-  "................",
-  "..##........##..",
-  ".#tt#......#tt#.",
-  ".#ttc#....#ctt#.",
-  ".#cccc####cccc#.",
-  ".#cccccccccccc#.",
-  "#cccccccccccccc#",
-  "#cc#cccccccc#cc#",
-  "#cccccccccccccc#",
-  "#cctccc##ccctcc#",
-  ".#ccccc##ccccc#.",
-  ".#cccccccccccc#.",
-  "..#cccccccccc#..",
-  "...##cccccc##...",
-  ".....######.....",
-  "................",
+  "........................",
+  ".....g............g.....",
+  ".....#..g......g..#.....",
+  "......#.#......#.#......",
+  ".......##......##.......",
+  "........#......#........",
+  "........#......#........",
+  "........#......#........",
+  "........#......#........",
+  "....##..#......#..##....",
+  "...#tt#.#......#.#tt#...",
+  "...#ttc#.#....#.#ctt#...",
+  "...#ccc##########ccc#...",
+  "..#cccccccccccccccccc#..",
+  ".#cccccccccccccccccccc#.",
+  ".#cccc##cccccccc##cccc#.",
+  ".#cccccccccccccccccccc#.",
+  "#cctccccc######ccccctcc#",
+  "#ccccccc#ssssss#ccccccc#",
+  "#cccccc#ssssssss#cccccc#",
+  ".#ccccc#sss##sss#ccccc#.",
+  "..#cccc#ssssssss#cccc#..",
+  "...##ccc#ssssss#ccc##...",
+  "......############......",
 ];
 
 const COLORS = {
@@ -35,6 +42,7 @@ const COLORS = {
   s: [0xec, 0xe0, 0xc6], // warm shadow
   t: [0xc4, 0x70, 0x4b], // terracotta
   g: [0xd9, 0xa4, 0x41], // muted gold
+  m: [0x7c, 0x8a, 0x4d], // moss
 };
 // Moss background so the cream fox reads clearly at icon size
 const PAPER = [0x7c, 0x8a, 0x4d];

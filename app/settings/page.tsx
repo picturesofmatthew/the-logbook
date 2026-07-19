@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { desc, eq } from "drizzle-orm";
+import { SoundToggle } from "@/components/sound-toggle";
 import { db } from "@/db";
 import { profiles, targets, weighIns } from "@/db/schema";
 import { todayIso } from "@/lib/dates";
@@ -60,6 +61,9 @@ export default async function SettingsPage() {
         </Link>
       </div>
       <SetupForm initial={initial} />
+      <div className="mt-6">
+        <SoundToggle />
+      </div>
     </main>
   );
 }
