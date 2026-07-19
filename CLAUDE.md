@@ -2,7 +2,7 @@
 
 ## Quick Resume
 
-- **Current focus:** "Inklight" overhaul (spec: `DIRECTION.md` v3). **Phases 0–1 SHIPPED to prod** (2026-07-19, commit 033b4ad): light script, engines (27 tests), workout tables on Neon, Training Log UI, DaySeal on home; app renamed **signxsealed** (Vercel project renamed via `vercel project rename`). Next: Phase 2 (Spellbook `/book`), ceremonies; Glade naming = **Glade**; first wave = Stag + Heron
+- **Current focus:** "Inklight" overhaul (spec: `DIRECTION.md` v3). **Phases 0–2 SHIPPED to prod** (2026-07-19, commits 033b4ad + 1415593): light script, engines (27 tests), Training Log, DaySeal on home, **the Spellbook** (`/book` compendium + `/book/[day]` pages + Legendarium + first-discovery ceremonies; museum → Pantry); app renamed **signxsealed**. Next: Phase 3 (Glade scene + first-wave beings) — **gated on Matthew's art masters**; prompt library ready at `art/prompts.md`; then Phase 4 (sounds/settings polish)
 - **Repo:** https://github.com/picturesofmatthew/the-logbook (public) · **Live:** https://the-logbook-six.vercel.app (serving the signxsealed build)
 - **⚠ One manual step:** https://signxsealed.vercel.app exists only as a deployment alias → gated by Vercel SSO deployment protection. Fix in dashboard: signxsealed project → Settings → Domains → add `signxsealed.vercel.app` (becomes the tracking production domain, public). CLI can't do it (`domains add` rejects vercel.app; API needs token). Deploys are CLI-driven (`npm exec --yes vercel@latest -- deploy --prod --yes`) — no Git auto-deploy
 - **Last meaningful change:** DIRECTION.md v3 + visual brief v3 (https://claude.ai/code/artifact/217589f0-834c-42bd-9a8d-afc1b0094572); art production = Matthew via ChatGPT + human direction (engines start on placeholder geometry)
