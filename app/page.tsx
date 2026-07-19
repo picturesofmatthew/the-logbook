@@ -5,6 +5,7 @@ import { PartnerColumn } from "@/components/journal/partner-column";
 import { TrainLog } from "@/components/journal/train-log";
 import { FoxHeader } from "@/components/pet/fox-header";
 import { DaySeal } from "@/components/sigil/day-seal";
+import { LegendaryCeremony } from "@/components/sigil/legendary-ceremony";
 import { DISPLAY_NAMES, PROFILES, partnerOf, type Profile } from "@/lib/auth";
 import {
   getAllSpecimens,
@@ -16,6 +17,7 @@ import {
   getRecentSpecimens,
   getWeighIn,
   getWorkoutsForDay,
+  recordLegendary,
 } from "@/lib/data";
 import { addDays, currentTz, diffDays, friendlyDate, todayIso } from "@/lib/dates";
 import { composeSigil, type KeeperDay } from "@/lib/engine/sigil";
@@ -100,6 +102,12 @@ export default async function Home({
     histories[profile].best,
   );
 
+  // The request that claims the discovery row throws the ceremony — once, ever.
+  const newlyDiscovered =
+    sigil.legendary != null && isToday
+      ? await recordLegendary(sigil.legendary, day)
+      : false;
+
   const dayNumber =
     diffDays(day, petState.adoptedAt.toISOString().slice(0, 10)) + 1;
 
@@ -161,6 +169,10 @@ export default async function Home({
         <DaySeal spec={sigil} missingName={missingName} isToday={isToday} />
       </div>
 
+      {newlyDiscovered && sigil.legendary ? (
+        <LegendaryCeremony legendary={sigil.legendary} spec={sigil} />
+      ) : null}
+
       {stamps.length > 0 ? (
         <div className="flex flex-wrap items-center justify-center gap-1.5">
           {stamps.map((s) => (
@@ -211,12 +223,18 @@ export default async function Home({
         </Link>
       ) : null}
 
-      <footer className="mt-2 flex items-center justify-center gap-5 text-sm text-ink-soft">
+      <footer className="mt-2 flex items-center justify-center gap-4 text-sm text-ink-soft">
+        <Link
+          href="/book"
+          className="underline decoration-dotted underline-offset-4"
+        >
+          📖 spellbook
+        </Link>
         <Link
           href="/museum"
           className="underline decoration-dotted underline-offset-4"
         >
-          🏛 museum
+          🏛 pantry
         </Link>
         <Link
           href="/trends"

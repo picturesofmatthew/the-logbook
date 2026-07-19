@@ -16,6 +16,7 @@ import {
   entries,
   foods,
   pet,
+  sigilDiscoveries,
   targets,
   weighIns,
   workouts,
@@ -364,6 +365,27 @@ export async function getExerciseHistory(
   ].sort();
 
   return { best: bestByExercise(prior), names };
+}
+
+// ── Legendary discoveries ──
+// One row per legendary, ever. Returns true only for the row that landed —
+// the caller that gets `true` throws the ceremony.
+
+export async function recordLegendary(
+  sigilId: string,
+  day: string,
+): Promise<boolean> {
+  const rows = await db
+    .insert(sigilDiscoveries)
+    .values({ sigilId, day })
+    .onConflictDoNothing({ target: sigilDiscoveries.sigilId })
+    .returning({ id: sigilDiscoveries.id });
+  return rows.length > 0;
+}
+
+export async function getDiscoveries(): Promise<Map<string, string>> {
+  const rows = await db.select().from(sigilDiscoveries);
+  return new Map(rows.map((r) => [r.sigilId, r.day]));
 }
 
 // The specimens this person logs most recently — the quick-tap grid.
