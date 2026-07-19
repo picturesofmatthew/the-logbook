@@ -3,7 +3,7 @@ import { DailyRituals } from "@/components/journal/daily-rituals";
 import { OwnColumn } from "@/components/journal/own-column";
 import { PartnerColumn } from "@/components/journal/partner-column";
 import { TrainLog } from "@/components/journal/train-log";
-import { FoxHeader } from "@/components/pet/fox-header";
+import { GladeHeader } from "@/components/glade/glade-header";
 import { DaySeal } from "@/components/sigil/day-seal";
 import { LegendaryCeremony } from "@/components/sigil/legendary-ceremony";
 import { DISPLAY_NAMES, PROFILES, partnerOf, type Profile } from "@/lib/auth";
@@ -20,6 +20,7 @@ import {
   recordLegendary,
 } from "@/lib/data";
 import { addDays, currentTz, diffDays, friendlyDate, todayIso } from "@/lib/dates";
+import { getGladeState } from "@/lib/ledger";
 import { composeSigil, type KeeperDay } from "@/lib/engine/sigil";
 import { newMarks, trainingSummary } from "@/lib/engine/training";
 import { totalOf } from "@/lib/engine/totals";
@@ -51,12 +52,13 @@ export default async function Home({
       getWeighIn(profile, day),
     ]);
 
-  const [dayWorkouts, firstLogs, matthewHistory, kennedyHistory] =
+  const [dayWorkouts, firstLogs, matthewHistory, kennedyHistory, glade] =
     await Promise.all([
       getWorkoutsForDay(day),
       getFirstLogTimes(day),
       getExerciseHistory("matthew", day),
       getExerciseHistory("kennedy", day),
+      getGladeState(today),
     ]);
   const histories = { matthew: matthewHistory, kennedy: kennedyHistory };
 
@@ -127,7 +129,12 @@ export default async function Home({
 
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-4 p-4 pb-24">
-      <FoxHeader petState={petState} today={today} dayNumber={dayNumber} />
+      <GladeHeader
+        petState={petState}
+        today={today}
+        dayNumber={dayNumber}
+        glade={glade}
+      />
 
       <nav className="flex items-center justify-between">
         <Link

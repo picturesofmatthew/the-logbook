@@ -185,6 +185,10 @@ export const LEGENDARIES: Record<
 // Moods that mark a hard day. The set matches the mood picker.
 const LOW_MOODS = ["😤", "🥱", "🥲"];
 
+export function isLowMood(mood: string | null): boolean {
+  return mood != null && LOW_MOODS.includes(mood);
+}
+
 // Moon phase, pure and offline: fraction of the synodic cycle at noon UTC of
 // the given day, from the known new moon of 2000-01-06 18:14 UTC. "Full"
 // means within about half a day of the peak.

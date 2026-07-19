@@ -107,6 +107,98 @@ body {
   border-radius: 50% 50% 14px 14px / 22% 22% 14px 14px;
 }
 
+/* ── The Glade scene ──
+   Scene-specific colors that can't ride the shared tokens (a day sky and a
+   night sky differ in structure, not just value). Fauna is the silhouette
+   color for beings — always darker than the ground band it stands on. */
+:root {
+  --glade-sky-top: #fbf6ea;
+  --glade-sky-bottom: #ecd9a8;
+  --glade-ground-top: #a8b06a;
+  --glade-ground-bottom: #7c8a4d;
+  --glade-fauna: #43492c;
+}
+html[data-light="dusk"] {
+  --glade-sky-top: #6f5a78;
+  --glade-sky-bottom: #e0a271;
+  --glade-ground-top: #8a6a4a;
+  --glade-ground-bottom: #6d5a40;
+  --glade-fauna: #3f3325;
+}
+html[data-light="night"] {
+  --glade-sky-top: #453a54;
+  --glade-sky-bottom: #3a3128;
+  --glade-ground-top: #3c352a;
+  --glade-ground-bottom: #332c22;
+  --glade-fauna: #241f18;
+}
+
+/* Time-of-day layers: stars and wicks belong to the dark hours, mosslings
+   to the day. Driven by CSS so the same scene serves all three states. */
+.glade-night-only {
+  display: none;
+}
+html[data-light="night"] .glade-night-only {
+  display: initial;
+}
+.glade-dark-only {
+  display: none;
+}
+html[data-light="dusk"] .glade-dark-only,
+html[data-light="night"] .glade-dark-only {
+  display: initial;
+}
+html[data-light="dusk"] .glade-day-only,
+html[data-light="night"] .glade-day-only {
+  display: none;
+}
+
+.wick-flicker {
+  animation: wick-flicker 3.2s ease-in-out infinite;
+}
+@keyframes wick-flicker {
+  0%,
+  100% {
+    opacity: 0.95;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 0.5;
+    transform: translateY(-3px);
+  }
+}
+.mossling-tilt {
+  animation: mossling-tilt 4.5s ease-in-out infinite;
+}
+@keyframes mossling-tilt {
+  0%,
+  100% {
+    transform: rotate(-4deg);
+  }
+  50% {
+    transform: rotate(5deg);
+  }
+}
+.lantern-breathe {
+  animation: lantern-breathe 5s ease-in-out infinite;
+}
+@keyframes lantern-breathe {
+  0%,
+  100% {
+    opacity: 0.85;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wick-flicker,
+  .mossling-tilt,
+  .lantern-breathe {
+    animation: none;
+  }
+}
+
 /* Violet bloom for a seal completing — union's color arriving. */
 .seal-bloom {
   animation: seal-bloom 0.9s ease-out both;

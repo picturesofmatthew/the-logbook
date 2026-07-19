@@ -1,6 +1,7 @@
-// The Spellbook's ledger: computes the sigil for every day of a month from
+// The Spellbook's ledger: computes the sigil for every day of a range from
 // bulk queries. Sigils are always derived, never stored — which means the
-// whole history grows seals retroactively the moment it is read.
+// whole history grows seals retroactively the moment it is read. The same
+// pass feeds the Glade: chords call beings, effort sets vitality.
 
 import { and, asc, countDistinct, eq, gte, inArray, lte } from "drizzle-orm";
 import { db } from "@/db";
@@ -13,8 +14,18 @@ import {
   workoutSets,
 } from "@/db/schema";
 import { PROFILES, type Profile } from "@/lib/auth";
+import { beingStates, type BeingState, type LedgerDay } from "@/lib/engine/beings";
+import {
+  gladeTier,
+  tierForScore,
+  vitalityScore,
+  WINDOW_DAYS,
+  type GladeDay,
+  type GladeTier,
+} from "@/lib/engine/glade";
 import {
   composeSigil,
+  isLowMood,
   type KeeperDay,
   type SigilSpec,
 } from "@/lib/engine/sigil";
@@ -25,7 +36,14 @@ import {
 } from "@/lib/engine/training";
 import type { Hall } from "@/lib/halls";
 
-export type LedgerEntry = { day: string; spec: SigilSpec };
+export type LedgerEntry = {
+  day: string;
+  spec: SigilSpec;
+  bothRest: boolean;
+  bothLowLogged: boolean;
+  workoutCount: number;
+  bothWatered: boolean;
+};
 
 type DayFacts = {
   calories: number;
@@ -54,13 +72,20 @@ export async function getFirstBothDay(): Promise<string | null> {
   return both[0] ?? null;
 }
 
-export async function buildMonthLedger(
-  monthPrefix: string, // "YYYY-MM"
+async function getFirstEntryDay(): Promise<string | null> {
+  const rows = await db
+    .select({ day: entries.day })
+    .from(entries)
+    .orderBy(asc(entries.day))
+    .limit(1);
+  return rows[0]?.day ?? null;
+}
+
+export async function buildLedgerRange(
+  start: string,
+  end: string,
   today: string,
 ): Promise<LedgerEntry[]> {
-  const start = `${monthPrefix}-01`;
-  const end = `${monthPrefix}-31`;
-
   const [entryRows, metaRows, workoutRows, targetRows, firstBothDay] =
     await Promise.all([
       db
@@ -76,7 +101,10 @@ export async function buildMonthLedger(
         .select()
         .from(workouts)
         .where(and(gte(workouts.day, start), lte(workouts.day, end))),
-      db.select().from(targets).orderBy(asc(targets.effectiveDate), asc(targets.id)),
+      db
+        .select()
+        .from(targets)
+        .orderBy(asc(targets.effectiveDate), asc(targets.id)),
       getFirstBothDay(),
     ]);
 
@@ -96,7 +124,11 @@ export async function buildMonthLedger(
 
   // Every lift set ever, by profile and day, for rolling PR history.
   const allSetRows = await db
-    .select({ set: workoutSets, day: workouts.day, profileId: workouts.profileId })
+    .select({
+      set: workoutSets,
+      day: workouts.day,
+      profileId: workouts.profileId,
+    })
     .from(workoutSets)
     .innerJoin(workouts, eq(workoutSets.workoutId, workouts.id))
     .orderBy(asc(workouts.day), asc(workoutSets.id));
@@ -135,7 +167,6 @@ export async function buildMonthLedger(
   }
 
   // Rolling per-exercise bests per profile, snapshotted before each day.
-  // historyBefore.get(profile).get(day) = best map as of the morning of `day`.
   const historyBefore = new Map<Profile, Map<string, Map<string, number>>>();
   for (const profile of PROFILES) {
     const mine = allSetRows.filter((r) => r.profileId === profile);
@@ -155,9 +186,7 @@ export async function buildMonthLedger(
     const rolling = new Map<string, number>();
     for (const day of [...byDay.keys()].sort()) {
       snapshots.set(day, new Map(rolling));
-      // Fold the day's sets into the rolling bests.
-      const daySets = byDay.get(day) ?? [];
-      for (const s of daySets) {
+      for (const s of byDay.get(day) ?? []) {
         if (s.kind !== "lift" || s.weightLb == null || !s.reps) continue;
         const k = s.exercise.trim().replace(/\s+/g, " ").toLowerCase();
         const rm = s.weightLb * (s.reps <= 1 ? 1 : 1 + s.reps / 30);
@@ -202,22 +231,92 @@ export async function buildMonthLedger(
   };
 
   const days: LedgerEntry[] = [];
-  for (let d = start; d.startsWith(monthPrefix) && d <= today; d = nextDay(d)) {
+  for (let d = start; d <= end && d <= today; d = nextDay(d)) {
+    const moss = keeperDayFor("matthew", d);
+    const ember = keeperDayFor("kennedy", d);
+    const spec = composeSigil({
+      day: d,
+      moss,
+      ember,
+      firstPage: firstBothDay === d,
+    });
     days.push({
       day: d,
-      spec: composeSigil({
-        day: d,
-        moss: keeperDayFor("matthew", d),
-        ember: keeperDayFor("kennedy", d),
-        firstPage: firstBothDay === d,
-      }),
+      spec,
+      bothRest: moss.restDay && ember.restDay,
+      bothLowLogged:
+        spec.completed && isLowMood(moss.mood) && isLowMood(ember.mood),
+      workoutCount:
+        (workoutsByKey.get(`matthew:${d}`)?.length ?? 0) +
+        (workoutsByKey.get(`kennedy:${d}`)?.length ?? 0),
+      bothWatered: moss.waterCups >= 8 && ember.waterCups >= 8,
     });
   }
   return days;
 }
 
+export async function buildMonthLedger(
+  monthPrefix: string, // "YYYY-MM"
+  today: string,
+): Promise<LedgerEntry[]> {
+  const end = lastDayOfMonth(monthPrefix);
+  return buildLedgerRange(`${monthPrefix}-01`, end, today);
+}
+
+// The Glade's whole memory: beings called by the full history, vitality from
+// the last two weeks (with the falls-slowly clamp against yesterday's tier).
+export type GladeState = {
+  tier: GladeTier;
+  beings: BeingState[];
+};
+
+export async function getGladeState(today: string): Promise<GladeState> {
+  const firstDay = await getFirstEntryDay();
+  if (!firstDay) {
+    return { tier: "hushed", beings: beingStates([]) };
+  }
+
+  const ledger = await buildLedgerRange(firstDay, today, today);
+
+  const history: LedgerDay[] = ledger.map((e) => ({
+    day: e.day,
+    chords: e.spec.chords,
+    legendary: e.spec.legendary,
+    bothRest: e.bothRest,
+    bothLowLogged: e.bothLowLogged,
+  }));
+
+  const toGladeDay = (e: LedgerEntry): GladeDay => ({
+    bothLogged: e.spec.completed,
+    chordCount: e.spec.chords.length,
+    workoutCount: e.workoutCount,
+    bothWatered: e.bothWatered,
+    legendary: e.spec.legendary != null,
+  });
+  const window = ledger.slice(-WINDOW_DAYS).map(toGladeDay);
+  const yesterdayWindow = ledger
+    .slice(0, -1)
+    .slice(-WINDOW_DAYS)
+    .map(toGladeDay);
+
+  return {
+    tier: gladeTier(
+      vitalityScore(window),
+      tierForScore(vitalityScore(yesterdayWindow)),
+    ),
+    beings: beingStates(history),
+  };
+}
+
 function nextDay(iso: string): string {
   const d = new Date(iso + "T12:00:00Z");
   d.setUTCDate(d.getUTCDate() + 1);
+  return d.toISOString().slice(0, 10);
+}
+
+function lastDayOfMonth(monthPrefix: string): string {
+  const d = new Date(`${monthPrefix}-01T12:00:00Z`);
+  d.setUTCMonth(d.getUTCMonth() + 1);
+  d.setUTCDate(0);
   return d.toISOString().slice(0, 10);
 }
