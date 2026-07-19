@@ -19,13 +19,15 @@ export default function EnterPage() {
               className="h-20 w-20"
               title="A small arctic fox kit"
             />
-            <h1 className="font-pixel text-3xl tracking-wide">THE LOGBOOK</h1>
-            <p className="text-ink-soft">a food museum for two</p>
+            <h1 className="font-pixel text-3xl tracking-wide">
+              sign<span className="text-violet">x</span>sealed
+            </h1>
+            <p className="text-ink-soft">a spellbook for two</p>
           </div>
           <EnterForm />
         </div>
         <p className="mt-4 text-center text-sm text-ink-soft">
-          someone small is waiting inside
+          the glade is waiting, and someone small is in it
         </p>
       </div>
     </main>

@@ -3,6 +3,7 @@ import { DailyRituals } from "@/components/journal/daily-rituals";
 import { OwnColumn } from "@/components/journal/own-column";
 import { PartnerColumn } from "@/components/journal/partner-column";
 import { TrainLog } from "@/components/journal/train-log";
+import { ArrivalCeremony } from "@/components/glade/arrival-ceremony";
 import { GladeHeader } from "@/components/glade/glade-header";
 import { DaySeal } from "@/components/sigil/day-seal";
 import { LegendaryCeremony } from "@/components/sigil/legendary-ceremony";
@@ -17,10 +18,12 @@ import {
   getRecentSpecimens,
   getWeighIn,
   getWorkoutsForDay,
+  recordArrival,
   recordLegendary,
 } from "@/lib/data";
 import { addDays, currentTz, diffDays, friendlyDate, todayIso } from "@/lib/dates";
 import { getGladeState } from "@/lib/ledger";
+import type { BeingId } from "@/lib/engine/beings";
 import { composeSigil, type KeeperDay } from "@/lib/engine/sigil";
 import { newMarks, trainingSummary } from "@/lib/engine/training";
 import { totalOf } from "@/lib/engine/totals";
@@ -110,6 +113,23 @@ export default async function Home({
       ? await recordLegendary(sigil.legendary, day)
       : false;
 
+  // Beings with scene art announce their first arrival; the rest arrive
+  // silently until their art lands. One ceremony per load, legends first.
+  const SCENE_BEINGS: BeingId[] = ["stag", "heron"];
+  let newBeing: BeingId | null = null;
+  if (isToday && !newlyDiscovered) {
+    for (const b of glade.beings) {
+      if (
+        b.arrived &&
+        SCENE_BEINGS.includes(b.id) &&
+        (await recordArrival(b.id, today))
+      ) {
+        newBeing = b.id;
+        break;
+      }
+    }
+  }
+
   const dayNumber =
     diffDays(day, petState.adoptedAt.toISOString().slice(0, 10)) + 1;
 
@@ -179,6 +199,8 @@ export default async function Home({
       {newlyDiscovered && sigil.legendary ? (
         <LegendaryCeremony legendary={sigil.legendary} spec={sigil} />
       ) : null}
+
+      {newBeing ? <ArrivalCeremony being={newBeing} /> : null}
 
       {stamps.length > 0 ? (
         <div className="flex flex-wrap items-center justify-center gap-1.5">

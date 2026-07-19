@@ -179,3 +179,12 @@ export const sigilDiscoveries = pgTable("sigil_discoveries", {
   day: date("day").notNull(),
   discoveredAt: timestamp("discovered_at").defaultNow().notNull(),
 });
+
+// First witnessing of an anchor being — one arrival ceremony each, ever.
+// Being state itself is always derived from chord history.
+export const beingArrivals = pgTable("being_arrivals", {
+  id: serial("id").primaryKey(),
+  beingId: text("being_id").notNull().unique(),
+  day: date("day").notNull(),
+  arrivedAt: timestamp("arrived_at").defaultNow().notNull(),
+});

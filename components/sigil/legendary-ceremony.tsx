@@ -4,8 +4,9 @@
 // that actually claimed the discovery row, so it fires exactly once, ever,
 // per legendary — the moment it is first earned.
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LEGENDARIES, type LegendaryId, type SigilSpec } from "@/lib/engine/sigil";
+import { legendaryTone } from "@/lib/sounds";
 import { SigilGlyph } from "./sigil-glyph";
 
 export function LegendaryCeremony({
@@ -16,6 +17,9 @@ export function LegendaryCeremony({
   spec: SigilSpec;
 }) {
   const [open, setOpen] = useState(true);
+  useEffect(() => {
+    legendaryTone();
+  }, []);
   if (!open) return null;
   const l = LEGENDARIES[legendary];
 

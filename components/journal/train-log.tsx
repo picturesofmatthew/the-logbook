@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { deleteWorkout, logWorkout, type SetInput } from "@/app/train/actions";
 import { SPLIT_PRESETS, totalVolumeLb } from "@/lib/engine/training";
+import { inscribeTick } from "@/lib/sounds";
 
 export type WorkoutItem = {
   id: number;
@@ -106,6 +107,7 @@ export function TrainLog({
       const result = await logWorkout({ day, title, sets: isRest ? [] : sets });
       setError(result.error ?? null);
       if (!result.error) {
+        inscribeTick();
         setOpen(false);
         setTitle("");
         setRows([{ ...emptyLift }]);

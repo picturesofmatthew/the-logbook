@@ -81,3 +81,56 @@ export function ritualChime(): void {
   if (!ac) return;
   tone(ac, 987.77, 0, 0.09, 0.04);
 }
+
+// Slow-attack sine for the ceremonial sounds — warmth, not sparkle.
+function swell(
+  ac: AudioContext,
+  freq: number,
+  startOffset: number,
+  duration: number,
+  peak = 0.045,
+) {
+  const osc = ac.createOscillator();
+  const gain = ac.createGain();
+  osc.type = "sine";
+  osc.frequency.value = freq;
+  const t0 = ac.currentTime + startOffset;
+  gain.gain.setValueAtTime(0, t0);
+  gain.gain.linearRampToValueAtTime(peak, t0 + 0.18);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t0 + duration);
+  osc.connect(gain).connect(ac.destination);
+  osc.start(t0);
+  osc.stop(t0 + duration + 0.05);
+}
+
+// The one low warm tone reserved for legendary reveals: a slow G-major hum
+// from the bottom of the register, with one faint high shimmer at the end —
+// violet arriving.
+export function legendaryTone(): void {
+  if (isMuted()) return;
+  const ac = audioCtx();
+  if (!ac) return;
+  swell(ac, 98, 0, 2.2, 0.05); // G2
+  swell(ac, 196, 0.12, 2.0, 0.045); // G3
+  swell(ac, 293.66, 0.28, 1.8, 0.035); // D4
+  swell(ac, 392, 0.44, 1.6, 0.028); // G4
+  tone(ac, 1567.98, 1.1, 0.5, 0.02); // the shimmer
+}
+
+// A gentle rising presence for a being's arrival — quieter than legend.
+export function arrivalTone(): void {
+  if (isMuted()) return;
+  const ac = audioCtx();
+  if (!ac) return;
+  swell(ac, 261.63, 0, 1.2, 0.04); // C4
+  swell(ac, 392, 0.25, 1.2, 0.035); // G4
+}
+
+// A dry pen-tap for inscribing a workout.
+export function inscribeTick(): void {
+  if (isMuted()) return;
+  const ac = audioCtx();
+  if (!ac) return;
+  tone(ac, 220, 0, 0.05, 0.05);
+  tone(ac, 330, 0.05, 0.06, 0.035);
+}

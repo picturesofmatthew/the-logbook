@@ -68,7 +68,8 @@ function Tuft({ x }: { x: number }) {
 }
 
 // The Stag at the tree line — silhouette-first, dignified, utterly still.
-function Stag({ stage }: { stage: number }) {
+// Exported for the arrival ceremony, which frames the same silhouette.
+export function Stag({ stage }: { stage: number }) {
   if (stage < 1) return null;
   const c = "var(--glade-fauna)";
   return (
@@ -109,7 +110,8 @@ function Stag({ stage }: { stage: number }) {
 }
 
 // The Heron at its pool — pale in every light, one leg, perfectly patient.
-function Heron({ stage }: { stage: number }) {
+// Exported for the arrival ceremony, which frames the same silhouette.
+export function Heron({ stage }: { stage: number }) {
   if (stage < 1) return null;
   const c = "var(--color-glow)";
   return (

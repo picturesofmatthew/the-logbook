@@ -12,6 +12,7 @@ import {
 } from "drizzle-orm";
 import { db } from "@/db";
 import {
+  beingArrivals,
   dayMeta,
   entries,
   foods,
@@ -386,6 +387,20 @@ export async function recordLegendary(
 export async function getDiscoveries(): Promise<Map<string, string>> {
   const rows = await db.select().from(sigilDiscoveries);
   return new Map(rows.map((r) => [r.sigilId, r.day]));
+}
+
+// Same gate for beings: the request that lands the unique row witnesses the
+// arrival and throws the ceremony.
+export async function recordArrival(
+  beingId: string,
+  day: string,
+): Promise<boolean> {
+  const rows = await db
+    .insert(beingArrivals)
+    .values({ beingId, day })
+    .onConflictDoNothing({ target: beingArrivals.beingId })
+    .returning({ id: beingArrivals.id });
+  return rows.length > 0;
 }
 
 // The specimens this person logs most recently — the quick-tap grid.
