@@ -4,7 +4,7 @@ import { PET_KIT, PET_PALETTE } from "@/components/sprites";
 import { EnterForm } from "./enter-form";
 
 export const metadata: Metadata = {
-  title: "Come in - The Logbook",
+  title: "Come in - signxsealed",
 };
 
 export default function EnterPage() {

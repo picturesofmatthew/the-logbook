@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Baloo_2, Pixelify_Sans } from "next/font/google";
 import { TzSync } from "@/components/tz-sync";
+import { currentTz } from "@/lib/dates";
+import { hourInTz, lightStateForHour } from "@/lib/light";
 import "./globals.css";
 
 const baloo = Baloo_2({
@@ -14,11 +16,11 @@ const pixelify = Pixelify_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "The Logbook",
-  description: "A food museum for Matthew & Kennedy",
+  title: "signxsealed",
+  description: "A shared logbook for Matthew & Kennedy",
   appleWebApp: {
     capable: true,
-    title: "Logbook",
+    title: "signxsealed",
     statusBarStyle: "default",
   },
 };
@@ -27,14 +29,16 @@ export const viewport: Viewport = {
   themeColor: "#f5eddc",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const light = lightStateForHour(hourInTz(new Date(), await currentTz()));
   return (
     <html
       lang="en"
+      data-light={light}
       className={`${baloo.variable} ${pixelify.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans">

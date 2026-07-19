@@ -2,10 +2,10 @@
 
 ## Quick Resume
 
-- **Current focus:** iteration phase — Matthew art-directing a custom graphics pass (replace hand-rolled sprites with a designed asset system) and expanding the concept
+- **Current focus:** "Inklight" overhaul (spec: `DIRECTION.md` v3). **Phases 0–1 BUILT locally, not yet committed/deployed** (2026-07-19): light script (day/dusk/night via `data-light` on html, tokens in globals.css), engines `lib/engine/{sigil,training,glade,beings}.ts` (27 tests green), workout tables pushed to Neon, Training Log UI, DaySeal + SigilGlyph on home. Next: commit/deploy, then Phase 2 (Spellbook `/book`) and ceremonies; Glade naming = **Glade** (not Vale); first-wave beings = Stag + Heron
 - **Repo:** https://github.com/picturesofmatthew/the-logbook (public) · **Live:** https://the-logbook-six.vercel.app
-- **Last meaningful change:** v1 shipped + prod login fixed (empty env vars via wrapped Vercel CLI — see memory `feedback_environment_constraints` item 5; always `npm exec --yes vercel@latest -- env add ... --value`)
-- **Open questions:** passcode is still placeholder `mochi`; `FDC_API_KEY` is `DEMO_KEY` (free key: https://api.data.gov/signup); graphics direction undecided — refined pixel vs. illustrated
+- **Last meaningful change:** DIRECTION.md v3 + visual brief v3 (https://claude.ai/code/artifact/217589f0-834c-42bd-9a8d-afc1b0094572); art production = Matthew via ChatGPT + human direction (engines start on placeholder geometry)
+- **Open questions:** Glade vs. Vale naming; first-wave beings (proposed Stag + Heron); passcode still placeholder `mochi`; `FDC_API_KEY` is `DEMO_KEY` (free key: https://api.data.gov/signup)
 
 ## Project notes
 

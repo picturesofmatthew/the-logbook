@@ -9,7 +9,7 @@ import { currentProfile } from "@/lib/session";
 import { SetupForm, type SetupInitial } from "./setup-form";
 
 export const metadata: Metadata = {
-  title: "Settings - The Logbook",
+  title: "Settings - signxsealed",
 };
 
 export default async function SettingsPage() {

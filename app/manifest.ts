@@ -2,9 +2,9 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "The Logbook",
-    short_name: "Logbook",
-    description: "A food museum for Matthew & Kennedy",
+    name: "signxsealed",
+    short_name: "signxsealed",
+    description: "A shared logbook for Matthew & Kennedy",
     start_url: "/",
     display: "standalone",
     background_color: "#f5eddc",

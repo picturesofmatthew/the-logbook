@@ -144,3 +144,38 @@ export const pet = pgTable("pet", {
   name: text("name"),
   adoptedAt: timestamp("adopted_at").defaultNow().notNull(),
 });
+
+// The Training Log: real workouts, not a toggle. A day may hold several.
+export const workouts = pgTable("workouts", {
+  id: serial("id").primaryKey(),
+  profileId: text("profile_id")
+    .references(() => profiles.id)
+    .notNull(),
+  day: date("day").notNull(),
+  title: text("title").notNull(),
+  note: text("note"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Sets: weight x reps for lifts, minutes for cardio. Bodyweight = null weight.
+export const workoutSets = pgTable("workout_sets", {
+  id: serial("id").primaryKey(),
+  workoutId: integer("workout_id")
+    .references(() => workouts.id, { onDelete: "cascade" })
+    .notNull(),
+  kind: text("kind", { enum: ["lift", "cardio"] }).notNull(),
+  exercise: text("exercise").notNull(),
+  setIndex: integer("set_index").notNull().default(0),
+  weightLb: real("weight_lb"),
+  reps: integer("reps"),
+  minutes: real("minutes"),
+});
+
+// First discoveries of legendary sigils — one ceremony each, ever. The sigil
+// itself is always derived from day data; only the discovery moment is stored.
+export const sigilDiscoveries = pgTable("sigil_discoveries", {
+  id: serial("id").primaryKey(),
+  sigilId: text("sigil_id").notNull().unique(),
+  day: date("day").notNull(),
+  discoveredAt: timestamp("discovered_at").defaultNow().notNull(),
+});

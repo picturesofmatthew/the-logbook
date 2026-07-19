@@ -2,17 +2,24 @@ import Link from "next/link";
 import { DailyRituals } from "@/components/journal/daily-rituals";
 import { OwnColumn } from "@/components/journal/own-column";
 import { PartnerColumn } from "@/components/journal/partner-column";
+import { TrainLog } from "@/components/journal/train-log";
 import { FoxHeader } from "@/components/pet/fox-header";
-import { DISPLAY_NAMES, PROFILES, partnerOf } from "@/lib/auth";
+import { DaySeal } from "@/components/sigil/day-seal";
+import { DISPLAY_NAMES, PROFILES, partnerOf, type Profile } from "@/lib/auth";
 import {
   getAllSpecimens,
   getDayExtras,
+  getExerciseHistory,
+  getFirstLogTimes,
   getJournalDay,
   getPetState,
   getRecentSpecimens,
   getWeighIn,
+  getWorkoutsForDay,
 } from "@/lib/data";
 import { addDays, currentTz, diffDays, friendlyDate, todayIso } from "@/lib/dates";
+import { composeSigil, type KeeperDay } from "@/lib/engine/sigil";
+import { newMarks, trainingSummary } from "@/lib/engine/training";
 import { totalOf } from "@/lib/engine/totals";
 import { stampsForDay } from "@/lib/engine/stamps";
 import { currentProfile } from "@/lib/session";
@@ -41,6 +48,57 @@ export default async function Home({
       getDayExtras(day),
       getWeighIn(profile, day),
     ]);
+
+  const [dayWorkouts, firstLogs, matthewHistory, kennedyHistory] =
+    await Promise.all([
+      getWorkoutsForDay(day),
+      getFirstLogTimes(day),
+      getExerciseHistory("matthew", day),
+      getExerciseHistory("kennedy", day),
+    ]);
+  const histories = { matthew: matthewHistory, kennedy: kennedyHistory };
+
+  const keeperDay = (p: Profile): KeeperDay => {
+    const total = totalOf(
+      journal[p].entries.map((e) => ({ ...e.food, servings: e.servings })),
+    );
+    const target = journal[p].target;
+    const summary = trainingSummary(dayWorkouts[p], histories[p].best);
+    return {
+      loggedAny: journal[p].entries.length > 0,
+      calories: total.calories,
+      targetCalories: target?.calories ?? null,
+      proteinG: total.proteinG,
+      targetProteinG: target?.proteinG ?? null,
+      halls: [...new Set(journal[p].entries.map((e) => e.food.hall))],
+      waterCups: extras.meta[p].waterCups,
+      mood: extras.meta[p].mood,
+      wroteNote: !!extras.meta[p].note,
+      restDay:
+        extras.meta[p].training === "rest" ||
+        summary.families.includes("rest"),
+      training: summary,
+      firstLoggedAtMs: firstLogs[p],
+    };
+  };
+
+  const sigil = composeSigil({
+    day,
+    moss: keeperDay("matthew"),
+    ember: keeperDay("kennedy"),
+  });
+  const notLogged = PROFILES.filter((p) => journal[p].entries.length === 0);
+  const missingName =
+    notLogged.length === 2
+      ? "you both"
+      : notLogged.length === 1
+        ? DISPLAY_NAMES[notLogged[0]]
+        : null;
+
+  const ownMarks = newMarks(
+    dayWorkouts[profile].flatMap((w) => w.sets),
+    histories[profile].best,
+  );
 
   const dayNumber =
     diffDays(day, petState.adoptedAt.toISOString().slice(0, 10)) + 1;
@@ -99,6 +157,10 @@ export default async function Home({
         )}
       </nav>
 
+      <div className="wobbly border-2 border-ink/20 bg-cream/70 p-3 shadow-card">
+        <DaySeal spec={sigil} missingName={missingName} isToday={isToday} />
+      </div>
+
       {stamps.length > 0 ? (
         <div className="flex flex-wrap items-center justify-center gap-1.5">
           {stamps.map((s) => (
@@ -132,6 +194,13 @@ export default async function Home({
       </div>
 
       <DailyRituals day={day} meta={extras.meta[profile]} weighInLb={weighInLb} />
+
+      <TrainLog
+        day={day}
+        workouts={dayWorkouts[profile]}
+        exerciseNames={histories[profile].names}
+        newMarkExercises={ownMarks}
+      />
 
       {journal[profile].target === null ? (
         <Link

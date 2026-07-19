@@ -15,7 +15,7 @@ import { addDays, currentTz, diffDays, todayIso } from "@/lib/dates";
 import { currentProfile } from "@/lib/session";
 
 export const metadata: Metadata = {
-  title: "Trends - The Logbook",
+  title: "Trends - signxsealed",
 };
 
 // Fixed series colors, validated for CVD + contrast on the cream surface.

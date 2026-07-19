@@ -11,9 +11,19 @@ import {
   min,
 } from "drizzle-orm";
 import { db } from "@/db";
-import { dayMeta, entries, foods, pet, targets, weighIns } from "@/db/schema";
+import {
+  dayMeta,
+  entries,
+  foods,
+  pet,
+  targets,
+  weighIns,
+  workouts,
+  workoutSets,
+} from "@/db/schema";
 import { PROFILES, type Profile } from "@/lib/auth";
 import { addDays, diffDays } from "@/lib/dates";
+import { bestByExercise, type WorkoutSet } from "@/lib/engine/training";
 import type { JournalEntry, Specimen, Target } from "@/lib/meals";
 
 export type JournalDay = Record<
@@ -244,6 +254,116 @@ export async function getMonthMarks(monthPrefix: string): Promise<{
     }
   }
   return { bothDays, training };
+}
+
+// Earliest log moment per keeper for a day — the Mirror at Dusk listens.
+export async function getFirstLogTimes(
+  day: string,
+): Promise<Record<Profile, number | null>> {
+  const rows = await db
+    .select({ p: entries.profileId, first: min(entries.loggedAt) })
+    .from(entries)
+    .where(eq(entries.day, day))
+    .groupBy(entries.profileId);
+  const result = {} as Record<Profile, number | null>;
+  for (const profile of PROFILES) {
+    const row = rows.find((r) => r.p === profile);
+    result[profile] = row?.first ? new Date(row.first).getTime() : null;
+  }
+  return result;
+}
+
+// ── The Training Log ──
+
+export type WorkoutView = {
+  id: number;
+  title: string;
+  note: string | null;
+  sets: {
+    kind: "lift" | "cardio";
+    exercise: string;
+    setIndex: number;
+    weightLb: number | null;
+    reps: number | null;
+    minutes: number | null;
+  }[];
+};
+
+export async function getWorkoutsForDay(
+  day: string,
+): Promise<Record<Profile, WorkoutView[]>> {
+  const workoutRows = await db
+    .select()
+    .from(workouts)
+    .where(eq(workouts.day, day))
+    .orderBy(asc(workouts.createdAt));
+
+  const setRows =
+    workoutRows.length > 0
+      ? await db
+          .select()
+          .from(workoutSets)
+          .where(
+            inArray(
+              workoutSets.workoutId,
+              workoutRows.map((w) => w.id),
+            ),
+          )
+          .orderBy(asc(workoutSets.id))
+      : [];
+
+  const result = {} as Record<Profile, WorkoutView[]>;
+  for (const profile of PROFILES) {
+    result[profile] = workoutRows
+      .filter((w) => w.profileId === profile)
+      .map((w) => ({
+        id: w.id,
+        title: w.title,
+        note: w.note,
+        sets: setRows
+          .filter((s) => s.workoutId === w.id)
+          .map((s) => ({
+            kind: s.kind,
+            exercise: s.exercise,
+            setIndex: s.setIndex,
+            weightLb: s.weightLb,
+            reps: s.reps,
+            minutes: s.minutes,
+          })),
+      }));
+  }
+  return result;
+}
+
+// History for PR detection (best est. 1RM per exercise from sets logged
+// strictly before the day) and autocomplete (every exercise name ever used).
+export async function getExerciseHistory(
+  profile: Profile,
+  beforeDay: string,
+): Promise<{ best: Map<string, number>; names: string[] }> {
+  const rows = await db
+    .select({ set: workoutSets, day: workouts.day })
+    .from(workoutSets)
+    .innerJoin(workouts, eq(workoutSets.workoutId, workouts.id))
+    .where(eq(workouts.profileId, profile));
+
+  const prior: WorkoutSet[] = rows
+    .filter((r) => r.day < beforeDay)
+    .map((r) => ({
+      kind: r.set.kind,
+      exercise: r.set.exercise,
+      weightLb: r.set.weightLb,
+      reps: r.set.reps,
+      minutes: r.set.minutes,
+    }));
+
+  const names = [
+    ...new Set(
+      rows.filter((r) => r.set.kind === "lift").map((r) => r.set.exercise),
+    ),
+  ].sort();
+
+  return { best: bestByExercise(prior), names };
 }
 
 // The specimens this person logs most recently — the quick-tap grid.

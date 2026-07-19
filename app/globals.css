@@ -14,6 +14,13 @@
   --color-gold: #d9a441;
   --color-gold-soft: #ecd9a8;
 
+  /* Violet is relational: it belongs to neither keeper and appears only in
+     union moments (completed seals, resonant/legendary sigils) and in the
+     dusk/night sky. Never in day-mode chrome. */
+  --color-violet-deep: #453a54;
+  --color-violet: #8d7aa8;
+  --color-violet-bright: #c9b3e3;
+
   --font-sans: var(--font-baloo);
   --font-pixel: var(--font-pixelify);
 
@@ -21,6 +28,39 @@
   --shadow-card: 0 2px 0 0 color-mix(in srgb, #4a3b2a 18%, transparent),
     0 8px 16px -8px color-mix(in srgb, #4a3b2a 30%, transparent);
   --shadow-pressed: 0 1px 0 0 color-mix(in srgb, #4a3b2a 18%, transparent);
+}
+
+/* ── The light script ──
+   The whole palette lives in tokens, so re-declaring them under a data-light
+   attribute re-skins every component at once. Values from DIRECTION.md;
+   shadows stay umber in every state (a cream shadow would read as glow). */
+html[data-light="dusk"] {
+  --color-paper: #ead8b4;
+  --color-paper-deep: #e0cba1;
+  --color-cream: #f3e4c4;
+  --color-ink: #43331f;
+  --color-ink-soft: #6d5a40;
+  --color-moss: #6d7b44;
+  --color-moss-deep: #4f5c35;
+  --color-terracotta: #b65f3e;
+  --color-terracotta-soft: #cf8a68;
+  --color-gold: #cf9a3a;
+  --color-gold-soft: #e5cf9b;
+  --color-violet-deep: #6f5a78;
+}
+html[data-light="night"] {
+  --color-paper: #2f2820;
+  --color-paper-deep: #282219;
+  --color-cream: #3a3128;
+  --color-ink: #f0e4cb;
+  --color-ink-soft: #b9a687;
+  --color-moss: #8a9663;
+  --color-moss-deep: #4a5238;
+  --color-terracotta: #c4704b;
+  --color-terracotta-soft: #d99a7e;
+  --color-gold: #e8b04b;
+  --color-gold-soft: #4e4126;
+  --color-violet-deep: #453a54;
 }
 
 body {
@@ -45,6 +85,46 @@ body {
 
 .pixelated {
   image-rendering: pixelated;
+}
+
+/* Coarse hatching — frame chrome and book plates only (fine stipple turns to
+   noise on phones). Ink-derived so it follows the light state. */
+.hatch {
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent 0 5px,
+    color-mix(in srgb, var(--color-ink) 6%, transparent) 5px 6px
+  );
+}
+
+/* Lantern pool — the soft radial glow behind surfaces that matter at night. */
+.lantern-pool {
+  box-shadow: 0 0 24px 6px color-mix(in srgb, var(--color-gold) 25%, transparent);
+}
+
+/* Diegetic arch frame — hall headers, being cards. */
+.arch {
+  border-radius: 50% 50% 14px 14px / 22% 22% 14px 14px;
+}
+
+/* Violet bloom for a seal completing — union's color arriving. */
+.seal-bloom {
+  animation: seal-bloom 0.9s ease-out both;
+}
+@keyframes seal-bloom {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .seal-bloom {
+    animation: none;
+  }
 }
 
 /* The fox's idle bounce — steps() keeps it snappy and pixel-toy-like */
