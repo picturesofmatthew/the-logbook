@@ -2,9 +2,10 @@
 
 ## Quick Resume
 
-- **Current focus:** shipped v1 to Vercel (all six build milestones done)
-- **Last meaningful change:** full v1 build — journal, museum, fox, trends, chimes, recipes; deployed via `vercel --prod`
-- **Open questions:** passcode is still the placeholder `mochi` (change via `vercel env`); `FDC_API_KEY` is `DEMO_KEY` — grab a free key at https://api.data.gov/signup when USDA searches start rate-limiting
+- **Current focus:** iteration phase — Matthew art-directing a custom graphics pass (replace hand-rolled sprites with a designed asset system) and expanding the concept
+- **Repo:** https://github.com/picturesofmatthew/the-logbook (public) · **Live:** https://the-logbook-six.vercel.app
+- **Last meaningful change:** v1 shipped + prod login fixed (empty env vars via wrapped Vercel CLI — see memory `feedback_environment_constraints` item 5; always `npm exec --yes vercel@latest -- env add ... --value`)
+- **Open questions:** passcode is still placeholder `mochi`; `FDC_API_KEY` is `DEMO_KEY` (free key: https://api.data.gov/signup); graphics direction undecided — refined pixel vs. illustrated
 
 ## Project notes
 
