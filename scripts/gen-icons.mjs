@@ -7,35 +7,37 @@ import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
-// Keep in sync with components/sprites.ts (PET_HAPPY)
+// Keep in sync with components/sprites.ts (PET_KIT) — the arctic fox kit.
+// TODO(ship): regenerate with the antlered adult fox once its sprite exists.
 const SPRITE = [
   "................",
-  "...##......##...",
-  "..#mm#....#mm#..",
-  "..#mm######mm#..",
-  ".#mmmmmmmmmmmm#.",
-  ".#mmmmmmmmmmmm#.",
-  ".#mm#mmmmmm#mm#.",
-  ".#mm#mmmmmm#mm#.",
-  ".#mmmmmmmmmmmm#.",
-  ".#mtmmm##mmmtm#.",
-  ".#mmmmmmmmmmmm#.",
-  "..#mmmmmmmmmm#..",
-  "...##mmmmmm##...",
+  "..##........##..",
+  ".#tt#......#tt#.",
+  ".#ttc#....#ctt#.",
+  ".#cccc####cccc#.",
+  ".#cccccccccccc#.",
+  "#cccccccccccccc#",
+  "#cc#cccccccc#cc#",
+  "#cccccccccccccc#",
+  "#cctccc##ccctcc#",
+  ".#ccccc##ccccc#.",
+  ".#cccccccccccc#.",
+  "..#cccccccccc#..",
+  "...##cccccc##...",
   ".....######.....",
-  "................",
   "................",
 ];
 
 const COLORS = {
-  ".": null, // paper shows through
+  ".": null, // background shows through
   "#": [0x4a, 0x3b, 0x2a], // cocoa ink
-  m: [0x7c, 0x8a, 0x4d], // moss
-  M: [0x5b, 0x6b, 0x3c], // deep moss
-  t: [0xc4, 0x70, 0x4b], // terracotta blush
+  c: [0xfb, 0xf6, 0xea], // arctic cream
+  s: [0xec, 0xe0, 0xc6], // warm shadow
+  t: [0xc4, 0x70, 0x4b], // terracotta
   g: [0xd9, 0xa4, 0x41], // muted gold
 };
-const PAPER = [0xf5, 0xed, 0xdc];
+// Moss background so the cream fox reads clearly at icon size
+const PAPER = [0x7c, 0x8a, 0x4d];
 
 const CRC_TABLE = new Int32Array(256).map((_, n) => {
   let c = n;

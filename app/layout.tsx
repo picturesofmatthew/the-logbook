@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Baloo_2, Pixelify_Sans } from "next/font/google";
+import { TzSync } from "@/components/tz-sync";
 import "./globals.css";
 
 const baloo = Baloo_2({
@@ -36,7 +37,10 @@ export default function RootLayout({
       lang="en"
       className={`${baloo.variable} ${pixelify.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-sans">{children}</body>
+      <body className="min-h-full flex flex-col font-sans">
+        <TzSync />
+        {children}
+      </body>
     </html>
   );
 }
