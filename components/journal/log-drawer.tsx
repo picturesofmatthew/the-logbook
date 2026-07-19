@@ -1,0 +1,227 @@
+"use client";
+
+import { useMemo, useState, useTransition } from "react";
+import { logEntry } from "@/app/log/actions";
+import { hallInfo } from "@/lib/halls";
+import type { Meal, Specimen } from "@/lib/meals";
+import { DonateFlow } from "./donate-flow";
+
+const inputCls =
+  "wobbly-sm border-2 border-ink/30 bg-cream px-3 py-2 outline-none focus:border-gold w-full";
+
+export function LogDrawer({
+  meal,
+  day,
+  specimens,
+  recents,
+  onClose,
+  onLogged,
+}: {
+  meal: Meal;
+  day: string;
+  specimens: Specimen[];
+  recents: Specimen[];
+  onClose: () => void;
+  onLogged: (message: string) => void;
+}) {
+  const [mode, setMode] = useState<"pick" | "donate">("pick");
+  const [search, setSearch] = useState("");
+  const [chosen, setChosen] = useState<Specimen | null>(null);
+  const [servings, setServings] = useState(1);
+  const [error, setError] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return specimens;
+    return specimens.filter((s) => s.name.toLowerCase().includes(q));
+  }, [specimens, search]);
+
+  const recentIds = new Set(recents.map((r) => r.id));
+
+  function confirmLog() {
+    if (!chosen) return;
+    startTransition(async () => {
+      const result = await logEntry({
+        foodId: chosen.id,
+        meal,
+        servings,
+        day,
+      });
+      if (result.error) {
+        setError(result.error);
+      } else {
+        onLogged(`${chosen.icon} ${chosen.name} — logged to ${meal}.`);
+      }
+    });
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center">
+      <button
+        type="button"
+        aria-label="close"
+        onClick={onClose}
+        className="absolute inset-0 bg-ink/30"
+      />
+      <div className="relative max-h-[85dvh] w-full max-w-md overflow-y-auto rounded-t-3xl border-2 border-b-0 border-ink/20 bg-paper p-5 shadow-card">
+        {mode === "donate" ? (
+          <DonateFlow
+            meal={meal}
+            day={day}
+            onDone={(msg) => onLogged(msg)}
+            onBack={() => setMode("pick")}
+          />
+        ) : chosen ? (
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-pixel text-sm tracking-wide">
+                {chosen.icon} {chosen.name.toUpperCase()}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setChosen(null)}
+                className="cursor-pointer text-sm text-ink-soft underline decoration-dotted"
+              >
+                back
+              </button>
+            </div>
+            <p className="text-sm text-ink-soft">
+              {chosen.servingLabel} · {Math.round(chosen.calories)} kcal · P
+              {chosen.proteinG} C{chosen.carbsG} F{chosen.fatG}
+            </p>
+            <div className="flex items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => setServings(Math.max(0.5, servings - 0.5))}
+                className="wobbly-sm h-11 w-11 cursor-pointer border-2 border-ink/30 bg-cream text-xl"
+              >
+                −
+              </button>
+              <div className="text-center">
+                <span className="block font-pixel text-2xl">{servings}</span>
+                <span className="block text-xs text-ink-soft">
+                  {Math.round(chosen.calories * servings)} kcal
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setServings(Math.min(20, servings + 0.5))}
+                className="wobbly-sm h-11 w-11 cursor-pointer border-2 border-ink/30 bg-cream text-xl"
+              >
+                +
+              </button>
+            </div>
+            {error ? (
+              <p className="text-center font-pixel text-xs text-terracotta">
+                {error}
+              </p>
+            ) : null}
+            <button
+              type="button"
+              disabled={pending}
+              onClick={confirmLog}
+              className="wobbly cursor-pointer bg-moss-deep py-2.5 text-lg text-cream shadow-card transition-all active:translate-y-0.5 active:shadow-pressed disabled:opacity-60"
+            >
+              {pending ? "logging..." : `log to ${meal}`}
+            </button>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <h3 className="font-pixel text-sm tracking-wide">
+                ADD TO {meal.toUpperCase()}
+              </h3>
+              <button
+                type="button"
+                onClick={onClose}
+                className="cursor-pointer text-sm text-ink-soft underline decoration-dotted"
+              >
+                close
+              </button>
+            </div>
+
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search the museum..."
+              className={inputCls}
+            />
+
+            {recents.length > 0 && !search ? (
+              <>
+                <p className="font-pixel text-[10px] tracking-wide text-ink-soft">
+                  RECENT
+                </p>
+                <div className="grid grid-cols-4 gap-1.5">
+                  {recents.slice(0, 8).map((s) => (
+                    <button
+                      key={s.id}
+                      type="button"
+                      onClick={() => {
+                        setChosen(s);
+                        setServings(1);
+                      }}
+                      className="wobbly-sm cursor-pointer border-2 border-ink/20 bg-cream p-1.5 text-center hover:border-gold"
+                    >
+                      <span className="block text-xl">{s.icon}</span>
+                      <span className="block truncate text-[10px] leading-tight">
+                        {s.name}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </>
+            ) : null}
+
+            <p className="font-pixel text-[10px] tracking-wide text-ink-soft">
+              {search ? "MATCHES" : "THE WHOLE COLLECTION"}
+            </p>
+            {filtered.length === 0 ? (
+              <p className="py-2 text-center text-sm text-ink-soft">
+                {specimens.length === 0
+                  ? "The museum is empty. Donate its first specimen!"
+                  : "Nothing in the collection matches."}
+              </p>
+            ) : (
+              <ul className="flex max-h-56 flex-col gap-1.5 overflow-y-auto">
+                {filtered.map((s) => (
+                  <li key={s.id}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setChosen(s);
+                        setServings(1);
+                      }}
+                      className="wobbly-sm flex w-full cursor-pointer items-center gap-2 border-2 border-ink/20 bg-cream px-3 py-1.5 text-left hover:border-gold"
+                    >
+                      <span className="text-lg">{s.icon}</span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-sm">{s.name}</span>
+                        <span className="block text-[11px] text-ink-soft">
+                          {hallInfo(s.hall).label}
+                          {recentIds.has(s.id) ? " · recent" : ""}
+                        </span>
+                      </span>
+                      <span className="font-pixel text-xs text-ink-soft">
+                        {Math.round(s.calories)}
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            <button
+              type="button"
+              onClick={() => setMode("donate")}
+              className="wobbly-sm cursor-pointer border-2 border-dashed border-ink/30 bg-transparent px-3 py-2 text-ink-soft hover:border-gold"
+            >
+              ✦ donate a new specimen
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

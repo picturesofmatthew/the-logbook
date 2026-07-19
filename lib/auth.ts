@@ -6,6 +6,15 @@ export const SESSION_COOKIE = "logbook_session";
 export const PROFILES = ["matthew", "kennedy"] as const;
 export type Profile = (typeof PROFILES)[number];
 
+export const DISPLAY_NAMES: Record<Profile, string> = {
+  matthew: "Matthew",
+  kennedy: "Kennedy",
+};
+
+export function partnerOf(profile: Profile): Profile {
+  return profile === "matthew" ? "kennedy" : "matthew";
+}
+
 export function isProfile(value: unknown): value is Profile {
   return PROFILES.includes(value as Profile);
 }
