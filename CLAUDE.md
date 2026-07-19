@@ -2,8 +2,9 @@
 
 ## Quick Resume
 
-- **Current focus:** "Inklight" overhaul (spec: `DIRECTION.md` v3). **Phases 0–1 BUILT locally, not yet committed/deployed** (2026-07-19): light script (day/dusk/night via `data-light` on html, tokens in globals.css), engines `lib/engine/{sigil,training,glade,beings}.ts` (27 tests green), workout tables pushed to Neon, Training Log UI, DaySeal + SigilGlyph on home. Next: commit/deploy, then Phase 2 (Spellbook `/book`) and ceremonies; Glade naming = **Glade** (not Vale); first-wave beings = Stag + Heron
-- **Repo:** https://github.com/picturesofmatthew/the-logbook (public) · **Live:** https://the-logbook-six.vercel.app
+- **Current focus:** "Inklight" overhaul (spec: `DIRECTION.md` v3). **Phases 0–1 SHIPPED to prod** (2026-07-19, commit 033b4ad): light script, engines (27 tests), workout tables on Neon, Training Log UI, DaySeal on home; app renamed **signxsealed** (Vercel project renamed via `vercel project rename`). Next: Phase 2 (Spellbook `/book`), ceremonies; Glade naming = **Glade**; first wave = Stag + Heron
+- **Repo:** https://github.com/picturesofmatthew/the-logbook (public) · **Live:** https://the-logbook-six.vercel.app (serving the signxsealed build)
+- **⚠ One manual step:** https://signxsealed.vercel.app exists only as a deployment alias → gated by Vercel SSO deployment protection. Fix in dashboard: signxsealed project → Settings → Domains → add `signxsealed.vercel.app` (becomes the tracking production domain, public). CLI can't do it (`domains add` rejects vercel.app; API needs token). Deploys are CLI-driven (`npm exec --yes vercel@latest -- deploy --prod --yes`) — no Git auto-deploy
 - **Last meaningful change:** DIRECTION.md v3 + visual brief v3 (https://claude.ai/code/artifact/217589f0-834c-42bd-9a8d-afc1b0094572); art production = Matthew via ChatGPT + human direction (engines start on placeholder geometry)
 - **Open questions:** Glade vs. Vale naming; first-wave beings (proposed Stag + Heron); passcode still placeholder `mochi`; `FDC_API_KEY` is `DEMO_KEY` (free key: https://api.data.gov/signup)
 
