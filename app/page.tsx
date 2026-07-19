@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { DailyRituals } from "@/components/journal/daily-rituals";
 import { OwnColumn } from "@/components/journal/own-column";
 import { PartnerColumn } from "@/components/journal/partner-column";
 import { FoxHeader } from "@/components/pet/fox-header";
@@ -9,6 +10,7 @@ import {
   getJournalDay,
   getPetState,
   getRecentSpecimens,
+  getWeighIn,
 } from "@/lib/data";
 import { addDays, currentTz, diffDays, friendlyDate, todayIso } from "@/lib/dates";
 import { totalOf } from "@/lib/engine/totals";
@@ -30,13 +32,15 @@ export default async function Home({
   const day = requested > today ? today : requested;
   const isToday = day === today;
 
-  const [journal, specimens, recents, petState, extras] = await Promise.all([
-    getJournalDay(day),
-    getAllSpecimens(),
-    getRecentSpecimens(profile),
-    getPetState(today),
-    getDayExtras(day),
-  ]);
+  const [journal, specimens, recents, petState, extras, weighInLb] =
+    await Promise.all([
+      getJournalDay(day),
+      getAllSpecimens(),
+      getRecentSpecimens(profile),
+      getPetState(today),
+      getDayExtras(day),
+      getWeighIn(profile, day),
+    ]);
 
   const dayNumber =
     diffDays(day, petState.adoptedAt.toISOString().slice(0, 10)) + 1;
@@ -127,6 +131,8 @@ export default async function Home({
         </div>
       </div>
 
+      <DailyRituals day={day} meta={extras.meta[profile]} weighInLb={weighInLb} />
+
       {journal[profile].target === null ? (
         <Link
           href="/settings"
@@ -142,6 +148,12 @@ export default async function Home({
           className="underline decoration-dotted underline-offset-4"
         >
           🏛 museum
+        </Link>
+        <Link
+          href="/trends"
+          className="underline decoration-dotted underline-offset-4"
+        >
+          📈 trends
         </Link>
         <Link
           href="/settings"

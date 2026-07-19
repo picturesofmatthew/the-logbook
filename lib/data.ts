@@ -1,6 +1,17 @@
-import { and, countDistinct, desc, eq, inArray, lte, max, min } from "drizzle-orm";
+import {
+  and,
+  asc,
+  countDistinct,
+  desc,
+  eq,
+  gte,
+  inArray,
+  lte,
+  max,
+  min,
+} from "drizzle-orm";
 import { db } from "@/db";
-import { dayMeta, entries, foods, pet, targets } from "@/db/schema";
+import { dayMeta, entries, foods, pet, targets, weighIns } from "@/db/schema";
 import { PROFILES, type Profile } from "@/lib/auth";
 import { addDays, diffDays } from "@/lib/dates";
 import type { JournalEntry, Specimen, Target } from "@/lib/meals";
@@ -138,6 +149,101 @@ export async function getDayExtras(day: string): Promise<{
     };
   }
   return { meta, newSpecimens };
+}
+
+export async function getWeighIn(
+  profile: Profile,
+  day: string,
+): Promise<number | null> {
+  const [row] = await db
+    .select({ weightLb: weighIns.weightLb })
+    .from(weighIns)
+    .where(and(eq(weighIns.profileId, profile), eq(weighIns.day, day)));
+  return row?.weightLb ?? null;
+}
+
+export type WeighInPoint = { day: string; weightLb: number };
+
+export async function getAllWeighIns(): Promise<
+  Record<Profile, WeighInPoint[]>
+> {
+  const rows = await db
+    .select()
+    .from(weighIns)
+    .orderBy(asc(weighIns.day));
+  const result = {} as Record<Profile, WeighInPoint[]>;
+  for (const profile of PROFILES) {
+    result[profile] = rows
+      .filter((r) => r.profileId === profile)
+      .map((r) => ({ day: r.day, weightLb: r.weightLb }));
+  }
+  return result;
+}
+
+export type DailyTotal = { day: string; calories: number; proteinG: number };
+
+// Per-person daily calorie/protein sums since a date — for weekly averages.
+export async function getDailyTotalsSince(
+  sinceDay: string,
+): Promise<Record<Profile, DailyTotal[]>> {
+  const rows = await db
+    .select({ entry: entries, food: foods })
+    .from(entries)
+    .innerJoin(foods, eq(entries.foodId, foods.id))
+    .where(gte(entries.day, sinceDay));
+
+  const result = {} as Record<Profile, DailyTotal[]>;
+  for (const profile of PROFILES) {
+    const byDay = new Map<string, DailyTotal>();
+    for (const r of rows) {
+      if (r.entry.profileId !== profile) continue;
+      const t = byDay.get(r.entry.day) ?? {
+        day: r.entry.day,
+        calories: 0,
+        proteinG: 0,
+      };
+      t.calories += r.food.calories * r.entry.servings;
+      t.proteinG += r.food.proteinG * r.entry.servings;
+      byDay.set(r.entry.day, t);
+    }
+    result[profile] = [...byDay.values()].sort((a, b) =>
+      a.day.localeCompare(b.day),
+    );
+  }
+  return result;
+}
+
+// Marks for the stamp calendar: which days that month were both-logged,
+// and who trained on which day.
+export async function getMonthMarks(monthPrefix: string): Promise<{
+  bothDays: Set<string>;
+  training: Record<Profile, Record<string, string>>;
+}> {
+  const start = `${monthPrefix}-01`;
+  const end = `${monthPrefix}-31`;
+  const dayRows = await db
+    .select({ day: entries.day, n: countDistinct(entries.profileId) })
+    .from(entries)
+    .where(and(gte(entries.day, start), lte(entries.day, end)))
+    .groupBy(entries.day);
+  const bothDays = new Set(
+    dayRows.filter((r) => Number(r.n) >= 2).map((r) => r.day),
+  );
+
+  const metaRows = await db
+    .select()
+    .from(dayMeta)
+    .where(and(gte(dayMeta.day, start), lte(dayMeta.day, end)));
+  const training = {} as Record<Profile, Record<string, string>>;
+  for (const profile of PROFILES) {
+    training[profile] = {};
+    for (const m of metaRows) {
+      if (m.profileId === profile && m.training && m.training !== "rest") {
+        training[profile][m.day] = m.training;
+      }
+    }
+  }
+  return { bothDays, training };
 }
 
 // The specimens this person logs most recently — the quick-tap grid.
