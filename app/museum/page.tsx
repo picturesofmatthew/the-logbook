@@ -42,6 +42,7 @@ export default async function MuseumPage() {
       proteinG: s.proteinG,
       carbsG: s.carbsG,
       fatG: s.fatG,
+      estimated: s.estimated,
       donorName:
         DISPLAY_NAMES[s.discoveredBy as Profile] ?? s.discoveredBy,
       discoveredLabel: fmt.format(new Date(s.discoveredAt)),

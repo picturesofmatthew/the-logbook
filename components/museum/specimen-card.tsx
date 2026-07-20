@@ -11,6 +11,7 @@ export type SpecimenCardData = {
   proteinG: number;
   carbsG: number;
   fatG: number;
+  estimated: boolean;
   donorName: string;
   discoveredLabel: string;
 };
@@ -46,6 +47,11 @@ export function SpecimenCard({ s }: { s: SpecimenCardData }) {
         <span key="front" className="card-flip block">
           <span className="block text-3xl">{s.icon}</span>
           <span className="mt-1 block truncate text-xs leading-tight">
+            {s.estimated ? (
+              <span className="text-terracotta" title="an estimate">
+                ~
+              </span>
+            ) : null}
             {s.name}
           </span>
           <span className="block font-pixel text-[10px] text-ink-soft">

@@ -191,6 +191,9 @@ export function LogDrawer({
                     >
                       <span className="block text-xl">{s.icon}</span>
                       <span className="block truncate text-[10px] leading-tight">
+                        {s.estimated ? (
+                          <span className="text-terracotta">~</span>
+                        ) : null}
                         {s.name}
                       </span>
                     </button>
@@ -231,7 +234,14 @@ export function LogDrawer({
                     >
                       <span className="text-lg">{s.icon}</span>
                       <span className="min-w-0 flex-1">
-                        <span className="block truncate text-sm">{s.name}</span>
+                        <span className="block truncate text-sm">
+                          {s.estimated ? (
+                            <span className="text-terracotta" title="an estimate">
+                              ~{" "}
+                            </span>
+                          ) : null}
+                          {s.name}
+                        </span>
                         <span className="block text-[11px] text-ink-soft">
                           {hallInfo(s.hall).label}
                           {recentIds.has(s.id) ? " · recent" : ""}
