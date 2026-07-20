@@ -25,7 +25,12 @@ import {
 } from "@/db/schema";
 import { PROFILES, type Profile } from "@/lib/auth";
 import { addDays, diffDays } from "@/lib/dates";
-import { bestByExercise, type WorkoutSet } from "@/lib/engine/training";
+import {
+  bestByExercise,
+  splitFamilyFor,
+  type SplitFamily,
+  type WorkoutSet,
+} from "@/lib/engine/training";
 import type { JournalEntry, Specimen, Target } from "@/lib/meals";
 
 export type JournalDay = Record<
@@ -436,4 +441,66 @@ export async function getRecentSpecimens(
   const rows = await db.select().from(foods).where(inArray(foods.id, ids));
   const byId = new Map(rows.map((r) => [r.id, r as Specimen]));
   return ids.map((id) => byId.get(id)).filter((s): s is Specimen => !!s);
+}
+
+// This keeper's recent workouts (with sets), most-recent first, tagged by
+// split family — the source for capture's "repeat last Push/Pull/Legs…".
+// Rest days (no sets) are skipped; there's nothing to repeat.
+export type RecentWorkout = {
+  id: number;
+  title: string;
+  day: string;
+  family: SplitFamily;
+  sets: {
+    kind: "lift" | "cardio";
+    exercise: string;
+    weightLb: number | null;
+    reps: number | null;
+    minutes: number | null;
+  }[];
+};
+
+export async function getRecentWorkouts(
+  profile: Profile,
+  limit = 12,
+): Promise<RecentWorkout[]> {
+  const workoutRows = await db
+    .select()
+    .from(workouts)
+    .where(eq(workouts.profileId, profile))
+    .orderBy(desc(workouts.day), desc(workouts.createdAt))
+    .limit(limit);
+  if (workoutRows.length === 0) return [];
+
+  const setRows = await db
+    .select()
+    .from(workoutSets)
+    .where(
+      inArray(
+        workoutSets.workoutId,
+        workoutRows.map((w) => w.id),
+      ),
+    )
+    .orderBy(asc(workoutSets.id));
+
+  return workoutRows
+    .map((w) => {
+      const sets = setRows
+        .filter((s) => s.workoutId === w.id)
+        .map((s) => ({
+          kind: s.kind,
+          exercise: s.exercise,
+          weightLb: s.weightLb,
+          reps: s.reps,
+          minutes: s.minutes,
+        }));
+      return {
+        id: w.id,
+        title: w.title,
+        day: w.day,
+        family: splitFamilyFor({ title: w.title, sets: sets as WorkoutSet[] }),
+        sets,
+      };
+    })
+    .filter((w) => w.sets.length > 0);
 }

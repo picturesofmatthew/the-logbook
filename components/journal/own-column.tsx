@@ -80,6 +80,11 @@ export function OwnColumn({
                   >
                     <span>{e.food.icon}</span>
                     <span className="min-w-0 flex-1 truncate">
+                      {e.food.estimated ? (
+                        <span className="text-terracotta" title="an estimate">
+                          ~{" "}
+                        </span>
+                      ) : null}
                       {e.food.name}
                       {e.servings !== 1 ? (
                         <span className="text-ink-soft"> ×{e.servings}</span>

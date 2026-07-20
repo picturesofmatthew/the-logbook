@@ -1,63 +1,47 @@
-import Link from "next/link";
-import { DailyRituals } from "@/components/journal/daily-rituals";
-import { OwnColumn } from "@/components/journal/own-column";
-import { PartnerColumn } from "@/components/journal/partner-column";
-import { TrainLog } from "@/components/journal/train-log";
 import { ArrivalCeremony } from "@/components/glade/arrival-ceremony";
-import { GladeHeader } from "@/components/glade/glade-header";
+import { GladeScene, type BeingStages } from "@/components/glade/glade-scene";
+import { PixelSprite } from "@/components/pixel-sprite";
 import { DaySeal } from "@/components/sigil/day-seal";
 import { LegendaryCeremony } from "@/components/sigil/legendary-ceremony";
 import { SealCeremony } from "@/components/sigil/seal-ceremony";
-import { DISPLAY_NAMES, PROFILES, partnerOf, type Profile } from "@/lib/auth";
+import { PET_PALETTE, PET_SPRITES } from "@/components/sprites";
+import { DISPLAY_NAMES, PROFILES, type Profile } from "@/lib/auth";
 import {
   getArrivals,
-  getAllSpecimens,
   getDayExtras,
   getExerciseHistories,
   getFirstLogTimes,
   getJournalDay,
   getPetState,
-  getRecentSpecimens,
-  getWeighIn,
   getWorkoutsForDay,
   recordArrival,
   recordLegendary,
 } from "@/lib/data";
-import { addDays, currentTz, diffDays, friendlyDate, todayIso } from "@/lib/dates";
+import { diffDays, todayIso } from "@/lib/dates";
 import { getGladeState } from "@/lib/ledger";
 import { paleElkGlimpsed, type BeingId } from "@/lib/engine/beings";
 import { buildKeeperDay } from "@/lib/engine/keeper-day";
+import { moodFor, PET_STAGES, speechFor, stageForDays } from "@/lib/engine/pet";
 import { composeSigil, type KeeperDay } from "@/lib/engine/sigil";
-import { newMarks } from "@/lib/engine/training";
 import { totalOf } from "@/lib/engine/totals";
 import { stampsForDay } from "@/lib/engine/stamps";
 import { currentProfile } from "@/lib/session";
 
-export default async function Home({
-  searchParams,
-}: {
-  searchParams: Promise<{ d?: string }>;
-}) {
-  const profile = await currentProfile();
-  const partner = partnerOf(profile);
+// The glade — home, and one continuous living world (not stacked cards). The
+// sky fills the screen behind the chrome; the ring narrates the day in it; two
+// lanterns stand for the keepers; the fox and its company live in the ground
+// band at the foot. The ledger's numbers live at /today.
+export default async function GladeHome() {
+  await currentProfile(); // route guard (redirects to /enter if unauthenticated)
   const today = await todayIso();
-  const tz = await currentTz();
+  const day = today;
+  const isToday = true;
 
-  const { d } = await searchParams;
-  const requested = d && /^\d{4}-\d{2}-\d{2}$/.test(d) ? d : today;
-  const day = requested > today ? today : requested;
-  const isToday = day === today;
-
-  const [journal, specimens, recents, petState, extras, weighInLb] =
-    await Promise.all([
-      getJournalDay(day),
-      getAllSpecimens(),
-      getRecentSpecimens(profile),
-      getPetState(today),
-      getDayExtras(day),
-      getWeighIn(profile, day),
-    ]);
-
+  const [journal, petState, extras] = await Promise.all([
+    getJournalDay(day),
+    getPetState(today),
+    getDayExtras(day),
+  ]);
   const [dayWorkouts, firstLogs, histories, glade] = await Promise.all([
     getWorkoutsForDay(day),
     getFirstLogTimes(day),
@@ -93,28 +77,20 @@ export default async function Home({
       : notLogged.length === 1
         ? DISPLAY_NAMES[notLogged[0]]
         : null;
-
-  const ownMarks = newMarks(
-    dayWorkouts[profile].flatMap((w) => w.sets),
-    histories[profile].best,
-  );
+  const hearthDay =
+    sigil.chords.includes("hearth") || sigil.legendary === "feast-seal";
 
   // The request that claims the discovery row throws the ceremony — once, ever.
   const newlyDiscovered =
-    sigil.legendary != null && isToday
+    sigil.legendary != null
       ? await recordLegendary(sigil.legendary, day)
       : false;
 
-  // Every being announces its first arrival. One ceremony per load,
-  // legends first; the rest of a backlog waits for the next visit. Read the
-  // recorded arrivals once so steady state costs a single SELECT, not a
-  // no-op INSERT per already-arrived being.
+  // Every being announces its first arrival — one ceremony per load.
   let newBeing: BeingId | null = null;
-  if (isToday && !newlyDiscovered) {
+  if (!newlyDiscovered) {
     const recorded = await getArrivals();
-    const pending = glade.beings.filter(
-      (b) => b.arrived && !recorded.has(b.id),
-    );
+    const pending = glade.beings.filter((b) => b.arrived && !recorded.has(b.id));
     for (const b of pending) {
       if (await recordArrival(b.id, today)) {
         newBeing = b.id;
@@ -123,8 +99,7 @@ export default async function Home({
     }
   }
 
-  // The Pale Elk: glimpsed, never resident. The first glimpse is recorded
-  // silently so the bestiary can remember it ever happened.
+  // The Pale Elk: glimpsed, never resident. First glimpse recorded silently.
   const paleElk = paleElkGlimpsed({
     gladeTier: glade.tier,
     daysSinceLegendary: glade.lastLegendaryDay
@@ -132,9 +107,6 @@ export default async function Home({
       : null,
   });
   if (paleElk) await recordArrival("pale-elk", today);
-
-  const dayNumber =
-    diffDays(day, petState.adoptedAt.toISOString().slice(0, 10)) + 1;
 
   const stamps = stampsForDay({
     people: PROFILES.map((p) => ({
@@ -150,66 +122,112 @@ export default async function Home({
     newSpecimens: extras.newSpecimens,
   });
 
+  // The fox living in the ground band.
+  const stage = stageForDays(petState.lifetimeDays);
+  const stageLabel = PET_STAGES.find((s) => s.id === stage)?.label ?? stage;
+  const mood = moodFor({
+    loggedTodayCount: petState.loggedToday.length,
+    daysSinceAnyEntry: petState.daysSinceAnyEntry,
+  });
+  const missing = PROFILES.find((p) => !petState.loggedToday.includes(p));
+  const speech = speechFor(
+    mood,
+    today + mood,
+    missing ? DISPLAY_NAMES[missing] : undefined,
+  );
+  const beingStages = Object.fromEntries(
+    glade.beings.map((b) => [b.id, b.stage]),
+  ) as BeingStages;
+
   return (
-    <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-4 p-4 pb-24">
-      <GladeHeader
-        petState={petState}
-        today={today}
-        dayNumber={dayNumber}
-        glade={glade}
-        paleElk={paleElk}
-        hearthDay={
-          isToday &&
-          (sigil.chords.includes("hearth") || sigil.legendary === "feast-seal")
-        }
-      />
-
-      <nav className="flex items-center justify-between">
-        <Link
-          href={`/?d=${addDays(day, -1)}`}
-          className="wobbly-sm border-2 border-ink/20 bg-cream px-3 py-1 text-sm shadow-card"
-        >
-          ◀
-        </Link>
-        <div className="text-center">
-          <p className="font-pixel text-sm tracking-wide">
-            {isToday ? "today" : friendlyDate(day, tz)}
-          </p>
-          {!isToday ? (
-            <Link
-              href="/"
-              className="text-xs text-ink-soft underline decoration-dotted underline-offset-2"
-            >
-              back to today
-            </Link>
-          ) : (
-            <p className="text-xs text-ink-soft">{friendlyDate(day, tz)}</p>
-          )}
+    <main
+      className="relative -mt-16 flex min-h-[calc(100dvh-6rem)] flex-col overflow-hidden"
+      style={{
+        background:
+          "linear-gradient(180deg, var(--glade-sky-top) 0%, var(--glade-sky-bottom) 58%, var(--glade-ground-top) 100%)",
+      }}
+    >
+      {/* SKY — the ring narrates the day, up top */}
+      <div className="flex flex-col items-center gap-3 px-6 pt-16 pb-2 text-center">
+        <div className="w-full max-w-[280px]">
+          <DaySeal spec={sigil} missingName={missingName} isToday={isToday} />
         </div>
-        {isToday ? (
-          <span className="wobbly-sm border-2 border-transparent px-3 py-1 text-sm opacity-30">
-            ▶
-          </span>
-        ) : (
-          <Link
-            href={`/?d=${addDays(day, 1)}`}
-            className="wobbly-sm border-2 border-ink/20 bg-cream px-3 py-1 text-sm shadow-card"
-          >
-            ▶
-          </Link>
-        )}
-      </nav>
 
-      <div className="wobbly hatch border-2 border-ink/20 bg-cream/70 p-3 shadow-card">
-        <DaySeal spec={sigil} missingName={missingName} isToday={isToday} />
+        {stamps.length > 0 ? (
+          <div className="flex flex-wrap items-center justify-center gap-1.5">
+            {stamps.map((s) => (
+              <span
+                key={s.id}
+                title={s.label}
+                className="wobbly-sm border border-gold bg-gold-soft/70 px-2 py-0.5 text-xs"
+              >
+                {s.emoji} {s.label}
+              </span>
+            ))}
+          </div>
+        ) : null}
+
+        <p className="max-w-[240px] text-[11px] italic leading-snug text-ink-soft">
+          “{speech}”
+        </p>
+        <p className="font-pixel text-[10px] tracking-wide text-ink-soft">
+          {petState.name ? `${petState.name} the ${stageLabel}` : `a ${stageLabel}`}{" "}
+          · ♥ {petState.lifetimeDays}
+          {petState.lifetimeDays === 1 ? " day" : " days"} fed
+        </p>
       </div>
 
+      {/* push the world to the foot of the screen */}
+      <div className="flex-1" />
+
+      {/* THE WORLD — skyless so the page gradient shows straight through (no
+          seam), cropped to the treeline + ground, sitting above the ribbon.
+          The keepers' lanterns light within it by who has logged. */}
+      <div className="relative h-[140px] overflow-hidden">
+        <div className="absolute inset-x-0 bottom-0 flex justify-center">
+          <div className="relative w-[132%] shrink-0">
+            <GladeScene
+              skyless
+              tier={glade.tier}
+              beings={beingStages}
+              paleElk={paleElk}
+              inklings={petState.loggedToday.length}
+              hearthDay={isToday && hearthDay}
+              mossLit={
+                petState.loggedToday.includes("matthew") ||
+                dayWorkouts.matthew.length > 0
+              }
+              emberLit={
+                petState.loggedToday.includes("kennedy") ||
+                dayWorkouts.kennedy.length > 0
+              }
+            />
+            <div
+              className={`absolute bottom-[8%] left-1/2 -translate-x-1/2 ${
+                mood === "lonely" ? "opacity-80 saturate-50" : ""
+              }`}
+            >
+              <PixelSprite
+                map={PET_SPRITES[stage]}
+                palette={PET_PALETTE}
+                className="idle-bounce h-14 w-14 pixelated"
+                title={`${petState.name ?? "The fox"}, a ${stageLabel} — the Glade is ${glade.tier}`}
+              />
+              {mood === "thriving" ? (
+                <span className="absolute -right-1 -top-1 animate-pulse font-pixel text-xs text-gold">
+                  ✦
+                </span>
+              ) : null}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ceremonies — overlays that fire on arrival */}
       {newlyDiscovered && sigil.legendary ? (
         <LegendaryCeremony legendary={sigil.legendary} spec={sigil} />
       ) : null}
-
       {newBeing ? <ArrivalCeremony being={newBeing} /> : null}
-
       {sigil.completed && isToday ? (
         <SealCeremony
           spec={sigil}
@@ -217,91 +235,6 @@ export default async function Home({
           suppressed={newlyDiscovered || newBeing != null}
         />
       ) : null}
-
-      {stamps.length > 0 ? (
-        <div className="flex flex-wrap items-center justify-center gap-1.5">
-          {stamps.map((s) => (
-            <span
-              key={s.id}
-              title={s.label}
-              className="wobbly-sm border border-gold bg-gold-soft px-2 py-0.5 text-xs"
-            >
-              {s.emoji} {s.label}
-            </span>
-          ))}
-        </div>
-      ) : null}
-
-      <div className="wobbly grid grid-cols-2 gap-4 border-2 border-ink/20 bg-cream/70 p-4 shadow-card">
-        <OwnColumn
-          displayName={DISPLAY_NAMES[profile]}
-          day={day}
-          entries={journal[profile].entries}
-          target={journal[profile].target}
-          specimens={specimens}
-          recents={recents}
-        />
-        <div className="border-l-2 border-dashed border-ink/15 pl-4">
-          <PartnerColumn
-            displayName={DISPLAY_NAMES[partner]}
-            entries={journal[partner].entries}
-            target={journal[partner].target}
-          />
-        </div>
-      </div>
-
-      <DailyRituals day={day} meta={extras.meta[profile]} weighInLb={weighInLb} />
-
-      <TrainLog
-        day={day}
-        workouts={dayWorkouts[profile]}
-        exerciseNames={histories[profile].names}
-        newMarkExercises={ownMarks}
-        bestEntries={[...histories[profile].best]}
-        training={extras.meta[profile].training}
-      />
-
-      {journal[profile].target === null ? (
-        <Link
-          href="/settings"
-          className="wobbly-sm border-2 border-dashed border-ink/30 bg-transparent px-4 py-2 text-center text-sm text-ink-soft hover:border-gold"
-        >
-          no targets yet — chart your course →
-        </Link>
-      ) : null}
-
-      <footer className="mt-2 flex items-center justify-center gap-4 text-sm text-ink-soft">
-        <Link
-          href="/book"
-          className="underline decoration-dotted underline-offset-4"
-        >
-          📖 spellbook
-        </Link>
-        <Link
-          href="/museum"
-          className="underline decoration-dotted underline-offset-4"
-        >
-          🏛 pantry
-        </Link>
-        <Link
-          href="/trends"
-          className="underline decoration-dotted underline-offset-4"
-        >
-          📈 trends
-        </Link>
-        <Link
-          href="/settings"
-          className="underline decoration-dotted underline-offset-4"
-        >
-          settings
-        </Link>
-        <Link
-          href="/enter"
-          className="underline decoration-dotted underline-offset-4"
-        >
-          switch profile
-        </Link>
-      </footer>
     </main>
   );
 }

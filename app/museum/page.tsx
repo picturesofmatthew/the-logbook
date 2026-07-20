@@ -11,7 +11,7 @@ import { HALLS } from "@/lib/halls";
 import { currentProfile } from "@/lib/session";
 
 export const metadata: Metadata = {
-  title: "The Pantry - signxsealed",
+  title: "The Pantry - signed × sealed",
 };
 
 export default async function MuseumPage() {

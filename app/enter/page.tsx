@@ -4,7 +4,7 @@ import { PET_KIT, PET_PALETTE } from "@/components/sprites";
 import { EnterForm } from "./enter-form";
 
 export const metadata: Metadata = {
-  title: "Come in - signxsealed",
+  title: "Come in — signed × sealed",
 };
 
 export default function EnterPage() {
@@ -20,7 +20,7 @@ export default function EnterPage() {
               title="A small arctic fox kit"
             />
             <h1 className="font-pixel text-3xl tracking-wide">
-              sign<span className="text-violet">x</span>sealed
+              signed<span className="text-violet"> × </span>sealed
             </h1>
             <p className="text-ink-soft">a spellbook for two</p>
           </div>

@@ -91,6 +91,52 @@ function Tuft({ x }: { x: number }) {
   );
 }
 
+// A keeper's lantern, standing in the glade. Unlit until that keeper logs
+// today, then its flame catches and it pools colored light — soft green for
+// Matthew (moss), brilliant auburn for Kennedy (ember). Both lit = the ring
+// closes and the world warms.
+function KeeperLantern({
+  x,
+  lit,
+  color,
+}: {
+  x: number;
+  lit: boolean;
+  color: string;
+}) {
+  return (
+    <g transform={`translate(${x} 132)`} aria-hidden="true">
+      {lit ? (
+        <>
+          <circle cx="0" cy="-10" r="14" fill={color} opacity="0.4" />
+          <circle cx="0" cy="-10" r="7" fill={color} opacity="0.5" />
+        </>
+      ) : null}
+      <line x1="0" y1="-5" x2="0" y2="7" stroke="var(--glade-fauna)" strokeWidth="1.6" strokeLinecap="round" />
+      <path d="M -3 -19 h6" stroke="var(--glade-fauna)" strokeWidth="1.2" strokeLinecap="round" />
+      <line x1="0" y1="-19" x2="0" y2="-16" stroke="var(--glade-fauna)" strokeWidth="1.2" />
+      <rect
+        x="-3.5"
+        y="-16"
+        width="7"
+        height="10"
+        rx="2.5"
+        fill={lit ? color : "var(--color-cream)"}
+        stroke="var(--glade-fauna)"
+        strokeWidth="1.4"
+      />
+      <ellipse
+        className={lit ? "lantern-breathe" : undefined}
+        cx="0"
+        cy="-11"
+        rx="1.3"
+        ry="2.3"
+        fill={lit ? color : "color-mix(in srgb, var(--glade-fauna) 28%, transparent)"}
+      />
+    </g>
+  );
+}
+
 // The Stag at the tree line — silhouette-first, dignified, utterly still.
 // Exported for the arrival ceremony, which frames the same silhouette.
 export function Stag({ stage }: { stage: number }) {
@@ -409,6 +455,9 @@ export function GladeScene({
   paleElk,
   inklings,
   hearthDay,
+  skyless,
+  mossLit,
+  emberLit,
 }: {
   tier: GladeTier;
   beings: BeingStages;
@@ -417,6 +466,13 @@ export function GladeScene({
   inklings: number;
   // A hearth-chord or feast-seal day — emberlings pop from the firepit.
   hearthDay: boolean;
+  // Drop the scene's own sky wash so it sits transparently on a page that
+  // already paints the sky (the glade home) — no seam where the two meet.
+  skyless?: boolean;
+  // Whether each keeper has logged today — lights their lantern in the glade
+  // (Matthew = moss green, Kennedy = ember auburn).
+  mossLit?: boolean;
+  emberLit?: boolean;
 }) {
   const counts = TIER_COUNTS[tier];
   const poolExists = beings.heron >= 1;
@@ -443,7 +499,7 @@ export function GladeScene({
       </defs>
 
       {/* wash */}
-      <rect width="360" height="150" fill="url(#glade-sky)" />
+      {skyless ? null : <rect width="360" height="150" fill="url(#glade-sky)" />}
 
       {/* stars keep to the night */}
       <g className="glade-night-only" fill="var(--color-glow)">
@@ -533,6 +589,10 @@ export function GladeScene({
         <line x1="322" y1="129" x2="338" y2="125" />
         <line x1="322" y1="126" x2="338" y2="122" strokeWidth="1.2" />
       </g>
+
+      {/* the keepers' lanterns — lit by who has logged today */}
+      <KeeperLantern x={104} lit={!!mossLit} color="var(--color-moss)" />
+      <KeeperLantern x={256} lit={!!emberLit} color="var(--color-terracotta)" />
 
       {/* beings, each in its zone */}
       {paleElk ? <PaleElk /> : null}

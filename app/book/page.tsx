@@ -10,7 +10,7 @@ import { buildMonthLedger, getGladeState } from "@/lib/ledger";
 import { currentProfile } from "@/lib/session";
 
 export const metadata: Metadata = {
-  title: "The Spellbook - signxsealed",
+  title: "The Spellbook - signed × sealed",
 };
 
 // A display-only spec for a discovered legendary's plate in the Legendarium.

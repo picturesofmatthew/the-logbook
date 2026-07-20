@@ -13,6 +13,15 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // Let a phone on the LAN hit the dev server. Next 16 blocks cross-origin
+  // dev-only assets (client JS, RSC, HMR) by default, which loads the HTML but
+  // leaves the page un-hydrated (dead buttons, full-reload links) — so testing
+  // on a real device via the Network URL needs its origin allowlisted here.
+  allowedDevOrigins: ["192.168.1.7"],
+  // React's <ViewTransition> integration — powers the spellbook page-turn.
+  experimental: {
+    viewTransition: true,
+  },
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
   },

@@ -65,6 +65,9 @@ export const foods = pgTable("foods", {
   carbsG: real("carbs_g").notNull(),
   fatG: real("fat_g").notNull(),
   isRecipe: boolean("is_recipe").notNull().default(false),
+  // A deterministic macro estimate (from the written-in "eat" line), not an
+  // exact label — the card wears a soft ~ and stays gently editable.
+  estimated: boolean("estimated").notNull().default(false),
   fdcId: integer("fdc_id"),
   discoveredBy: text("discovered_by")
     .references(() => profiles.id)

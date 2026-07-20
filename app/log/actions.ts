@@ -83,6 +83,8 @@ export type DonateInput = {
   carbsG: number;
   fatG: number;
   fdcId: number | null;
+  // A deterministic estimate (from the written-in eat line) — wears a soft ~.
+  estimated?: boolean;
   // If set, log it right away too.
   logAs: { meal: Meal; servings: number; day: string } | null;
 };
@@ -127,6 +129,7 @@ export async function donateSpecimen(
           carbsG: input.carbsG,
           fatG: input.fatG,
           fdcId: input.fdcId,
+          estimated: input.estimated ?? false,
           discoveredBy: profileId,
         })
         .returning({ id: foods.id });

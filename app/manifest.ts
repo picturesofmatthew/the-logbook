@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "signxsealed",
-    short_name: "signxsealed",
+    name: "signed × sealed",
+    short_name: "signed × sealed",
     description: "A shared logbook for Matthew & Kennedy",
     start_url: "/",
     display: "standalone",

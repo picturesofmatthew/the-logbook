@@ -22,7 +22,7 @@ import { getFirstBothDay } from "@/lib/ledger";
 import { currentProfile } from "@/lib/session";
 
 export const metadata: Metadata = {
-  title: "A day's page - signxsealed",
+  title: "A day's page - signed × sealed",
 };
 
 function foldWorkout(w: WorkoutView): { label: string; detail: string }[] {

@@ -16,7 +16,7 @@ import { addDays, currentTz, diffDays, todayIso } from "@/lib/dates";
 import { currentProfile } from "@/lib/session";
 
 export const metadata: Metadata = {
-  title: "The chart plates - signxsealed",
+  title: "The chart plates - signed × sealed",
 };
 
 // An engraved plate caption, field-guide style — the book's shared rule.
