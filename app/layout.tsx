@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Baloo_2, Pixelify_Sans } from "next/font/google";
+import { SwRegister } from "@/components/sw-register";
 import { TzSync } from "@/components/tz-sync";
 import { currentTz } from "@/lib/dates";
 import { hourInTz, lightStateForHour } from "@/lib/light";
@@ -43,6 +44,7 @@ export default async function RootLayout({
     >
       <body className="min-h-full flex flex-col font-sans">
         <TzSync />
+        <SwRegister />
         {children}
       </body>
     </html>

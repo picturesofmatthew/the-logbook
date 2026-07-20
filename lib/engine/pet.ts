@@ -56,7 +56,7 @@ const SPEECH: Record<PetMood, string[]> = {
     "Both of you! The den is warm tonight.",
     "A full logbook makes the antlers tingle.",
     "Fed twice over. What a day to be a fox.",
-    "The museum grows, and so do I.",
+    "The pantry grows, and so do I.",
   ],
   cozy: [
     "Half the den is fed. Waiting on {missing}...",

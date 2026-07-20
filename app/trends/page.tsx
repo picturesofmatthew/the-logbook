@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { RuledHeading } from "@/components/ruled-heading";
 import {
   WeightChart,
   type ChartSeries,
@@ -15,8 +16,17 @@ import { addDays, currentTz, diffDays, todayIso } from "@/lib/dates";
 import { currentProfile } from "@/lib/session";
 
 export const metadata: Metadata = {
-  title: "Trends - signxsealed",
+  title: "The chart plates - signxsealed",
 };
+
+// An engraved plate caption, field-guide style — the book's shared rule.
+function PlateCaption({ numeral, title }: { numeral: string; title: string }) {
+  return (
+    <div className="mb-3">
+      <RuledHeading title={`PLATE ${numeral} — ${title}`} />
+    </div>
+  );
+}
 
 // Fixed series colors, validated for CVD + contrast on the cream surface.
 const SERIES_COLORS: Record<Profile, string> = {
@@ -110,17 +120,28 @@ export default async function TrendsPage() {
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-5 p-4 pb-16">
       <header className="text-center">
-        <h1 className="font-pixel text-2xl tracking-wide">📈 TRENDS</h1>
-        <Link
-          href="/"
-          className="mt-1 inline-block text-sm text-ink-soft underline decoration-dotted underline-offset-4"
-        >
-          back to the journal
-        </Link>
+        <h1 className="font-pixel text-2xl tracking-wide">📈 THE CHART PLATES</h1>
+        <p className="mt-1 text-sm text-ink-soft">
+          trends, drawn into the book
+        </p>
+        <nav className="mt-1 flex items-center justify-center gap-4 text-sm text-ink-soft">
+          <Link
+            href="/"
+            className="underline decoration-dotted underline-offset-4"
+          >
+            back to the journal
+          </Link>
+          <Link
+            href="/book"
+            className="underline decoration-dotted underline-offset-4"
+          >
+            📖 the spellbook
+          </Link>
+        </nav>
       </header>
 
-      <section className="wobbly border-2 border-ink/20 bg-cream/70 p-4 shadow-card">
-        <h2 className="mb-1 font-pixel text-sm tracking-wide">WEIGHT</h2>
+      <section className="wobbly hatch border-2 border-ink/20 bg-cream/70 p-4 shadow-card">
+        <PlateCaption numeral="I" title="THE WEIGHT LINE" />
         <p className="mb-3 text-xs text-ink-soft">
           Dots are mornings; the line is your 7-day average — steer by the
           line, not the dots.
@@ -156,10 +177,8 @@ export default async function TrendsPage() {
         ) : null}
       </section>
 
-      <section className="wobbly border-2 border-ink/20 bg-cream/70 p-4 shadow-card">
-        <h2 className="mb-3 font-pixel text-sm tracking-wide">
-          WEEKLY AVERAGES
-        </h2>
+      <section className="wobbly hatch border-2 border-ink/20 bg-cream/70 p-4 shadow-card">
+        <PlateCaption numeral="II" title="THE WEEKS, AVERAGED" />
         {weeklyRows.length === 0 ? (
           <p className="text-sm text-ink-soft">
             Averages appear once meals start landing in the logbook.
@@ -205,17 +224,15 @@ export default async function TrendsPage() {
         )}
       </section>
 
-      <section className="wobbly border-2 border-ink/20 bg-cream/70 p-4 shadow-card">
-        <h2 className="mb-3 font-pixel text-sm tracking-wide">
-          {monthName.toUpperCase()}
-        </h2>
+      <section className="wobbly hatch border-2 border-ink/20 bg-cream/70 p-4 shadow-card">
+        <PlateCaption numeral="III" title={monthName.toUpperCase()} />
         <div className="grid grid-cols-7 gap-1 text-center">
-          {["S", "M", "T", "W", "T2", "F", "S2"].map((d) => (
+          {["s", "m", "t", "w", "t", "f", "s"].map((d, i) => (
             <span
-              key={d}
+              key={`${d}${i}`}
               className="font-pixel text-[9px] text-ink-soft"
             >
-              {d.charAt(0)}
+              {d}
             </span>
           ))}
           {cells.map((day, i) =>

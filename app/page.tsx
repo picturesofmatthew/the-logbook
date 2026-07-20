@@ -7,11 +7,13 @@ import { ArrivalCeremony } from "@/components/glade/arrival-ceremony";
 import { GladeHeader } from "@/components/glade/glade-header";
 import { DaySeal } from "@/components/sigil/day-seal";
 import { LegendaryCeremony } from "@/components/sigil/legendary-ceremony";
+import { SealCeremony } from "@/components/sigil/seal-ceremony";
 import { DISPLAY_NAMES, PROFILES, partnerOf, type Profile } from "@/lib/auth";
 import {
+  getArrivals,
   getAllSpecimens,
   getDayExtras,
-  getExerciseHistory,
+  getExerciseHistories,
   getFirstLogTimes,
   getJournalDay,
   getPetState,
@@ -23,9 +25,10 @@ import {
 } from "@/lib/data";
 import { addDays, currentTz, diffDays, friendlyDate, todayIso } from "@/lib/dates";
 import { getGladeState } from "@/lib/ledger";
-import type { BeingId } from "@/lib/engine/beings";
+import { paleElkGlimpsed, type BeingId } from "@/lib/engine/beings";
+import { buildKeeperDay } from "@/lib/engine/keeper-day";
 import { composeSigil, type KeeperDay } from "@/lib/engine/sigil";
-import { newMarks, trainingSummary } from "@/lib/engine/training";
+import { newMarks } from "@/lib/engine/training";
 import { totalOf } from "@/lib/engine/totals";
 import { stampsForDay } from "@/lib/engine/stamps";
 import { currentProfile } from "@/lib/session";
@@ -55,38 +58,27 @@ export default async function Home({
       getWeighIn(profile, day),
     ]);
 
-  const [dayWorkouts, firstLogs, matthewHistory, kennedyHistory, glade] =
-    await Promise.all([
-      getWorkoutsForDay(day),
-      getFirstLogTimes(day),
-      getExerciseHistory("matthew", day),
-      getExerciseHistory("kennedy", day),
-      getGladeState(today),
-    ]);
-  const histories = { matthew: matthewHistory, kennedy: kennedyHistory };
+  const [dayWorkouts, firstLogs, histories, glade] = await Promise.all([
+    getWorkoutsForDay(day),
+    getFirstLogTimes(day),
+    getExerciseHistories(day),
+    getGladeState(today),
+  ]);
 
   const keeperDay = (p: Profile): KeeperDay => {
     const total = totalOf(
       journal[p].entries.map((e) => ({ ...e.food, servings: e.servings })),
     );
-    const target = journal[p].target;
-    const summary = trainingSummary(dayWorkouts[p], histories[p].best);
-    return {
-      loggedAny: journal[p].entries.length > 0,
+    return buildKeeperDay({
       calories: total.calories,
-      targetCalories: target?.calories ?? null,
       proteinG: total.proteinG,
-      targetProteinG: target?.proteinG ?? null,
       halls: [...new Set(journal[p].entries.map((e) => e.food.hall))],
-      waterCups: extras.meta[p].waterCups,
-      mood: extras.meta[p].mood,
-      wroteNote: !!extras.meta[p].note,
-      restDay:
-        extras.meta[p].training === "rest" ||
-        summary.families.includes("rest"),
-      training: summary,
+      target: journal[p].target,
+      meta: extras.meta[p],
+      workouts: dayWorkouts[p],
+      historyBest: histories[p].best,
       firstLoggedAtMs: firstLogs[p],
-    };
+    });
   };
 
   const sigil = composeSigil({
@@ -113,22 +105,33 @@ export default async function Home({
       ? await recordLegendary(sigil.legendary, day)
       : false;
 
-  // Beings with scene art announce their first arrival; the rest arrive
-  // silently until their art lands. One ceremony per load, legends first.
-  const SCENE_BEINGS: BeingId[] = ["stag", "heron"];
+  // Every being announces its first arrival. One ceremony per load,
+  // legends first; the rest of a backlog waits for the next visit. Read the
+  // recorded arrivals once so steady state costs a single SELECT, not a
+  // no-op INSERT per already-arrived being.
   let newBeing: BeingId | null = null;
   if (isToday && !newlyDiscovered) {
-    for (const b of glade.beings) {
-      if (
-        b.arrived &&
-        SCENE_BEINGS.includes(b.id) &&
-        (await recordArrival(b.id, today))
-      ) {
+    const recorded = await getArrivals();
+    const pending = glade.beings.filter(
+      (b) => b.arrived && !recorded.has(b.id),
+    );
+    for (const b of pending) {
+      if (await recordArrival(b.id, today)) {
         newBeing = b.id;
         break;
       }
     }
   }
+
+  // The Pale Elk: glimpsed, never resident. The first glimpse is recorded
+  // silently so the bestiary can remember it ever happened.
+  const paleElk = paleElkGlimpsed({
+    gladeTier: glade.tier,
+    daysSinceLegendary: glade.lastLegendaryDay
+      ? diffDays(today, glade.lastLegendaryDay)
+      : null,
+  });
+  if (paleElk) await recordArrival("pale-elk", today);
 
   const dayNumber =
     diffDays(day, petState.adoptedAt.toISOString().slice(0, 10)) + 1;
@@ -154,6 +157,11 @@ export default async function Home({
         today={today}
         dayNumber={dayNumber}
         glade={glade}
+        paleElk={paleElk}
+        hearthDay={
+          isToday &&
+          (sigil.chords.includes("hearth") || sigil.legendary === "feast-seal")
+        }
       />
 
       <nav className="flex items-center justify-between">
@@ -192,7 +200,7 @@ export default async function Home({
         )}
       </nav>
 
-      <div className="wobbly border-2 border-ink/20 bg-cream/70 p-3 shadow-card">
+      <div className="wobbly hatch border-2 border-ink/20 bg-cream/70 p-3 shadow-card">
         <DaySeal spec={sigil} missingName={missingName} isToday={isToday} />
       </div>
 
@@ -201,6 +209,14 @@ export default async function Home({
       ) : null}
 
       {newBeing ? <ArrivalCeremony being={newBeing} /> : null}
+
+      {sigil.completed && isToday ? (
+        <SealCeremony
+          spec={sigil}
+          day={day}
+          suppressed={newlyDiscovered || newBeing != null}
+        />
+      ) : null}
 
       {stamps.length > 0 ? (
         <div className="flex flex-wrap items-center justify-center gap-1.5">
@@ -241,6 +257,8 @@ export default async function Home({
         workouts={dayWorkouts[profile]}
         exerciseNames={histories[profile].names}
         newMarkExercises={ownMarks}
+        bestEntries={[...histories[profile].best]}
+        training={extras.meta[profile].training}
       />
 
       {journal[profile].target === null ? (
@@ -248,7 +266,7 @@ export default async function Home({
           href="/settings"
           className="wobbly-sm border-2 border-dashed border-ink/30 bg-transparent px-4 py-2 text-center text-sm text-ink-soft hover:border-gold"
         >
-          no targets yet — set up your cut →
+          no targets yet — chart your course →
         </Link>
       ) : null}
 

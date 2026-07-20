@@ -233,7 +233,7 @@ export function SetupForm({ initial }: { initial: SetupInitial }) {
 
         {flooredAt ? (
           <p className="mb-4 text-sm text-terracotta">
-            Rounded up to {flooredAt.toLocaleString()} kcal - a nourishing
+            Rounded up to {flooredAt.toLocaleString()} kcal — a nourishing
             floor. Slower is safer.
           </p>
         ) : null}

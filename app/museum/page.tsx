@@ -72,7 +72,7 @@ export default async function MuseumPage() {
           <p className="text-3xl">🏛</p>
           <p className="mt-2">
             The halls are empty and echoing. Log your first meal to donate the
-            museum&apos;s very first specimen.
+            pantry&apos;s very first specimen.
           </p>
         </div>
       ) : (
@@ -80,14 +80,15 @@ export default async function MuseumPage() {
           const inHall = specimens.filter((s) => s.hall === hall.id);
           return (
             <section key={hall.id}>
-              <h2 className="mb-2 flex items-baseline justify-between font-pixel text-sm tracking-wide">
-                <span>
+              <div className="mb-2 flex items-center gap-2">
+                <span className="font-pixel text-sm tracking-wide">
                   {hall.emoji} {hall.label.toUpperCase()}
                 </span>
-                <span className="text-[10px] text-ink-soft">
+                <span className="h-px flex-1 bg-ink/20" />
+                <span className="font-pixel text-[10px] text-ink-soft">
                   {inHall.length || "—"}
                 </span>
-              </h2>
+              </div>
               {inHall.length === 0 ? (
                 <p className="wobbly-sm border-2 border-dashed border-ink/15 px-3 py-2 text-xs text-ink-soft/70">
                   awaiting its first donation

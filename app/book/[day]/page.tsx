@@ -5,7 +5,7 @@ import { DaySeal } from "@/components/sigil/day-seal";
 import { DISPLAY_NAMES, PROFILES, type Profile } from "@/lib/auth";
 import {
   getDayExtras,
-  getExerciseHistory,
+  getExerciseHistories,
   getFirstLogTimes,
   getJournalDay,
   getWeighIn,
@@ -14,8 +14,8 @@ import {
   type WorkoutView,
 } from "@/lib/data";
 import { addDays, currentTz, friendlyDate, todayIso } from "@/lib/dates";
+import { buildKeeperDay } from "@/lib/engine/keeper-day";
 import { composeSigil, type KeeperDay } from "@/lib/engine/sigil";
-import { trainingSummary } from "@/lib/engine/training";
 import { totalOf } from "@/lib/engine/totals";
 import { MEALS, type JournalEntry } from "@/lib/meals";
 import { getFirstBothDay } from "@/lib/ledger";
@@ -65,14 +65,11 @@ export default async function DayPage({
       getFirstLogTimes(day),
       getFirstBothDay(),
     ]);
-  const [matthewHistory, kennedyHistory, matthewWeighIn, kennedyWeighIn] =
-    await Promise.all([
-      getExerciseHistory("matthew", day),
-      getExerciseHistory("kennedy", day),
-      getWeighIn("matthew", day),
-      getWeighIn("kennedy", day),
-    ]);
-  const histories = { matthew: matthewHistory, kennedy: kennedyHistory };
+  const [histories, matthewWeighIn, kennedyWeighIn] = await Promise.all([
+    getExerciseHistories(day),
+    getWeighIn("matthew", day),
+    getWeighIn("kennedy", day),
+  ]);
   const weighIns = { matthew: matthewWeighIn, kennedy: kennedyWeighIn };
 
   const totals = {} as Record<Profile, ReturnType<typeof totalOf>>;
@@ -80,24 +77,16 @@ export default async function DayPage({
     totals[p] = totalOf(
       journal[p].entries.map((e) => ({ ...e.food, servings: e.servings })),
     );
-    const target = journal[p].target;
-    const summary = trainingSummary(dayWorkouts[p], histories[p].best);
-    return {
-      loggedAny: journal[p].entries.length > 0,
+    return buildKeeperDay({
       calories: totals[p].calories,
-      targetCalories: target?.calories ?? null,
       proteinG: totals[p].proteinG,
-      targetProteinG: target?.proteinG ?? null,
       halls: [...new Set(journal[p].entries.map((e) => e.food.hall))],
-      waterCups: extras.meta[p].waterCups,
-      mood: extras.meta[p].mood,
-      wroteNote: !!extras.meta[p].note,
-      restDay:
-        extras.meta[p].training === "rest" ||
-        summary.families.includes("rest"),
-      training: summary,
+      target: journal[p].target,
+      meta: extras.meta[p],
+      workouts: dayWorkouts[p],
+      historyBest: histories[p].best,
       firstLoggedAtMs: firstLogs[p],
-    };
+    });
   };
 
   const spec = composeSigil({

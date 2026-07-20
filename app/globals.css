@@ -148,6 +148,12 @@ html[data-light="dusk"] .glade-dark-only,
 html[data-light="night"] .glade-dark-only {
   display: initial;
 }
+.glade-dusk-only {
+  display: none;
+}
+html[data-light="dusk"] .glade-dusk-only {
+  display: initial;
+}
 html[data-light="dusk"] .glade-day-only,
 html[data-light="night"] .glade-day-only {
   display: none;
@@ -179,6 +185,65 @@ html[data-light="night"] .glade-day-only {
     transform: rotate(5deg);
   }
 }
+.inkling-hop {
+  animation: inkling-hop 3.6s ease-in-out infinite;
+}
+@keyframes inkling-hop {
+  0%,
+  55%,
+  100% {
+    transform: translate(0, 0);
+  }
+  62% {
+    transform: translate(2px, -4px);
+  }
+  70% {
+    transform: translate(4px, 0);
+  }
+  82% {
+    transform: translate(1px, -2px);
+  }
+}
+.emberling-drift {
+  animation: emberling-drift 2.6s ease-in infinite;
+}
+@keyframes emberling-drift {
+  0% {
+    transform: translateY(0);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(-14px);
+    opacity: 0;
+  }
+}
+.moth-flutter {
+  animation: moth-flutter 2.8s ease-in-out infinite;
+}
+@keyframes moth-flutter {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(-6deg);
+  }
+  35% {
+    transform: translate(-3px, -4px) rotate(5deg);
+  }
+  70% {
+    transform: translate(2px, -2px) rotate(-3deg);
+  }
+}
+.koi-drift {
+  animation: koi-drift 7s ease-in-out infinite;
+}
+@keyframes koi-drift {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate(-6px, 1px) rotate(8deg);
+  }
+}
 .lantern-breathe {
   animation: lantern-breathe 5s ease-in-out infinite;
 }
@@ -194,6 +259,10 @@ html[data-light="night"] .glade-day-only {
 @media (prefers-reduced-motion: reduce) {
   .wick-flicker,
   .mossling-tilt,
+  .moth-flutter,
+  .koi-drift,
+  .inkling-hop,
+  .emberling-drift,
   .lantern-breathe {
     animation: none;
   }

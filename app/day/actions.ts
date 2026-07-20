@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { db } from "@/db";
 import { dayMeta, weighIns } from "@/db/schema";
+import { safely } from "@/lib/safe";
 import { todayIso } from "@/lib/dates";
 import { currentProfile } from "@/lib/session";
 
@@ -45,16 +46,18 @@ export async function saveWeighIn(input: {
   if (!(input.weightLb >= 60 && input.weightLb <= 600)) {
     return { error: "That weight doesn't look right." };
   }
-  await db
-    .insert(weighIns)
-    .values({ profileId, day, weightLb: input.weightLb })
-    .onConflictDoUpdate({
-      target: [weighIns.profileId, weighIns.day],
-      set: { weightLb: input.weightLb },
-    });
-  revalidatePath("/");
-  revalidatePath("/trends");
-  return {};
+  return safely(async () => {
+    await db
+      .insert(weighIns)
+      .values({ profileId, day, weightLb: input.weightLb })
+      .onConflictDoUpdate({
+        target: [weighIns.profileId, weighIns.day],
+        set: { weightLb: input.weightLb },
+      });
+    revalidatePath("/");
+    revalidatePath("/trends");
+    return {};
+  });
 }
 
 export async function setTraining(input: {
@@ -70,9 +73,11 @@ export async function setTraining(input: {
   ) {
     return { error: "Unknown training type." };
   }
-  await upsertMeta(profileId, day, { training: input.training });
-  revalidatePath("/");
-  return {};
+  return safely(async () => {
+    await upsertMeta(profileId, day, { training: input.training });
+    revalidatePath("/");
+    return {};
+  });
 }
 
 export async function setWater(input: {
@@ -84,22 +89,39 @@ export async function setWater(input: {
   if (!day) return { error: "Unknown day." };
   const cups = Math.round(input.cups);
   if (!(cups >= 0 && cups <= 20)) return { error: "That's a lot of water." };
-  await upsertMeta(profileId, day, { waterCups: cups });
-  revalidatePath("/");
-  return {};
+  return safely(async () => {
+    await upsertMeta(profileId, day, { waterCups: cups });
+    revalidatePath("/");
+    return {};
+  });
 }
 
-export async function saveNote(input: {
+export async function setMood(input: {
   day: string;
-  note: string;
   mood: string;
 }): Promise<{ error?: string }> {
   const profileId = await currentProfile();
   const day = await guardedDay(input.day);
   if (!day) return { error: "Unknown day." };
-  const note = input.note.trim().slice(0, 240) || null;
   const mood = input.mood.trim().slice(0, 8) || null;
-  await upsertMeta(profileId, day, { note, mood });
-  revalidatePath("/");
-  return {};
+  return safely(async () => {
+    await upsertMeta(profileId, day, { mood });
+    revalidatePath("/");
+    return {};
+  });
+}
+
+export async function saveNote(input: {
+  day: string;
+  note: string;
+}): Promise<{ error?: string }> {
+  const profileId = await currentProfile();
+  const day = await guardedDay(input.day);
+  if (!day) return { error: "Unknown day." };
+  const note = input.note.trim().slice(0, 240) || null;
+  return safely(async () => {
+    await upsertMeta(profileId, day, { note });
+    revalidatePath("/");
+    return {};
+  });
 }

@@ -27,6 +27,10 @@ function secret(): string {
   return s;
 }
 
+export async function hmacDigest(value: string): Promise<string> {
+  return hmac(value);
+}
+
 async function hmac(value: string): Promise<string> {
   const key = await crypto.subtle.importKey(
     "raw",
@@ -43,7 +47,7 @@ async function hmac(value: string): Promise<string> {
   return btoa(bin).replaceAll("+", "-").replaceAll("/", "_").replace(/=+$/, "");
 }
 
-function timingSafeEqual(a: string, b: string): boolean {
+export function timingSafeEqual(a: string, b: string): boolean {
   if (a.length !== b.length) return false;
   let diff = 0;
   for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);

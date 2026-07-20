@@ -6,26 +6,7 @@
 import { useEffect, useState } from "react";
 import { BEINGS, type BeingId } from "@/lib/engine/beings";
 import { arrivalTone } from "@/lib/sounds";
-import { Heron, Stag } from "./glade-scene";
-
-// Tight viewBox windows around each being's scene-space position.
-function BeingPortrait({ being }: { being: BeingId }) {
-  if (being === "stag") {
-    return (
-      <svg viewBox="276 50 60 78" width="120" height="156" aria-hidden>
-        <Stag stage={1} />
-      </svg>
-    );
-  }
-  if (being === "heron") {
-    return (
-      <svg viewBox="60 76 40 56" width="100" height="140" aria-hidden>
-        <Heron stage={1} />
-      </svg>
-    );
-  }
-  return null;
-}
+import { BeingPortrait } from "./being-portrait";
 
 export function ArrivalCeremony({ being }: { being: BeingId }) {
   const [open, setOpen] = useState(true);

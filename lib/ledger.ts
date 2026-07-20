@@ -23,6 +23,7 @@ import {
   type GladeDay,
   type GladeTier,
 } from "@/lib/engine/glade";
+import { buildKeeperDay } from "@/lib/engine/keeper-day";
 import {
   composeSigil,
   isLowMood,
@@ -30,7 +31,8 @@ import {
   type SigilSpec,
 } from "@/lib/engine/sigil";
 import {
-  trainingSummary,
+  est1Rm,
+  normalizeExercise,
   type Workout,
   type WorkoutSet,
 } from "@/lib/engine/training";
@@ -122,15 +124,19 @@ export async function buildLedgerRange(
           .orderBy(asc(workoutSets.id))
       : [];
 
-  // Every lift set ever, by profile and day, for rolling PR history.
+  // Lift sets up to the range's end, narrow columns only, for rolling PR
+  // history. Sets after `end` can never affect a day inside the range.
   const allSetRows = await db
     .select({
-      set: workoutSets,
+      exercise: workoutSets.exercise,
+      weightLb: workoutSets.weightLb,
+      reps: workoutSets.reps,
       day: workouts.day,
       profileId: workouts.profileId,
     })
     .from(workoutSets)
     .innerJoin(workouts, eq(workoutSets.workoutId, workouts.id))
+    .where(and(eq(workoutSets.kind, "lift"), lte(workouts.day, end)))
     .orderBy(asc(workouts.day), asc(workoutSets.id));
 
   // Food facts per profile per day.
@@ -167,19 +173,15 @@ export async function buildLedgerRange(
   }
 
   // Rolling per-exercise bests per profile, snapshotted before each day.
+  // (Days with no lift sets have no snapshot; the empty-map fallback is
+  // harmless there — a day without lifts can't strike a New Mark.)
   const historyBefore = new Map<Profile, Map<string, Map<string, number>>>();
   for (const profile of PROFILES) {
     const mine = allSetRows.filter((r) => r.profileId === profile);
-    const byDay = new Map<string, WorkoutSet[]>();
+    const byDay = new Map<string, typeof mine>();
     for (const r of mine) {
       const list = byDay.get(r.day) ?? [];
-      list.push({
-        kind: r.set.kind,
-        exercise: r.set.exercise,
-        weightLb: r.set.weightLb,
-        reps: r.set.reps,
-        minutes: r.set.minutes,
-      });
+      list.push(r);
       byDay.set(r.day, list);
     }
     const snapshots = new Map<string, Map<string, number>>();
@@ -187,9 +189,9 @@ export async function buildLedgerRange(
     for (const day of [...byDay.keys()].sort()) {
       snapshots.set(day, new Map(rolling));
       for (const s of byDay.get(day) ?? []) {
-        if (s.kind !== "lift" || s.weightLb == null || !s.reps) continue;
-        const k = s.exercise.trim().replace(/\s+/g, " ").toLowerCase();
-        const rm = s.weightLb * (s.reps <= 1 ? 1 : 1 + s.reps / 30);
+        if (s.weightLb == null || !s.reps) continue;
+        const k = normalizeExercise(s.exercise);
+        const rm = est1Rm(s.weightLb, s.reps);
         if (rm > (rolling.get(k) ?? 0)) rolling.set(k, rm);
       }
     }
@@ -209,25 +211,17 @@ export async function buildLedgerRange(
     const meta = metaRows.find(
       (m) => m.profileId === profile && m.day === day,
     );
-    const dayWorkouts = workoutsByKey.get(`${profile}:${day}`) ?? [];
-    const history =
-      historyBefore.get(profile)?.get(day) ?? new Map<string, number>();
-    const summary = trainingSummary(dayWorkouts, history);
-    const target = targetFor(profile, day);
-    return {
-      loggedAny: f.calories > 0 || f.halls.size > 0,
+    return buildKeeperDay({
       calories: f.calories,
-      targetCalories: target?.calories ?? null,
       proteinG: f.proteinG,
-      targetProteinG: target?.proteinG ?? null,
       halls: [...f.halls],
-      waterCups: meta?.waterCups ?? 0,
-      mood: meta?.mood ?? null,
-      wroteNote: !!meta?.note,
-      restDay: meta?.training === "rest" || summary.families.includes("rest"),
-      training: summary,
+      target: targetFor(profile, day),
+      meta: meta ?? null,
+      workouts: workoutsByKey.get(`${profile}:${day}`) ?? [],
+      historyBest:
+        historyBefore.get(profile)?.get(day) ?? new Map<string, number>(),
       firstLoggedAtMs: f.firstLoggedAtMs,
-    };
+    });
   };
 
   const days: LedgerEntry[] = [];
@@ -255,6 +249,11 @@ export async function buildLedgerRange(
   return days;
 }
 
+// Ledger results are always derived from source rows, never stored — the
+// whole history grows seals retroactively the moment it is read. Reads run
+// on dynamic (cookie-gated) pages that already recompute per request; the
+// bounded queries below keep that cheap. Per-household caching is a
+// scale-time concern, designed alongside the household boundary.
 export async function buildMonthLedger(
   monthPrefix: string, // "YYYY-MM"
   today: string,
@@ -268,12 +267,14 @@ export async function buildMonthLedger(
 export type GladeState = {
   tier: GladeTier;
   beings: BeingState[];
+  // The most recent legendary day, if any — the Pale Elk listens for it.
+  lastLegendaryDay: string | null;
 };
 
 export async function getGladeState(today: string): Promise<GladeState> {
   const firstDay = await getFirstEntryDay();
   if (!firstDay) {
-    return { tier: "hushed", beings: beingStates([]) };
+    return { tier: "hushed", beings: beingStates([]), lastLegendaryDay: null };
   }
 
   const ledger = await buildLedgerRange(firstDay, today, today);
@@ -299,12 +300,16 @@ export async function getGladeState(today: string): Promise<GladeState> {
     .slice(-WINDOW_DAYS)
     .map(toGladeDay);
 
+  const lastLegendaryDay =
+    ledger.filter((e) => e.spec.legendary != null).at(-1)?.day ?? null;
+
   return {
     tier: gladeTier(
       vitalityScore(window),
       tierForScore(vitalityScore(yesterdayWindow)),
     ),
     beings: beingStates(history),
+    lastLegendaryDay,
   };
 }
 

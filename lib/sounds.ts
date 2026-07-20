@@ -117,6 +117,17 @@ export function legendaryTone(): void {
   tone(ac, 1567.98, 1.1, 0.5, 0.02); // the shimmer
 }
 
+// Two halves meeting: moss, then ember, resolving into one held note.
+// Played once when the day's ring first closes. Quieter than arrival.
+export function sealTone(): void {
+  if (isMuted()) return;
+  const ac = audioCtx();
+  if (!ac) return;
+  swell(ac, 220, 0, 0.9, 0.032); // A3 — one half
+  swell(ac, 329.63, 0.18, 0.9, 0.03); // E4 — the other
+  swell(ac, 440, 0.5, 1.1, 0.026); // A4 — the union
+}
+
 // A gentle rising presence for a being's arrival — quieter than legend.
 export function arrivalTone(): void {
   if (isMuted()) return;
@@ -124,6 +135,17 @@ export function arrivalTone(): void {
   if (!ac) return;
   swell(ac, 261.63, 0, 1.2, 0.04); // C4
   swell(ac, 392, 0.25, 1.2, 0.035); // G4
+}
+
+// A bright little rising spark for a New Mark — bigger than a pen-tap,
+// far smaller than a legend. Iron, honored.
+export function newMarkTone(): void {
+  if (isMuted()) return;
+  const ac = audioCtx();
+  if (!ac) return;
+  tone(ac, 659.25, 0, 0.12); // E5
+  tone(ac, 880, 0.1, 0.12); // A5
+  tone(ac, 1318.51, 0.22, 0.3, 0.035); // E6 — the star
 }
 
 // A dry pen-tap for inscribing a workout.

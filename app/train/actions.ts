@@ -5,6 +5,7 @@ import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { dayMeta, workouts, workoutSets } from "@/db/schema";
 import { todayIso } from "@/lib/dates";
+import { safely } from "@/lib/safe";
 import { currentProfile } from "@/lib/session";
 
 function validDay(day: unknown): day is string {
@@ -66,47 +67,49 @@ export async function logWorkout(input: {
   }
   const clean = sets as SetInput[];
 
-  const [workout] = await db
-    .insert(workouts)
-    .values({
-      profileId,
-      day,
-      title,
-      note: input.note?.trim().slice(0, 240) || null,
-    })
-    .returning({ id: workouts.id });
+  return safely(async () => {
+    const [workout] = await db
+      .insert(workouts)
+      .values({
+        profileId,
+        day,
+        title,
+        note: input.note?.trim().slice(0, 240) || null,
+      })
+      .returning({ id: workouts.id });
 
-  if (clean.length > 0) {
-    await db.insert(workoutSets).values(
-      clean.map((s, i) => ({
-        workoutId: workout.id,
-        kind: s.kind,
-        exercise: s.exercise,
-        setIndex: i,
-        weightLb: s.weightLb,
-        reps: s.reps,
-        minutes: s.minutes,
-      })),
-    );
-  }
+    if (clean.length > 0) {
+      await db.insert(workoutSets).values(
+        clean.map((s, i) => ({
+          workoutId: workout.id,
+          kind: s.kind,
+          exercise: s.exercise,
+          setIndex: i,
+          weightLb: s.weightLb,
+          reps: s.reps,
+          minutes: s.minutes,
+        })),
+      );
+    }
 
-  // Keep the quick-mark in step: a real workout speaks for the day.
-  const training =
-    clean.length === 0
-      ? ("rest" as const)
-      : clean.some((s) => s.kind === "lift")
-        ? ("lift" as const)
-        : ("cardio" as const);
-  await db
-    .insert(dayMeta)
-    .values({ profileId, day, training })
-    .onConflictDoUpdate({
-      target: [dayMeta.profileId, dayMeta.day],
-      set: { training },
-    });
+    // Keep the quick-mark in step: a real workout speaks for the day.
+    const training =
+      clean.length === 0
+        ? ("rest" as const)
+        : clean.some((s) => s.kind === "lift")
+          ? ("lift" as const)
+          : ("cardio" as const);
+    await db
+      .insert(dayMeta)
+      .values({ profileId, day, training })
+      .onConflictDoUpdate({
+        target: [dayMeta.profileId, dayMeta.day],
+        set: { training },
+      });
 
-  revalidatePath("/");
-  return {};
+    revalidatePath("/");
+    return {};
+  });
 }
 
 export async function deleteWorkout(input: {
@@ -115,9 +118,11 @@ export async function deleteWorkout(input: {
   const profileId = await currentProfile();
   const id = Math.round(Number(input.id));
   if (!Number.isFinite(id)) return { error: "Unknown workout." };
-  await db
-    .delete(workouts)
-    .where(and(eq(workouts.id, id), eq(workouts.profileId, profileId)));
-  revalidatePath("/");
-  return {};
+  return safely(async () => {
+    await db
+      .delete(workouts)
+      .where(and(eq(workouts.id, id), eq(workouts.profileId, profileId)));
+    revalidatePath("/");
+    return {};
+  });
 }

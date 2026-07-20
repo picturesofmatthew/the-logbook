@@ -4,7 +4,10 @@
 // and lantern night. Generated placeholder art: Matthew's masters replace
 // layers one-for-one later.
 
+import type { BeingId } from "@/lib/engine/beings";
 import type { GladeTier } from "@/lib/engine/glade";
+
+export type BeingStages = Record<BeingId, number>;
 
 const WICK_SPOTS = [
   { x: 120, y: 96 },
@@ -43,15 +46,36 @@ const STAR_SPOTS = [
   { x: 340, y: 34 },
 ];
 
+const DEWDROP_SPOTS = [
+  { x: 64, y: 120 },
+  { x: 93, y: 121 },
+  { x: 78, y: 117 },
+];
+const INKLING_SPOTS = [
+  { x: 321, y: 117 },
+  { x: 339, y: 112 },
+];
+const EMBERLING_SPOTS = [
+  { x: 216, y: 128 },
+  { x: 220, y: 126 },
+  { x: 224, y: 128 },
+];
+
 const TIER_COUNTS: Record<
   GladeTier,
-  { tufts: number; blooms: number; wicks: number; mosslings: number }
+  {
+    tufts: number;
+    blooms: number;
+    wicks: number;
+    mosslings: number;
+    dewdrops: number;
+  }
 > = {
-  hushed: { tufts: 3, blooms: 0, wicks: 1, mosslings: 1 },
-  waking: { tufts: 5, blooms: 1, wicks: 2, mosslings: 2 },
-  green: { tufts: 8, blooms: 3, wicks: 3, mosslings: 3 },
-  flourishing: { tufts: 10, blooms: 5, wicks: 5, mosslings: 4 },
-  radiant: { tufts: 12, blooms: 7, wicks: 7, mosslings: 4 },
+  hushed: { tufts: 3, blooms: 0, wicks: 1, mosslings: 1, dewdrops: 0 },
+  waking: { tufts: 5, blooms: 1, wicks: 2, mosslings: 2, dewdrops: 1 },
+  green: { tufts: 8, blooms: 3, wicks: 3, mosslings: 3, dewdrops: 2 },
+  flourishing: { tufts: 10, blooms: 5, wicks: 5, mosslings: 4, dewdrops: 2 },
+  radiant: { tufts: 12, blooms: 7, wicks: 7, mosslings: 4, dewdrops: 3 },
 };
 
 function Tuft({ x }: { x: number }) {
@@ -148,17 +172,254 @@ export function Heron({ stage }: { stage: number }) {
   );
 }
 
+// ── The second wave and the deep wood ──
+// Same recipe as the Stag and Heron: silhouette-first, one color, trust
+// stages adding gold then violet. Each group is a swappable layer.
+
+// The Tortoise on the moss bank — a garden riding a patient dome.
+export function Tortoise({ stage }: { stage: number }) {
+  if (stage < 1) return null;
+  const c = "var(--glade-fauna)";
+  return (
+    <g transform="translate(118 133)" aria-label="the Tortoise">
+      <path d="M -8 3 Q -8 -5 0 -5 Q 8 -5 8 3 Z" fill={c} />
+      <rect x="-9.5" y="2" width="19" height="2.4" rx="1.2" fill={c} />
+      <ellipse cx="10.5" cy="1.6" rx="2.6" ry="2" fill={c} />
+      {/* the shell-garden deepens with trust */}
+      <path
+        d="M -3 -5 q 0 -3 1.5 -4 M 2 -5 q 1 -2.5 3 -3"
+        fill="none"
+        stroke="var(--color-moss-deep)"
+        strokeWidth="1.1"
+        strokeLinecap="round"
+      />
+      {stage >= 2 ? (
+        <g fill="var(--color-gold)">
+          <circle cx="-1.5" cy="-9.5" r="1.2" />
+          <circle cx="5" cy="-8.5" r="1" />
+        </g>
+      ) : null}
+      {stage >= 3 ? (
+        <circle cx="2" cy="-11" r="1.5" fill="var(--color-violet-bright)" />
+      ) : null}
+    </g>
+  );
+}
+
+// The Moth at the lantern — night-only in the scene; a portrait shows it
+// in any light.
+export function Moth({ stage, portrait }: { stage: number; portrait?: boolean }) {
+  if (stage < 1) return null;
+  const c = "var(--color-glow)";
+  return (
+    <g className={portrait ? undefined : "glade-dark-only"} aria-label="the Moth">
+      <g
+        className="moth-flutter"
+        style={{ transformBox: "fill-box", transformOrigin: "center" }}
+        transform="translate(172 99)"
+      >
+        <ellipse cx="0" cy="0" rx="1.2" ry="2.6" fill={c} />
+        <path d="M -1 -1 Q -6 -4 -6.5 0 Q -6 3 -1 1 Z" fill={c} opacity="0.85" />
+        <path d="M 1 -1 Q 6 -4 6.5 0 Q 6 3 1 1 Z" fill={c} opacity="0.85" />
+        {stage >= 2 ? (
+          <g fill="var(--color-gold)" opacity="0.9">
+            <circle cx="-4" cy="0" r="0.6" />
+            <circle cx="4" cy="0" r="0.6" />
+          </g>
+        ) : null}
+        {stage >= 3 ? (
+          <circle cx="0" cy="-2.8" r="0.8" fill="var(--color-violet-bright)" />
+        ) : null}
+      </g>
+    </g>
+  );
+}
+
+// The Crow at the dark edge — a watcher with a lantern eye.
+export function Crow({ stage, portrait }: { stage: number; portrait?: boolean }) {
+  if (stage < 1) return null;
+  const c = "var(--glade-fauna)";
+  return (
+    <g transform="translate(26 66)" aria-label="the Crow">
+      <ellipse cx="0" cy="0" rx="5" ry="3.4" fill={c} transform="rotate(-8)" />
+      <path d="M 3 -2 Q 6 -5 5 -7 Q 8 -6 8 -3 Z" fill={c} />
+      <path d="M -4 1 L -10 3.5 L -4 3 Z" fill={c} />
+      <line x1="-1" y1="3" x2="-1" y2="6" stroke={c} strokeWidth="1.1" />
+      <line x1="2" y1="3" x2="2" y2="6" stroke={c} strokeWidth="1.1" />
+      {/* the lantern eye, lit after dark */}
+      <circle
+        className={portrait ? undefined : "glade-dark-only"}
+        cx="5.6"
+        cy="-4.6"
+        r="0.8"
+        fill="var(--color-gold)"
+      />
+      {stage >= 2 ? (
+        <circle cx="-2" cy="-2" r="0.9" fill="var(--color-gold)" opacity="0.8" />
+      ) : null}
+      {stage >= 3 ? (
+        <circle cx="1" cy="-3.4" r="1" fill="var(--color-violet-bright)" opacity="0.9" />
+      ) : null}
+    </g>
+  );
+}
+
+// The Hare in the meadow grass — ears first, always listening.
+export function Hare({ stage }: { stage: number }) {
+  if (stage < 1) return null;
+  const c = "var(--glade-fauna)";
+  return (
+    <g transform="translate(256 131)" aria-label="the Hare">
+      <ellipse cx="0" cy="0" rx="5.5" ry="4" fill={c} />
+      <circle cx="5.5" cy="-3.5" r="2.8" fill={c} />
+      <path d="M 4.5 -6 Q 3.5 -13 5.5 -14 Q 7 -12 6.5 -6 Z" fill={c} />
+      <path d="M 7 -6 Q 8 -12 10 -12.5 Q 10.5 -10 8.8 -5.5 Z" fill={c} />
+      <circle cx="-4.5" cy="-2" r="1.6" fill={c} />
+      {stage >= 2 ? (
+        <circle cx="5.5" cy="-14.5" r="1" fill="var(--color-gold)" />
+      ) : null}
+      {stage >= 3 ? (
+        <circle cx="10" cy="-13" r="1.2" fill="var(--color-violet-bright)" />
+      ) : null}
+    </g>
+  );
+}
+
+// The Salamander in the firepit — the anti-guilt being, warm-bellied.
+export function Salamander({ stage }: { stage: number }) {
+  if (stage < 1) return null;
+  const c = "var(--glade-fauna)";
+  return (
+    <g transform="translate(224 129)" aria-label="the Salamander">
+      <path
+        d="M -6 2 Q -2 -1 2 1 Q 6 3 9 1"
+        fill="none"
+        stroke={c}
+        strokeWidth="2.6"
+        strokeLinecap="round"
+      />
+      <circle cx="-7" cy="1.5" r="1.9" fill={c} />
+      <circle className="glade-dark-only lantern-breathe" cx="0" cy="0.6" r="1" fill="var(--color-gold)" />
+      {stage >= 2 ? (
+        <g fill="var(--color-gold)" opacity="0.9">
+          <circle cx="3" cy="1.4" r="0.7" />
+          <circle cx="6" cy="1.6" r="0.7" />
+        </g>
+      ) : null}
+      {stage >= 3 ? (
+        <circle cx="9.5" cy="0.6" r="0.9" fill="var(--color-violet-bright)" />
+      ) : null}
+    </g>
+  );
+}
+
+// The Owl at the book-stand — the night reader.
+export function Owl({ stage, portrait }: { stage: number; portrait?: boolean }) {
+  if (stage < 1) return null;
+  const c = "var(--glade-fauna)";
+  return (
+    <g transform="translate(330 116)" aria-label="the Owl">
+      <ellipse cx="0" cy="0" rx="4.2" ry="5.2" fill={c} />
+      <path d="M -3.4 -4 L -4.6 -7 L -1.8 -5.2 Z" fill={c} />
+      <path d="M 3.4 -4 L 4.6 -7 L 1.8 -5.2 Z" fill={c} />
+      {/* eyes catch the lantern after dark */}
+      <g className={portrait ? undefined : "glade-dark-only"} fill="var(--color-gold)">
+        <circle cx="-1.6" cy="-2.2" r="0.9" />
+        <circle cx="1.6" cy="-2.2" r="0.9" />
+      </g>
+      {stage >= 2 ? (
+        <path
+          d="M -2.5 2 q 2.5 1.6 5 0"
+          fill="none"
+          stroke="var(--color-gold)"
+          strokeWidth="0.8"
+          strokeLinecap="round"
+          opacity="0.9"
+        />
+      ) : null}
+      {stage >= 3 ? (
+        <circle cx="0" cy="-6.8" r="1" fill="var(--color-violet-bright)" />
+      ) : null}
+    </g>
+  );
+}
+
+// The Koi in the pool — violet-flecked luck, drifting.
+export function Koi({ stage }: { stage: number }) {
+  if (stage < 1) return null;
+  const c = "var(--color-glow)";
+  return (
+    <g aria-label="the Koi">
+      <g
+        className="koi-drift"
+        style={{ transformBox: "fill-box", transformOrigin: "center" }}
+        transform="translate(90 124)"
+      >
+        <path d="M -4 0 Q 0 -2.2 4 0 Q 0 2.2 -4 0 Z" fill={c} opacity="0.9" />
+        <path d="M 4 0 L 6.5 -1.6 L 6.5 1.6 Z" fill={c} opacity="0.8" />
+        <circle cx="-1" cy="-0.4" r="0.7" fill="var(--color-violet-bright)" />
+        {stage >= 2 ? (
+          <circle cx="1.5" cy="0.4" r="0.6" fill="var(--color-violet-bright)" opacity="0.8" />
+        ) : null}
+      </g>
+    </g>
+  );
+}
+
+// The Pale Elk — never a resident, only a glimpse at the far tree line:
+// moon-pale, moss-hung antlers, footsteps that bloom where it stood.
+export function PaleElk() {
+  const c = "var(--color-glow)";
+  return (
+    <g transform="translate(44 80)" opacity="0.55" aria-label="the Pale Elk">
+      <g stroke={c} strokeWidth="1.8" strokeLinecap="round">
+        <line x1="-7" y1="12" x2="-8" y2="26" />
+        <line x1="-2" y1="13" x2="-2" y2="26" />
+        <line x1="6" y1="13" x2="5" y2="26" />
+        <line x1="9" y1="12" x2="11" y2="26" />
+      </g>
+      <ellipse cx="0" cy="8" rx="11.5" ry="5.5" fill={c} />
+      <path d="M 8 6 Q 13 0 14 -7 L 17 -6 Q 15 1 11 8 Z" fill={c} />
+      <ellipse cx="16.5" cy="-7.5" rx="3.6" ry="2.6" fill={c} />
+      <g stroke={c} strokeWidth="1.4" strokeLinecap="round" fill="none">
+        <path d="M 15 -10 Q 12 -22 5 -27" />
+        <path d="M 12 -17 Q 8 -20 4 -19" />
+        <path d="M 17 -10 Q 20 -22 27 -26" />
+        <path d="M 20 -17 Q 25 -20 28 -19" />
+        <path d="M 9 -22 Q 6 -24 3 -23" />
+      </g>
+      {/* moss hangs from the crown */}
+      <g stroke="var(--color-moss)" strokeWidth="1" strokeLinecap="round" opacity="0.9">
+        <line x1="5" y1="-27" x2="4.5" y2="-23" />
+        <line x1="27" y1="-26" x2="26.5" y2="-22" />
+      </g>
+      {/* footsteps bloom and fade behind it */}
+      <g fill="var(--color-gold)" opacity="0.7">
+        <circle cx="-14" cy="27" r="1" />
+        <circle cx="-20" cy="28" r="0.8" />
+        <circle cx="-26" cy="27.5" r="0.6" />
+      </g>
+    </g>
+  );
+}
+
 export function GladeScene({
   tier,
-  stagStage,
-  heronStage,
+  beings,
+  paleElk,
+  inklings,
+  hearthDay,
 }: {
   tier: GladeTier;
-  stagStage: number;
-  heronStage: number;
+  beings: BeingStages;
+  paleElk: boolean;
+  // How many keepers inscribed today's page — inklings gather at the book.
+  inklings: number;
+  // A hearth-chord or feast-seal day — emberlings pop from the firepit.
+  hearthDay: boolean;
 }) {
   const counts = TIER_COUNTS[tier];
-  const poolExists = heronStage >= 1;
+  const poolExists = beings.heron >= 1;
 
   return (
     <svg
@@ -273,9 +534,17 @@ export function GladeScene({
         <line x1="322" y1="126" x2="338" y2="122" strokeWidth="1.2" />
       </g>
 
-      {/* beings */}
-      <Stag stage={stagStage} />
-      <Heron stage={heronStage} />
+      {/* beings, each in its zone */}
+      {paleElk ? <PaleElk /> : null}
+      <Crow stage={beings.crow} />
+      <Stag stage={beings.stag} />
+      <Heron stage={beings.heron} />
+      <Tortoise stage={beings.tortoise} />
+      <Hare stage={beings.hare} />
+      <Salamander stage={beings.salamander} />
+      <Owl stage={beings.owl} />
+      {poolExists ? <Koi stage={beings.koi} /> : null}
+      <Moth stage={beings.moth} />
 
       {/* the small folk */}
       <g className="glade-dark-only">
@@ -307,6 +576,82 @@ export function GladeScene({
           </g>
         ))}
       </g>
+
+      {/* dewdrops — pool spirits at dusk, only once the Heron's pool exists */}
+      {poolExists ? (
+        <g className="glade-dusk-only">
+          {DEWDROP_SPOTS.slice(0, counts.dewdrops).map((d, i) => (
+            <g
+              key={i}
+              className="lantern-breathe"
+              style={{ animationDelay: `${(i % 3) * -1.6}s` }}
+            >
+              <circle cx={d.x} cy={d.y} r="1.3" fill="var(--color-glow)" />
+              <circle
+                cx={d.x}
+                cy={d.y + 1.5}
+                r="2.6"
+                fill="none"
+                stroke="var(--color-glow)"
+                strokeWidth="0.5"
+                opacity="0.5"
+              />
+            </g>
+          ))}
+        </g>
+      ) : null}
+
+      {/* inklings — ink-drop spirits with paper wings, hopping at the book
+          for each keeper who inscribed today's page */}
+      {INKLING_SPOTS.slice(0, Math.max(0, Math.min(inklings, 2))).map(
+        (s, i) => (
+          <g
+            key={i}
+            className="inkling-hop"
+            style={{
+              transformBox: "fill-box",
+              transformOrigin: "center bottom",
+              animationDelay: `${i * -1.7}s`,
+            }}
+          >
+            <path
+              d={`M ${s.x} ${s.y} q -1 -2.6 0 -3.4 q 1 0.8 0 3.4`}
+              fill="var(--glade-fauna)"
+            />
+            <path
+              d={`M ${s.x - 0.6} ${s.y - 2.2} q -2.4 -1.4 -3 0.2`}
+              fill="none"
+              stroke="var(--color-glow)"
+              strokeWidth="0.7"
+              strokeLinecap="round"
+            />
+            <path
+              d={`M ${s.x + 0.6} ${s.y - 2.2} q 2.4 -1.4 3 0.2`}
+              fill="none"
+              stroke="var(--color-glow)"
+              strokeWidth="0.7"
+              strokeLinecap="round"
+            />
+          </g>
+        ),
+      )}
+
+      {/* emberlings — hearth sparks on feast and hearth days */}
+      {hearthDay ? (
+        <g>
+          {EMBERLING_SPOTS.map((e, i) => (
+            <circle
+              key={i}
+              className="emberling-drift"
+              style={{ animationDelay: `${i * -0.9}s` }}
+              cx={e.x}
+              cy={e.y}
+              r={i === 1 ? 1.1 : 0.8}
+              fill="var(--color-gold)"
+            />
+          ))}
+        </g>
+      ) : null}
     </svg>
   );
 }

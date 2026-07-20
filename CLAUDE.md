@@ -16,7 +16,7 @@
 - Engine logic (`lib/engine/*`) is pure and unit-tested: `npm test`
 - Sprites are string maps in `components/sprites.ts`; preview to PNG with `node scripts/preview-sprite.mjs <outDir>`; icons regenerate with `npm run icons`
 - "Today" follows a timezone cookie (`components/tz-sync.tsx`) — survives the move to Chiang Mai
-- DB is Neon via the Vercel marketplace integration; schema changes: edit `db/schema.ts` then `npx drizzle-kit push`
+- DB is Neon via the Vercel marketplace integration; schema changes are versioned: edit `db/schema.ts`, then `npx drizzle-kit generate` + `npm run migrate` (never `push` — history lives in `db/migrations/`)
 
 ## Session Logs
 

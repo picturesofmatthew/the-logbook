@@ -145,10 +145,11 @@ export async function getDayExtras(day: string): Promise<{
   const metaRows = await db.select().from(dayMeta).where(eq(dayMeta.day, day));
 
   const firstDays = await db
-    .select({ foodId: entries.foodId, first: min(entries.day) })
+    .select({ foodId: entries.foodId })
     .from(entries)
-    .groupBy(entries.foodId);
-  const newSpecimens = firstDays.filter((r) => r.first === day).length;
+    .groupBy(entries.foodId)
+    .having(eq(min(entries.day), day));
+  const newSpecimens = firstDays.length;
 
   const meta = {} as Record<Profile, DayMetaRow>;
   for (const profile of PROFILES) {
@@ -339,33 +340,42 @@ export async function getWorkoutsForDay(
 
 // History for PR detection (best est. 1RM per exercise from sets logged
 // strictly before the day) and autocomplete (every exercise name ever used).
-export async function getExerciseHistory(
-  profile: Profile,
+// One narrow, lift-only query serves both keepers.
+export type ExerciseHistory = { best: Map<string, number>; names: string[] };
+
+export async function getExerciseHistories(
   beforeDay: string,
-): Promise<{ best: Map<string, number>; names: string[] }> {
+): Promise<Record<Profile, ExerciseHistory>> {
   const rows = await db
-    .select({ set: workoutSets, day: workouts.day })
+    .select({
+      profileId: workouts.profileId,
+      day: workouts.day,
+      exercise: workoutSets.exercise,
+      weightLb: workoutSets.weightLb,
+      reps: workoutSets.reps,
+    })
     .from(workoutSets)
     .innerJoin(workouts, eq(workoutSets.workoutId, workouts.id))
-    .where(eq(workouts.profileId, profile));
+    .where(eq(workoutSets.kind, "lift"));
 
-  const prior: WorkoutSet[] = rows
-    .filter((r) => r.day < beforeDay)
-    .map((r) => ({
-      kind: r.set.kind,
-      exercise: r.set.exercise,
-      weightLb: r.set.weightLb,
-      reps: r.set.reps,
-      minutes: r.set.minutes,
-    }));
-
-  const names = [
-    ...new Set(
-      rows.filter((r) => r.set.kind === "lift").map((r) => r.set.exercise),
-    ),
-  ].sort();
-
-  return { best: bestByExercise(prior), names };
+  const result = {} as Record<Profile, ExerciseHistory>;
+  for (const profile of PROFILES) {
+    const mine = rows.filter((r) => r.profileId === profile);
+    const prior: WorkoutSet[] = mine
+      .filter((r) => r.day < beforeDay)
+      .map((r) => ({
+        kind: "lift" as const,
+        exercise: r.exercise,
+        weightLb: r.weightLb,
+        reps: r.reps,
+        minutes: null,
+      }));
+    result[profile] = {
+      best: bestByExercise(prior),
+      names: [...new Set(mine.map((r) => r.exercise))].sort(),
+    };
+  }
+  return result;
 }
 
 // ── Legendary discoveries ──
@@ -401,6 +411,11 @@ export async function recordArrival(
     .onConflictDoNothing({ target: beingArrivals.beingId })
     .returning({ id: beingArrivals.id });
   return rows.length > 0;
+}
+
+export async function getArrivals(): Promise<Map<string, string>> {
+  const rows = await db.select().from(beingArrivals);
+  return new Map(rows.map((r) => [r.beingId, r.day]));
 }
 
 // The specimens this person logs most recently — the quick-tap grid.

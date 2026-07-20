@@ -1,9 +1,16 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { setTraining } from "@/app/day/actions";
 import { deleteWorkout, logWorkout, type SetInput } from "@/app/train/actions";
-import { SPLIT_PRESETS, totalVolumeLb } from "@/lib/engine/training";
-import { inscribeTick } from "@/lib/sounds";
+import {
+  newMarks,
+  normalizeExercise,
+  SPLIT_PRESETS,
+  totalVolumeLb,
+} from "@/lib/engine/training";
+import { RuledHeading } from "@/components/ruled-heading";
+import { inscribeTick, newMarkTone, ritualChime } from "@/lib/sounds";
 
 export type WorkoutItem = {
   id: number;
@@ -64,16 +71,21 @@ export function TrainLog({
   workouts,
   exerciseNames,
   newMarkExercises,
+  bestEntries,
+  training,
 }: {
   day: string;
   workouts: WorkoutItem[];
   exerciseNames: string[];
   newMarkExercises: string[];
+  bestEntries: [string, number][];
+  training: "lift" | "cardio" | "rest" | null;
 }) {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [rows, setRows] = useState<Row[]>([{ ...emptyLift }]);
   const [error, setError] = useState<string | null>(null);
+  const [markMoment, setMarkMoment] = useState<string[] | null>(null);
   const [pending, startTransition] = useTransition();
 
   function patchRow(i: number, patch: Partial<Row>) {
@@ -107,7 +119,20 @@ export function TrainLog({
       const result = await logWorkout({ day, title, sets: isRest ? [] : sets });
       setError(result.error ?? null);
       if (!result.error) {
-        inscribeTick();
+        // Only sets that were actually inscribed can mint a New Mark — a
+        // rest-titled day saves no sets, even if rows were left filled.
+        const marks = newMarks(isRest ? [] : sets, new Map(bestEntries));
+        if (marks.length > 0) {
+          // Recover display casing from the sets just inscribed.
+          const casing = new Map(
+            sets.map((s) => [normalizeExercise(s.exercise), s.exercise.trim()]),
+          );
+          newMarkTone();
+          setMarkMoment(marks.map((m) => casing.get(m) ?? m));
+          window.setTimeout(() => setMarkMoment(null), 3200);
+        } else {
+          inscribeTick();
+        }
         setOpen(false);
         setTitle("");
         setRows([{ ...emptyLift }]);
@@ -117,7 +142,29 @@ export function TrainLog({
 
   return (
     <section className="wobbly flex flex-col gap-3 border-2 border-ink/20 bg-cream/70 p-4 shadow-card">
-      <h2 className="font-pixel text-sm tracking-wide">TRAINING LOG</h2>
+      <RuledHeading title="TRAINING LOG" />
+
+      {markMoment ? (
+        <div
+          className="fixed inset-0 z-[55] flex items-center justify-center p-6"
+          onClick={() => setMarkMoment(null)}
+          role="dialog"
+          aria-label="A New Mark"
+        >
+          <div className="absolute inset-0 bg-ink/40" />
+          <div className="ceremony-card relative w-full max-w-xs">
+            <div className="wobbly lantern-pool border-2 border-gold bg-cream p-5 text-center shadow-card">
+              <p className="font-pixel text-sm tracking-widest text-gold">
+                ✦ A NEW MARK ✦
+              </p>
+              <p className="mt-2 font-pixel text-sm">{markMoment.join(" · ")}</p>
+              <p className="mt-2 text-xs italic text-ink-soft">
+                your best yet — the iron remembers
+              </p>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       {workouts.map((w) => (
         <div
@@ -160,9 +207,44 @@ export function TrainLog({
       ))}
 
       {workouts.length === 0 && !open ? (
-        <p className="text-xs text-ink-soft/80">
-          Nothing inscribed yet. Iron, road, or rest — all of it counts.
-        </p>
+        <>
+          <p className="text-xs text-ink-soft/80">
+            Nothing inscribed yet. Iron, road, or rest — all of it counts.
+          </p>
+          <div className="flex items-center justify-between gap-3">
+            <span className={labelCls}>QUICK MARK</span>
+            <div className="flex gap-1.5">
+              {(
+                [
+                  ["lift", "🏋 lift"],
+                  ["cardio", "👟 cardio"],
+                  ["rest", "🛏 rest"],
+                ] as const
+              ).map(([id, label]) => (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => {
+                    ritualChime();
+                    startTransition(async () => {
+                      await setTraining({
+                        day,
+                        training: training === id ? null : id,
+                      });
+                    });
+                  }}
+                  className={`wobbly-sm cursor-pointer border-2 px-2 py-1 text-xs transition-all ${
+                    training === id
+                      ? "border-moss-deep bg-moss text-cream"
+                      : "border-ink/20 bg-cream text-ink-soft"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </>
       ) : null}
 
       {open ? (

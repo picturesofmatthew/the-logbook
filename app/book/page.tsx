@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { BeingPortrait } from "@/components/glade/being-portrait";
 import { SigilGlyph } from "@/components/sigil/sigil-glyph";
-import { getDiscoveries, recordLegendary } from "@/lib/data";
+import { getArrivals, getDiscoveries, recordLegendary } from "@/lib/data";
 import { currentTz, friendlyDate, todayIso } from "@/lib/dates";
+import { BEINGS } from "@/lib/engine/beings";
 import { LEGENDARIES, type LegendaryId, type SigilSpec } from "@/lib/engine/sigil";
-import { buildMonthLedger } from "@/lib/ledger";
+import { buildMonthLedger, getGladeState } from "@/lib/ledger";
 import { currentProfile } from "@/lib/session";
 
 export const metadata: Metadata = {
@@ -51,12 +53,26 @@ export default async function BookPage({
 
   const ledger = await buildMonthLedger(month, today);
 
-  // Lazy discovery: any legendary this page just computed gets its row —
-  // earliest day first, so history claims titles in order.
-  for (const { day, spec } of ledger) {
+  const [initialDiscoveries, glade, arrivals] = await Promise.all([
+    getDiscoveries(),
+    getGladeState(today),
+    getArrivals(),
+  ]);
+
+  // Lazy discovery: any legendary this page just computed and hasn't recorded
+  // yet gets its row — earliest day first, so history claims titles in order.
+  // Skipping already-known ids avoids a no-op INSERT per legendary per view.
+  const undiscovered = ledger.filter(
+    (e) => e.spec.legendary && !initialDiscoveries.has(e.spec.legendary),
+  );
+  for (const { day, spec } of undiscovered) {
     if (spec.legendary) await recordLegendary(spec.legendary, day);
   }
-  const discoveries = await getDiscoveries();
+  const discoveries =
+    undiscovered.length > 0 ? await getDiscoveries() : initialDiscoveries;
+  const beingStage = new Map(glade.beings.map((b) => [b.id, b.stage]));
+  const arrivedCount = glade.beings.filter((b) => b.arrived).length;
+  const elkGlimpsedOn = arrivals.get("pale-elk");
 
   const monthLabel = new Intl.DateTimeFormat("en-US", {
     timeZone: "UTC",
@@ -179,6 +195,66 @@ export default async function BookPage({
               </div>
             );
           })}
+        </div>
+      </section>
+
+      <section>
+        <h2 className="mb-2 font-pixel text-sm tracking-wide">
+          🦌 THE BESTIARY
+          <span className="ml-2 text-[10px] text-ink-soft">
+            {arrivedCount}/{BEINGS.length} arrived
+          </span>
+        </h2>
+        <div className="grid grid-cols-2 gap-2">
+          {BEINGS.map((def) => {
+            const stage = beingStage.get(def.id) ?? 0;
+            const arrivedOn = arrivals.get(def.id);
+            return stage >= 1 ? (
+              <div
+                key={def.id}
+                className="wobbly-sm flex flex-col items-center border-2 border-gold bg-cream/70 p-2 text-center shadow-card"
+              >
+                <div className="flex h-24 items-center justify-center">
+                  <BeingPortrait being={def.id} stage={stage} />
+                </div>
+                <p className="font-pixel text-[10px] capitalize leading-tight">
+                  {def.name}
+                </p>
+                <p className="mt-0.5 text-[10px] italic leading-tight text-ink-soft">
+                  {def.line}
+                </p>
+                <p className="mt-0.5 text-[9px] text-ink-soft/70">
+                  keeps {def.zone}
+                  {arrivedOn ? ` · since ${friendlyDate(arrivedOn, tz)}` : ""}
+                </p>
+              </div>
+            ) : (
+              <div
+                key={def.id}
+                className="wobbly-sm hatch flex flex-col items-center justify-center border-2 border-dashed border-ink/25 p-2 py-4 text-center"
+              >
+                <span className="text-2xl opacity-40">?</span>
+                <p className="mt-1 font-pixel text-[10px] text-ink-soft/70">
+                  still in the wood
+                </p>
+                <p className="mt-0.5 text-[10px] italic leading-tight text-ink-soft/70">
+                  {def.line}
+                </p>
+              </div>
+            );
+          })}
+          {elkGlimpsedOn ? (
+            <div className="wobbly-sm lantern-pool col-span-2 flex flex-col items-center border-2 border-violet/50 bg-cream/70 p-3 text-center shadow-card">
+              <BeingPortrait being="pale-elk" />
+              <p className="mt-1 font-pixel text-[10px] capitalize leading-tight text-violet">
+                the Pale Elk
+              </p>
+              <p className="mt-0.5 text-[10px] italic leading-tight text-ink-soft">
+                Glimpsed {friendlyDate(elkGlimpsedOn, tz)}. It did not stay.
+                They never do.
+              </p>
+            </div>
+          ) : null}
         </div>
       </section>
 

@@ -1,8 +1,15 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { saveNote, saveWeighIn, setTraining, setWater } from "@/app/day/actions";
+import {
+  saveNote,
+  saveWeighIn,
+  setMood as setMoodAction,
+  setWater,
+} from "@/app/day/actions";
+import { RuledHeading } from "@/components/ruled-heading";
 import type { DayMetaRow } from "@/lib/data";
+import { ritualChime } from "@/lib/sounds";
 
 const MOODS = ["😊", "😌", "😤", "🥱", "🥲"];
 const labelCls = "font-pixel text-[10px] tracking-wide text-ink-soft";
@@ -35,7 +42,7 @@ export function DailyRituals({
 
   return (
     <section className="wobbly flex flex-col gap-4 border-2 border-ink/20 bg-cream/70 p-4 shadow-card">
-      <h2 className="font-pixel text-sm tracking-wide">DAILY RITUALS</h2>
+      <RuledHeading title="DAILY RITUALS" />
 
       <div className="flex items-center justify-between gap-3">
         <span className={labelCls}>MORNING WEIGH-IN</span>
@@ -57,7 +64,8 @@ export function DailyRituals({
           <button
             type="button"
             disabled={weightSaved || !weight}
-            onClick={() =>
+            onClick={() => {
+              ritualChime();
               run(async () => {
                 const r = await saveWeighIn({
                   day,
@@ -65,8 +73,8 @@ export function DailyRituals({
                 });
                 if (!r.error) setWeightSaved(true);
                 return r;
-              })
-            }
+              });
+            }}
             className="wobbly-sm cursor-pointer border-2 border-moss-deep bg-moss px-2 py-1 text-sm text-cream disabled:border-ink/20 disabled:bg-paper-deep disabled:text-ink-soft"
           >
             {weightSaved ? "✓" : "save"}
@@ -82,52 +90,20 @@ export function DailyRituals({
               key={i}
               type="button"
               aria-label={`${i + 1} cups`}
-              onClick={() =>
+              onClick={() => {
+                ritualChime();
                 run(() =>
                   setWater({
                     day,
                     cups: meta.waterCups === i + 1 ? i : i + 1,
                   }),
-                )
-              }
+                );
+              }}
               className={`cursor-pointer text-lg transition-transform active:scale-125 ${
                 i < meta.waterCups ? "" : "opacity-25 grayscale"
               }`}
             >
               💧
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="flex items-center justify-between gap-3">
-        <span className={labelCls}>TRAINING</span>
-        <div className="flex gap-1.5">
-          {(
-            [
-              ["lift", "🏋 lift"],
-              ["cardio", "👟 cardio"],
-              ["rest", "🛏 rest"],
-            ] as const
-          ).map(([id, label]) => (
-            <button
-              key={id}
-              type="button"
-              onClick={() =>
-                run(() =>
-                  setTraining({
-                    day,
-                    training: meta.training === id ? null : id,
-                  }),
-                )
-              }
-              className={`wobbly-sm cursor-pointer border-2 px-2 py-1 text-xs transition-all ${
-                meta.training === id
-                  ? "border-moss-deep bg-moss text-cream"
-                  : "border-ink/20 bg-cream text-ink-soft"
-              }`}
-            >
-              {label}
             </button>
           ))}
         </div>
@@ -141,8 +117,10 @@ export function DailyRituals({
               key={m}
               type="button"
               onClick={() => {
-                setMood(mood === m ? "" : m);
-                setNoteSaved(false);
+                ritualChime();
+                const next = mood === m ? "" : m;
+                setMood(next);
+                run(() => setMoodAction({ day, mood: next }));
               }}
               className={`cursor-pointer text-lg transition-transform active:scale-125 ${
                 mood === m ? "" : "opacity-30 grayscale"
@@ -168,7 +146,7 @@ export function DailyRituals({
             disabled={noteSaved}
             onClick={() =>
               run(async () => {
-                const r = await saveNote({ day, note, mood });
+                const r = await saveNote({ day, note });
                 if (!r.error) setNoteSaved(true);
                 return r;
               })

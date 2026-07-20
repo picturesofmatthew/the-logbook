@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { db } from "@/db";
 import { profiles, targets, weighIns } from "@/db/schema";
 import { todayIso } from "@/lib/dates";
+import { safely } from "@/lib/safe";
 import { currentProfile } from "@/lib/session";
 import type { ActivityLevel, Sex } from "@/lib/engine/tdee";
 
@@ -64,38 +65,42 @@ export async function saveSetup(
     !(carbsG >= 0 && carbsG <= 800) ||
     !(fatG >= 20 && fatG <= 300)
   ) {
-    return { error: "Those macros look off - double-check the grams." };
+    return { error: "Those macros look off — double-check the grams." };
   }
 
   const heightIn = heightFt * 12 + heightExtraIn;
   const today = await todayIso();
 
-  await db
-    .update(profiles)
-    .set({
-      sex: sex as Sex,
-      birthdate,
-      heightIn,
-      activityLevel: activity as ActivityLevel,
-    })
-    .where(eq(profiles.id, profileId));
+  const saved = await safely(async () => {
+    await db
+      .update(profiles)
+      .set({
+        sex: sex as Sex,
+        birthdate,
+        heightIn,
+        activityLevel: activity as ActivityLevel,
+      })
+      .where(eq(profiles.id, profileId));
 
-  await db
-    .insert(weighIns)
-    .values({ profileId, day: today, weightLb })
-    .onConflictDoUpdate({
-      target: [weighIns.profileId, weighIns.day],
-      set: { weightLb },
+    await db
+      .insert(weighIns)
+      .values({ profileId, day: today, weightLb })
+      .onConflictDoUpdate({
+        target: [weighIns.profileId, weighIns.day],
+        set: { weightLb },
+      });
+
+    await db.insert(targets).values({
+      profileId,
+      effectiveDate: today,
+      calories,
+      proteinG,
+      carbsG,
+      fatG,
     });
-
-  await db.insert(targets).values({
-    profileId,
-    effectiveDate: today,
-    calories,
-    proteinG,
-    carbsG,
-    fatG,
+    return null;
   });
+  if (saved) return saved;
 
   redirect("/");
 }

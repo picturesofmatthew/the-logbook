@@ -6,6 +6,10 @@ export async function proxy(request: NextRequest) {
     request.cookies.get(SESSION_COOKIE)?.value,
   );
   if (!profile) {
+    // API callers get a proper 401, not an HTML redirect.
+    if (request.nextUrl.pathname.startsWith("/api/")) {
+      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+    }
     return NextResponse.redirect(new URL("/enter", request.url));
   }
   return NextResponse.next();

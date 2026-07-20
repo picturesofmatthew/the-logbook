@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/db";
 import { entries, foods, recipeItems } from "@/db/schema";
 import { todayIso } from "@/lib/dates";
+import { safely } from "@/lib/safe";
 import { currentProfile } from "@/lib/session";
 import type { Hall } from "@/lib/halls";
 
@@ -42,29 +43,34 @@ export async function logEntry(input: {
   const today = await todayIso();
   if (input.day > today) return { error: "The future is unwritten." };
 
-  const [food] = await db
-    .select({ id: foods.id })
-    .from(foods)
-    .where(eq(foods.id, input.foodId));
-  if (!food) return { error: "That specimen is missing from the museum." };
+  return safely(async () => {
+    const [food] = await db
+      .select({ id: foods.id })
+      .from(foods)
+      .where(eq(foods.id, input.foodId));
+    if (!food) return { error: "That specimen is missing from the pantry." };
 
-  await db.insert(entries).values({
-    profileId,
-    day: input.day,
-    meal: input.meal,
-    foodId: input.foodId,
-    servings: input.servings,
+    await db.insert(entries).values({
+      profileId,
+      day: input.day,
+      meal: input.meal,
+      foodId: input.foodId,
+      servings: input.servings,
+    });
+    revalidatePath("/");
+    return {};
   });
-  revalidatePath("/");
-  return {};
 }
 
 export async function removeEntry(entryId: number): Promise<void> {
   const profileId = await currentProfile();
-  await db
-    .delete(entries)
-    .where(and(eq(entries.id, entryId), eq(entries.profileId, profileId)));
-  revalidatePath("/");
+  await safely(async () => {
+    await db
+      .delete(entries)
+      .where(and(eq(entries.id, entryId), eq(entries.profileId, profileId)));
+    revalidatePath("/");
+    return {};
+  });
 }
 
 export type DonateInput = {
@@ -96,48 +102,50 @@ export async function donateSpecimen(
     return { error: "Those numbers look off." };
   }
 
-  // Same name (case-insensitive) = same specimen; museums hate duplicates.
-  const [existing] = await db
-    .select({ id: foods.id })
-    .from(foods)
-    .where(sql`lower(${foods.name}) = ${name.toLowerCase()}`);
+  return safely(async () => {
+    // Same name (case-insensitive) = same specimen; museums hate duplicates.
+    const [existing] = await db
+      .select({ id: foods.id })
+      .from(foods)
+      .where(sql`lower(${foods.name}) = ${name.toLowerCase()}`);
 
-  let foodId: number;
-  let alreadyKnown = false;
-  if (existing) {
-    foodId = existing.id;
-    alreadyKnown = true;
-  } else {
-    const [created] = await db
-      .insert(foods)
-      .values({
-        name,
-        hall: input.hall,
-        icon,
-        servingLabel,
-        calories: input.calories,
-        proteinG: input.proteinG,
-        carbsG: input.carbsG,
-        fatG: input.fatG,
-        fdcId: input.fdcId,
-        discoveredBy: profileId,
-      })
-      .returning({ id: foods.id });
-    foodId = created.id;
-  }
+    let foodId: number;
+    let alreadyKnown = false;
+    if (existing) {
+      foodId = existing.id;
+      alreadyKnown = true;
+    } else {
+      const [created] = await db
+        .insert(foods)
+        .values({
+          name,
+          hall: input.hall,
+          icon,
+          servingLabel,
+          calories: input.calories,
+          proteinG: input.proteinG,
+          carbsG: input.carbsG,
+          fatG: input.fatG,
+          fdcId: input.fdcId,
+          discoveredBy: profileId,
+        })
+        .returning({ id: foods.id });
+      foodId = created.id;
+    }
 
-  if (input.logAs) {
-    const result = await logEntry({
-      foodId,
-      meal: input.logAs.meal,
-      servings: input.logAs.servings,
-      day: input.logAs.day,
-    });
-    if (result.error) return { error: result.error };
-  }
+    if (input.logAs) {
+      const result = await logEntry({
+        foodId,
+        meal: input.logAs.meal,
+        servings: input.logAs.servings,
+        day: input.logAs.day,
+      });
+      if (result.error) return { error: result.error };
+    }
 
-  revalidatePath("/");
-  return { foodId, alreadyKnown };
+    revalidatePath("/");
+    return { foodId, alreadyKnown };
+  });
 }
 
 export async function createRecipe(input: {
@@ -158,71 +166,73 @@ export async function createRecipe(input: {
     return { error: "Ingredient servings look off." };
   }
 
-  const [existing] = await db
-    .select({ id: foods.id })
-    .from(foods)
-    .where(sql`lower(${foods.name}) = ${name.toLowerCase()}`);
-  if (existing) {
-    return { error: "The museum already has a specimen by that name." };
-  }
+  return safely(async () => {
+    const [existing] = await db
+      .select({ id: foods.id })
+      .from(foods)
+      .where(sql`lower(${foods.name}) = ${name.toLowerCase()}`);
+    if (existing) {
+      return { error: "The pantry already has a specimen by that name." };
+    }
 
-  const ingredients = await db
-    .select()
-    .from(foods)
-    .where(
-      inArray(
-        foods.id,
-        input.items.map((i) => i.foodId),
-      ),
+    const ingredients = await db
+      .select()
+      .from(foods)
+      .where(
+        inArray(
+          foods.id,
+          input.items.map((i) => i.foodId),
+        ),
+      );
+    if (ingredients.length !== input.items.length) {
+      return { error: "An ingredient is missing from the pantry." };
+    }
+
+    const sum = { calories: 0, proteinG: 0, carbsG: 0, fatG: 0 };
+    for (const item of input.items) {
+      const f = ingredients.find((x) => x.id === item.foodId)!;
+      sum.calories += f.calories * item.servings;
+      sum.proteinG += f.proteinG * item.servings;
+      sum.carbsG += f.carbsG * item.servings;
+      sum.fatG += f.fatG * item.servings;
+    }
+    const r1 = (n: number) => Math.round(n * 10) / 10;
+
+    const [created] = await db
+      .insert(foods)
+      .values({
+        name,
+        hall: "dishes",
+        icon: (input.icon || "🍲").slice(0, 8),
+        servingLabel: input.servingLabel.trim().slice(0, 40) || "1 serving",
+        calories: Math.round(sum.calories),
+        proteinG: r1(sum.proteinG),
+        carbsG: r1(sum.carbsG),
+        fatG: r1(sum.fatG),
+        isRecipe: true,
+        discoveredBy: profileId,
+      })
+      .returning({ id: foods.id });
+
+    await db.insert(recipeItems).values(
+      input.items.map((i) => ({
+        recipeFoodId: created.id,
+        ingredientFoodId: i.foodId,
+        servings: i.servings,
+      })),
     );
-  if (ingredients.length !== input.items.length) {
-    return { error: "An ingredient is missing from the museum." };
-  }
 
-  const sum = { calories: 0, proteinG: 0, carbsG: 0, fatG: 0 };
-  for (const item of input.items) {
-    const f = ingredients.find((x) => x.id === item.foodId)!;
-    sum.calories += f.calories * item.servings;
-    sum.proteinG += f.proteinG * item.servings;
-    sum.carbsG += f.carbsG * item.servings;
-    sum.fatG += f.fatG * item.servings;
-  }
-  const r1 = (n: number) => Math.round(n * 10) / 10;
+    if (input.logAs) {
+      const result = await logEntry({
+        foodId: created.id,
+        meal: input.logAs.meal,
+        servings: input.logAs.servings,
+        day: input.logAs.day,
+      });
+      if (result.error) return { error: result.error };
+    }
 
-  const [created] = await db
-    .insert(foods)
-    .values({
-      name,
-      hall: "dishes",
-      icon: (input.icon || "🍲").slice(0, 8),
-      servingLabel: input.servingLabel.trim().slice(0, 40) || "1 serving",
-      calories: Math.round(sum.calories),
-      proteinG: r1(sum.proteinG),
-      carbsG: r1(sum.carbsG),
-      fatG: r1(sum.fatG),
-      isRecipe: true,
-      discoveredBy: profileId,
-    })
-    .returning({ id: foods.id });
-
-  await db.insert(recipeItems).values(
-    input.items.map((i) => ({
-      recipeFoodId: created.id,
-      ingredientFoodId: i.foodId,
-      servings: i.servings,
-    })),
-  );
-
-  if (input.logAs) {
-    const result = await logEntry({
-      foodId: created.id,
-      meal: input.logAs.meal,
-      servings: input.logAs.servings,
-      day: input.logAs.day,
-    });
-    if (result.error) return { error: result.error };
-  }
-
-  revalidatePath("/");
-  return { foodId: created.id };
+    revalidatePath("/");
+    return { foodId: created.id };
+  });
 }

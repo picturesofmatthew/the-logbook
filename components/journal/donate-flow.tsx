@@ -108,7 +108,7 @@ export function DonateFlow({
 
   function submit() {
     if (!hall) {
-      setError("Pick a hall for the museum.");
+      setError("Pick a hall for the pantry.");
       return;
     }
     setError(null);
@@ -128,7 +128,7 @@ export function DonateFlow({
       if (result.error) {
         setError(result.error);
       } else if (result.alreadyKnown) {
-        onDone({ message: `Already in the museum — logged it for ${meal}.` });
+        onDone({ message: `Already in the pantry — logged it for ${meal}.` });
       } else {
         onDone({
           message: `✦ New specimen donated: ${name}`,

@@ -9,7 +9,8 @@
     "lint": "eslint",
     "test": "node --import tsx --test \"tests/*.test.ts\"",
     "icons": "node scripts/gen-icons.mjs",
-    "seed": "node scripts/seed.mjs"
+    "seed": "node scripts/seed.mjs",
+    "migrate": "drizzle-kit migrate"
   },
   "dependencies": {
     "@neondatabase/serverless": "1.1.0",

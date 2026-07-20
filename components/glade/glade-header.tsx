@@ -15,18 +15,22 @@ import {
   PET_STAGES,
 } from "@/lib/engine/pet";
 import { DISPLAY_NAMES, PROFILES } from "@/lib/auth";
-import { GladeScene } from "./glade-scene";
+import { GladeScene, type BeingStages } from "./glade-scene";
 
 export function GladeHeader({
   petState,
   today,
   dayNumber,
   glade,
+  paleElk,
+  hearthDay,
 }: {
   petState: PetStateRaw;
   today: string;
   dayNumber: number;
   glade: GladeState;
+  paleElk: boolean;
+  hearthDay: boolean;
 }) {
   const stage = stageForDays(petState.lifetimeDays);
   const stageLabel = PET_STAGES.find((s) => s.id === stage)?.label ?? stage;
@@ -42,16 +46,19 @@ export function GladeHeader({
   );
   const next = nextStageIn(petState.lifetimeDays);
 
-  const stagStage = glade.beings.find((b) => b.id === "stag")?.stage ?? 0;
-  const heronStage = glade.beings.find((b) => b.id === "heron")?.stage ?? 0;
+  const stages = Object.fromEntries(
+    glade.beings.map((b) => [b.id, b.stage]),
+  ) as BeingStages;
 
   return (
     <header className="wobbly overflow-hidden border-2 border-ink/20 bg-cream/70 shadow-card">
       <div className="relative">
         <GladeScene
           tier={glade.tier}
-          stagStage={stagStage}
-          heronStage={heronStage}
+          beings={stages}
+          paleElk={paleElk}
+          inklings={petState.loggedToday.length}
+          hearthDay={hearthDay}
         />
         {/* The fox lives in the scene, by the lantern. */}
         <div

@@ -61,6 +61,18 @@ export function LogDrawer({
     });
   }
 
+  // The fast path: a recent specimen logs itself at one serving, one tap.
+  function quickLog(s: Specimen) {
+    startTransition(async () => {
+      const result = await logEntry({ foodId: s.id, meal, servings: 1, day });
+      if (result.error) {
+        setError(result.error);
+      } else {
+        onLogged({ message: `${s.icon} ${s.name} — logged to ${meal}.` });
+      }
+    });
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center">
       <button
@@ -159,25 +171,23 @@ export function LogDrawer({
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search the museum..."
+              placeholder="Search the pantry..."
               className={inputCls}
             />
 
             {recents.length > 0 && !search ? (
               <>
                 <p className="font-pixel text-[10px] tracking-wide text-ink-soft">
-                  RECENT
+                  RECENT · one tap logs one serving
                 </p>
                 <div className="grid grid-cols-4 gap-1.5">
                   {recents.slice(0, 8).map((s) => (
                     <button
                       key={s.id}
                       type="button"
-                      onClick={() => {
-                        setChosen(s);
-                        setServings(1);
-                      }}
-                      className="wobbly-sm cursor-pointer border-2 border-ink/20 bg-cream p-1.5 text-center hover:border-gold"
+                      disabled={pending}
+                      onClick={() => quickLog(s)}
+                      className="wobbly-sm cursor-pointer border-2 border-ink/20 bg-cream p-1.5 text-center hover:border-gold disabled:opacity-60"
                     >
                       <span className="block text-xl">{s.icon}</span>
                       <span className="block truncate text-[10px] leading-tight">
@@ -186,7 +196,16 @@ export function LogDrawer({
                     </button>
                   ))}
                 </div>
+                <p className="text-[11px] text-ink-soft/80">
+                  need a different amount? find it in the collection below.
+                </p>
               </>
+            ) : null}
+
+            {error ? (
+              <p className="text-center font-pixel text-xs text-terracotta">
+                {error}
+              </p>
             ) : null}
 
             <p className="font-pixel text-[10px] tracking-wide text-ink-soft">
@@ -195,7 +214,7 @@ export function LogDrawer({
             {filtered.length === 0 ? (
               <p className="py-2 text-center text-sm text-ink-soft">
                 {specimens.length === 0
-                  ? "The museum is empty. Donate its first specimen!"
+                  ? "The pantry is empty. Donate its first specimen!"
                   : "Nothing in the collection matches."}
               </p>
             ) : (

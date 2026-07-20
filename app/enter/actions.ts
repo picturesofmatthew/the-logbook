@@ -1,10 +1,34 @@
 "use server";
 
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { isProfile, SESSION_COOKIE, signSession } from "@/lib/auth";
+import {
+  hmacDigest,
+  isProfile,
+  SESSION_COOKIE,
+  signSession,
+  timingSafeEqual,
+} from "@/lib/auth";
 
 export type EnterState = { error: string } | null;
+
+// Best-effort brute-force brake. Per-instance memory on serverless — a cold
+// start forgets, so this slows guessing rather than hard-stopping it. Real
+// per-user auth (the v1 track) replaces this wholesale.
+const WINDOW_MS = 15 * 60 * 1000;
+const MAX_ATTEMPTS = 10;
+const attempts = new Map<string, { count: number; resetAt: number }>();
+
+function throttled(ip: string): boolean {
+  const now = Date.now();
+  const slot = attempts.get(ip);
+  if (!slot || now > slot.resetAt) {
+    attempts.set(ip, { count: 1, resetAt: now + WINDOW_MS });
+    return false;
+  }
+  slot.count += 1;
+  return slot.count > MAX_ATTEMPTS;
+}
 
 export async function enter(
   _prev: EnterState,
@@ -16,9 +40,24 @@ export async function enter(
   if (!isProfile(profile)) {
     return { error: "Pick who you are first." };
   }
-  if (typeof passcode !== "string" || passcode !== process.env.APP_PASSCODE) {
-    return { error: "Hmm - that's not the secret word." };
+
+  const ip =
+    (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() ??
+    "unknown";
+  if (throttled(ip)) {
+    return { error: "The door needs a moment. Try again in a little while." };
   }
+
+  const expected = process.env.APP_PASSCODE;
+  if (!expected) throw new Error("APP_PASSCODE is not set");
+  // HMAC both sides first: constant-time compare with no length leak.
+  const ok =
+    typeof passcode === "string" &&
+    timingSafeEqual(await hmacDigest(passcode), await hmacDigest(expected));
+  if (!ok) {
+    return { error: "Hmm — that's not the secret word." };
+  }
+  attempts.delete(ip);
 
   const token = await signSession(profile);
   (await cookies()).set(SESSION_COOKIE, token, {
