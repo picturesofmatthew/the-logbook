@@ -21,7 +21,7 @@ import { diffDays, todayIso } from "@/lib/dates";
 import { getGladeState } from "@/lib/ledger";
 import { paleElkGlimpsed, type BeingId } from "@/lib/engine/beings";
 import { buildKeeperDay } from "@/lib/engine/keeper-day";
-import { moodFor, PET_STAGES, speechFor, stageForDays } from "@/lib/engine/pet";
+import { moodFor, nextStageIn, PET_STAGES, speechFor, stageForDays } from "@/lib/engine/pet";
 import { composeSigil, type KeeperDay } from "@/lib/engine/sigil";
 import { totalOf } from "@/lib/engine/totals";
 import { stampsForDay } from "@/lib/engine/stamps";
@@ -32,7 +32,7 @@ import { currentProfile } from "@/lib/session";
 // lanterns stand for the keepers; the fox and its company live in the ground
 // band at the foot. The ledger's numbers live at /today.
 export default async function GladeHome() {
-  await currentProfile(); // route guard (redirects to /enter if unauthenticated)
+  const viewer = await currentProfile(); // route guard (redirects to /enter if unauthenticated)
   const today = await todayIso();
   const day = today;
   const isToday = true;
@@ -139,6 +139,25 @@ export default async function GladeHome() {
     glade.beings.map((b) => [b.id, b.stage]),
   ) as BeingStages;
 
+  // Who set down the second lantern — the keeper whose log closed the ring
+  // today (the later first-log wins). Named only when both times are known.
+  const bothTimed = firstLogs.matthew != null && firstLogs.kennedy != null;
+  const closer: Profile | null =
+    sigil.completed && bothTimed
+      ? firstLogs.matthew! >= firstLogs.kennedy!
+        ? "matthew"
+        : "kennedy"
+      : null;
+  const closerLine =
+    closer == null
+      ? null
+      : closer === viewer
+        ? "you closed the ring"
+        : `${DISPLAY_NAMES[closer]} closed the ring`;
+
+  // The fox's next growth mark — a gentle pull forward, in both-logged days.
+  const foxNext = nextStageIn(petState.lifetimeDays);
+
   return (
     <main
       className="relative -mt-16 flex min-h-[calc(100dvh-6rem)] flex-col overflow-hidden"
@@ -175,6 +194,12 @@ export default async function GladeHome() {
           · ♥ {petState.lifetimeDays}
           {petState.lifetimeDays === 1 ? " day" : " days"} fed
         </p>
+        {foxNext ? (
+          <p className="text-[10px] italic leading-snug text-ink-soft/80">
+            {foxNext.daysLeft === 1 ? "one day" : `${foxNext.daysLeft} days`} to
+            the {foxNext.label}
+          </p>
+        ) : null}
       </div>
 
       {/* push the world to the foot of the screen */}
@@ -232,6 +257,8 @@ export default async function GladeHome() {
         <SealCeremony
           spec={sigil}
           day={day}
+          closerLine={closerLine}
+          sealedCount={petState.lifetimeDays}
           suppressed={newlyDiscovered || newBeing != null}
         />
       ) : null}

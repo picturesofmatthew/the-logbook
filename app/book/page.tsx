@@ -70,7 +70,7 @@ export default async function BookPage({
   }
   const discoveries =
     undiscovered.length > 0 ? await getDiscoveries() : initialDiscoveries;
-  const beingStage = new Map(glade.beings.map((b) => [b.id, b.stage]));
+  const beingById = new Map(glade.beings.map((b) => [b.id, b]));
   const arrivedCount = glade.beings.filter((b) => b.arrived).length;
   const elkGlimpsedOn = arrivals.get("pale-elk");
 
@@ -207,7 +207,8 @@ export default async function BookPage({
         </h2>
         <div className="grid grid-cols-2 gap-2">
           {BEINGS.map((def) => {
-            const stage = beingStage.get(def.id) ?? 0;
+            const state = beingById.get(def.id);
+            const stage = state?.stage ?? 0;
             const arrivedOn = arrivals.get(def.id);
             return stage >= 1 ? (
               <div
@@ -227,6 +228,11 @@ export default async function BookPage({
                   keeps {def.zone}
                   {arrivedOn ? ` · since ${friendlyDate(arrivedOn, tz)}` : ""}
                 </p>
+                {state && state.stage < 3 && state.nextAt != null ? (
+                  <p className="mt-0.5 font-pixel text-[9px] tracking-wide text-gold">
+                    deeper trust — {state.nextAt - state.count} more
+                  </p>
+                ) : null}
               </div>
             ) : (
               <div
@@ -240,6 +246,11 @@ export default async function BookPage({
                 <p className="mt-0.5 text-[10px] italic leading-tight text-ink-soft/70">
                   {def.line}
                 </p>
+                {state && state.count > 0 && state.nextAt != null ? (
+                  <p className="mt-1 font-pixel text-[9px] tracking-wide text-moss-deep">
+                    the wood stirs — {state.nextAt - state.count} more
+                  </p>
+                ) : null}
               </div>
             );
           })}

@@ -36,16 +36,32 @@ const TIER_LINES: Record<SigilSpec["tier"], string> = {
   legendary: "a legendary seal",
 };
 
+// Sealed-day counts worth marking — a shared milestone, spoken in union's
+// color. (Day 1 is the First Page legendary's own ceremony, so it isn't here.)
+const MILESTONES: Record<number, string> = {
+  7: "a week of pages, kept",
+  30: "thirty days, sealed together",
+  50: "fifty days",
+  100: "one hundred days",
+  200: "two hundred days",
+  365: "a year of pages",
+};
+
 export function SealCeremony({
   spec,
   day,
+  closerLine,
+  sealedCount,
   suppressed,
 }: {
   spec: SigilSpec;
   day: string;
+  closerLine?: string | null;
+  sealedCount?: number;
   suppressed: boolean;
 }) {
   const [stage, setStage] = useState<"hidden" | "shown" | "fading">("hidden");
+  const milestone = sealedCount != null ? MILESTONES[sealedCount] : undefined;
 
   useEffect(() => {
     let seen = false;
@@ -95,6 +111,16 @@ export function SealCeremony({
           {spec.chords.length > 0 ? (
             <p className="mt-1 text-xs text-ink-soft">
               {spec.chords.map((c) => CHORDS[c].name).join(" · ")}
+            </p>
+          ) : null}
+          {closerLine ? (
+            <p className="mt-2 font-pixel text-[10px] tracking-wide text-ink-soft">
+              {closerLine}
+            </p>
+          ) : null}
+          {milestone ? (
+            <p className="mt-2 font-pixel text-xs tracking-wide text-violet">
+              ✦ {milestone}
             </p>
           ) : null}
           <p className="mt-3 text-xs italic text-ink-soft">
