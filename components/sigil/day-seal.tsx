@@ -27,7 +27,7 @@ export function DaySeal({
   return (
     <section className="flex items-center gap-3">
       <div className={spec.tier === "legendary" ? "lantern-pool rounded-full" : undefined}>
-        <SigilGlyph spec={spec} size={88} bloom={spec.completed && isToday} />
+        <SigilGlyph spec={spec} size={96} bloom={spec.completed && isToday} />
       </div>
       <div className="min-w-0 flex-1">
         {legendary ? (

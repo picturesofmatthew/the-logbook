@@ -79,15 +79,19 @@ const TIER_COUNTS: Record<
 };
 
 function Tuft({ x }: { x: number }) {
+  // Upright blades in a small clump — grass, not chevrons.
   return (
-    <path
-      d={`M ${x} 146 q -2 -6 -4 -9 M ${x} 146 q 0 -8 1 -10 M ${x} 146 q 2 -5 4 -8`}
+    <g
       fill="none"
       stroke="var(--color-moss-deep)"
-      strokeWidth="1.3"
+      strokeWidth="1.1"
       strokeLinecap="round"
-      opacity="0.8"
-    />
+      opacity="0.7"
+    >
+      <path d={`M ${x - 2} 147 q -0.5 -4 -1.5 -7`} />
+      <path d={`M ${x} 147 q 0 -5 0.4 -9`} />
+      <path d={`M ${x + 2} 147 q 0.5 -4 1.5 -6.5`} />
+    </g>
   );
 }
 
@@ -104,12 +108,22 @@ function KeeperLantern({
   lit: boolean;
   color: string;
 }) {
+  const gid = `kl-${x}`;
   return (
     <g transform={`translate(${x} 132)`} aria-hidden="true">
       {lit ? (
         <>
-          <circle cx="0" cy="-10" r="14" fill={color} opacity="0.4" />
-          <circle cx="0" cy="-10" r="7" fill={color} opacity="0.5" />
+          <defs>
+            <radialGradient id={gid}>
+              <stop offset="0%" stopColor="var(--color-gold)" stopOpacity="0.8" />
+              <stop offset="40%" stopColor={color} stopOpacity="0.3" />
+              <stop offset="100%" stopColor={color} stopOpacity="0" />
+            </radialGradient>
+          </defs>
+          {/* a soft, warm-cored glow — reads as lantern light, not a flat disc,
+              and the gold heart keeps Matthew's moss light legible on green */}
+          <circle className="glade-dark-only" cx="0" cy="-11" r="24" fill={`url(#${gid})`} opacity="0.7" />
+          <circle cx="0" cy="-11" r="14" fill={`url(#${gid})`} />
         </>
       ) : null}
       <line x1="0" y1="-5" x2="0" y2="7" stroke="var(--glade-fauna)" strokeWidth="1.6" strokeLinecap="round" />
@@ -559,12 +573,13 @@ export function GladeScene({
         </g>
       ))}
 
-      {/* the firepit, embered after dark */}
+      {/* the firepit — a ring of stones, embered after dark */}
       <g>
-        <circle cx="218" cy="132" r="1.8" fill="var(--glade-fauna)" />
-        <circle cx="223" cy="133.5" r="1.6" fill="var(--glade-fauna)" />
-        <circle cx="213.5" cy="133.5" r="1.5" fill="var(--glade-fauna)" />
-        <circle className="glade-dark-only lantern-breathe" cx="218" cy="131" r="2.2" fill="var(--color-gold)" />
+        <ellipse cx="218" cy="133" rx="7.5" ry="3" fill="none" stroke="var(--glade-fauna)" strokeWidth="1" opacity="0.45" />
+        <circle cx="212" cy="133" r="1.4" fill="var(--glade-fauna)" opacity="0.85" />
+        <circle cx="218" cy="134.4" r="1.5" fill="var(--glade-fauna)" opacity="0.85" />
+        <circle cx="224" cy="133" r="1.4" fill="var(--glade-fauna)" opacity="0.85" />
+        <circle className="glade-dark-only lantern-breathe" cx="218" cy="131.5" r="2.2" fill="var(--color-gold)" />
       </g>
 
       {/* the crook'd lantern post */}

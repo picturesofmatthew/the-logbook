@@ -163,7 +163,7 @@ const ELDER = [
   ...FACE,
 ];
 
-// Yearling: the kit face with two shy nubs.
+// Yearling: the kit face (with muzzle) plus two shy antler nubs.
 const YEARLING = [
   "...g........g...",
   "...#........#...",
@@ -175,10 +175,31 @@ const YEARLING = [
   "#cccccccccccccc#",
   "#cc#cccccccc#cc#",
   "#cccccccccccccc#",
-  "#cctccc##ccctcc#",
-  ".#ccccc##ccccc#.",
+  "#cctcccssccctcc#",
+  ".#cccss##ssccc#.",
+  ".#ccccsssscccc#.",
+  "..#cccssssccc#..",
+  "...##cccccc##...",
+  ".....######.....",
+];
+
+// Kit v2 — a muzzle added (s-shaded snout, nose at its tip) so it reads fox,
+// not cat. Same shape the grown FACE already uses, scaled to 16.
+const KIT = [
+  "................",
+  "..##........##..",
+  ".#tt#......#tt#.",
+  ".#ttc#....#ctt#.",
+  ".#cccc####cccc#.",
   ".#cccccccccccc#.",
-  "..#cccccccccc#..",
+  "#cccccccccccccc#",
+  "#cc#cccccccc#cc#",
+  "#cccccccccccccc#",
+  "#cctcccssccctcc#",
+  "#cccccs##sccccc#",
+  "#cccccssssccccc#",
+  ".#ccccsssscccc#.",
+  "..#cccssssccc#..",
   "...##cccccc##...",
   ".....######.....",
 ];
@@ -187,3 +208,4 @@ render("young", YOUNG);
 render("adult", ADULT);
 render("elder", ELDER);
 render("yearling", YEARLING);
+render("kit", KIT, 14);

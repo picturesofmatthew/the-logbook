@@ -22,13 +22,13 @@ export const PET_KIT = [
   "#cccccccccccccc#",
   "#cc#cccccccc#cc#",
   "#cccccccccccccc#",
-  "#cctccc##ccctcc#",
-  ".#ccccc##ccccc#.",
-  ".#cccccccccccc#.",
-  "..#cccccccccc#..",
+  "#cctcccssccctcc#",
+  "#cccccs##sccccc#",
+  "#cccccssssccccc#",
+  ".#ccccsssscccc#.",
+  "..#cccssssccc#..",
   "...##cccccc##...",
   ".....######.....",
-  "................",
 ];
 
 export const PET_YEARLING = [
@@ -42,10 +42,10 @@ export const PET_YEARLING = [
   "#cccccccccccccc#",
   "#cc#cccccccc#cc#",
   "#cccccccccccccc#",
-  "#cctccc##ccctcc#",
-  ".#ccccc##ccccc#.",
-  ".#cccccccccccc#.",
-  "..#cccccccccc#..",
+  "#cctcccssccctcc#",
+  ".#cccss##ssccc#.",
+  ".#ccccsssscccc#.",
+  "..#cccssssccc#..",
   "...##cccccc##...",
   ".....######.....",
 ];

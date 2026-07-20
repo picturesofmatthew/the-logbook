@@ -32,6 +32,16 @@ import { currentProfile } from "@/lib/session";
 // sky fills the screen behind the chrome; the ring narrates the day in it; two
 // lanterns stand for the keepers; the fox and its company live in the ground
 // band at the foot. The ledger's numbers live at /today.
+// A handful of drifting motes for the sky band — position %, size px, delay s.
+const MOTES = [
+  { x: 16, y: 74, s: 3, d: 0 },
+  { x: 33, y: 34, s: 2, d: 2.6 },
+  { x: 50, y: 58, s: 3, d: 4.2 },
+  { x: 68, y: 28, s: 2, d: 1.3 },
+  { x: 83, y: 66, s: 3, d: 5.6 },
+  { x: 44, y: 82, s: 2, d: 3.4 },
+];
+
 export default async function GladeHome() {
   const viewer = await currentProfile(); // route guard (redirects to /enter if unauthenticated)
   const today = await todayIso();
@@ -181,7 +191,7 @@ export default async function GladeHome() {
                 title={s.label}
                 className="wobbly-sm flex items-center gap-1 border border-gold bg-gold-soft/70 px-2 py-0.5 text-xs"
               >
-                <StampMark kind={s.kind} size={12} /> {s.label}
+                <StampMark kind={s.kind} size={13} /> {s.label}
               </span>
             ))}
           </div>
@@ -203,6 +213,30 @@ export default async function GladeHome() {
             the {foxNext.label}
           </p>
         ) : null}
+      </div>
+
+      {/* ambient motes, drifting up through the sky's empty middle */}
+      <div
+        className="pointer-events-none absolute inset-x-0 top-[34%] bottom-[20%] overflow-hidden"
+        aria-hidden
+      >
+        {MOTES.map((m, i) => (
+          <span
+            key={i}
+            className="mote absolute block rounded-full"
+            style={{
+              left: `${m.x}%`,
+              top: `${m.y}%`,
+              width: m.s,
+              height: m.s,
+              background:
+                i % 3 === 0 && sigil.completed
+                  ? "var(--color-violet-bright)"
+                  : "var(--color-gold)",
+              animationDelay: `${m.d}s`,
+            }}
+          />
+        ))}
       </div>
 
       {/* push the world to the foot of the screen */}
@@ -231,21 +265,28 @@ export default async function GladeHome() {
               }
             />
             <div
-              className={`absolute bottom-[8%] left-1/2 -translate-x-1/2 ${
+              className={`absolute bottom-[6%] left-1/2 -translate-x-1/2 ${
                 mood === "lonely" ? "opacity-80 saturate-50" : ""
               }`}
             >
-              <PixelSprite
-                map={PET_SPRITES[stage]}
-                palette={PET_PALETTE}
-                className="idle-bounce h-14 w-14 pixelated"
-                title={`${petState.name ?? "The fox"}, a ${stageLabel} — the Glade is ${glade.tier}`}
-              />
-              {mood === "thriving" ? (
-                <span className="absolute -right-1 -top-1 animate-pulse text-gold">
-                  <StarMark size={12} />
-                </span>
-              ) : null}
+              <div className="relative flex flex-col items-center">
+                <PixelSprite
+                  map={PET_SPRITES[stage]}
+                  palette={PET_PALETTE}
+                  className="idle-bounce h-14 w-14 pixelated"
+                  title={`${petState.name ?? "The fox"}, a ${stageLabel} — the Glade is ${glade.tier}`}
+                />
+                {/* a soft shadow so the fox sits on the grass, not above it */}
+                <span
+                  className="-mt-1 h-1.5 w-8 rounded-[50%] bg-ink/25 blur-[1.5px]"
+                  aria-hidden
+                />
+                {mood === "thriving" ? (
+                  <span className="absolute -right-0.5 top-0 animate-pulse text-gold">
+                    <StarMark size={12} />
+                  </span>
+                ) : null}
+              </div>
             </div>
           </div>
         </div>

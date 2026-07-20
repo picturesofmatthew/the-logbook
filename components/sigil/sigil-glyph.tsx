@@ -209,18 +209,31 @@ export function SigilGlyph({
 
         {/* union's color arrives only when the ring closes */}
         {spec.completed ? (
-          <circle
-            className={bloom ? "seal-bloom" : undefined}
-            cx="60"
-            cy="60"
-            r="36"
-            fill="none"
-            stroke={
-              violet ? "var(--color-violet)" : "var(--color-violet-deep)"
-            }
-            strokeWidth={violet ? 1.6 : 1}
-            opacity={violet ? 0.9 : 0.55}
-          />
+          <g className={bloom ? "seal-bloom" : undefined}>
+            {/* union's color arrives — bloomed brighter on today's close */}
+            {bloom ? (
+              <circle
+                cx="60"
+                cy="60"
+                r="36"
+                fill="none"
+                stroke="var(--color-violet-bright)"
+                strokeWidth="3.5"
+                opacity="0.25"
+              />
+            ) : null}
+            <circle
+              cx="60"
+              cy="60"
+              r="36"
+              fill="none"
+              stroke={
+                violet ? "var(--color-violet-bright)" : "var(--color-violet)"
+              }
+              strokeWidth={violet ? 1.8 : 1.4}
+              opacity={violet ? 0.95 : 0.78}
+            />
+          </g>
         ) : null}
 
         {/* core by tier */}
