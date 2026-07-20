@@ -7,6 +7,7 @@
 import { useEffect, useState } from "react";
 import { LEGENDARIES, type LegendaryId, type SigilSpec } from "@/lib/engine/sigil";
 import { legendaryTone } from "@/lib/sounds";
+import { StarMark } from "@/components/glyphs";
 import { SigilGlyph } from "./sigil-glyph";
 
 export function LegendaryCeremony({
@@ -32,8 +33,8 @@ export function LegendaryCeremony({
     >
       <div className="absolute inset-0 bg-ink/60" />
       <div className="ceremony-card relative w-full max-w-xs">
-        <p className="mb-3 text-center font-pixel text-sm tracking-widest text-violet-bright">
-          ✦ A LEGENDARY SIGIL ✦
+        <p className="mb-3 flex items-center justify-center gap-2 font-pixel text-sm tracking-widest text-violet-bright">
+          <StarMark size={13} /> A LEGENDARY SIGIL <StarMark size={13} />
         </p>
         <div className="wobbly hatch lantern-pool border-2 border-violet/60 bg-cream p-6 text-center shadow-card">
           <div className="flex justify-center">

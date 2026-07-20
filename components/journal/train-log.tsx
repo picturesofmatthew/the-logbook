@@ -10,6 +10,7 @@ import {
   totalVolumeLb,
 } from "@/lib/engine/training";
 import { RuledHeading } from "@/components/ruled-heading";
+import { StarMark, WorkoutGlyph } from "@/components/glyphs";
 import { inscribeTick, newMarkTone, ritualChime } from "@/lib/sounds";
 
 export type WorkoutItem = {
@@ -154,8 +155,8 @@ export function TrainLog({
           <div className="absolute inset-0 bg-ink/40" />
           <div className="ceremony-card relative w-full max-w-xs">
             <div className="wobbly lantern-pool border-2 border-gold bg-cream p-5 text-center shadow-card">
-              <p className="font-pixel text-sm tracking-widest text-gold">
-                ✦ A NEW MARK ✦
+              <p className="flex items-center justify-center gap-2 font-pixel text-sm tracking-widest text-gold">
+                <StarMark size={13} /> A NEW MARK <StarMark size={13} />
               </p>
               <p className="mt-2 font-pixel text-sm">{markMoment.join(" · ")}</p>
               <p className="mt-2 text-xs italic text-ink-soft">
@@ -197,8 +198,8 @@ export function TrainLog({
             <p key={line.label} className="mt-0.5 text-xs text-ink-soft">
               {line.label} — {line.detail}
               {newMarkExercises.includes(line.label.toLowerCase()) ? (
-                <span className="ml-1.5 text-gold" title="A New Mark">
-                  ✦ new mark
+                <span className="ml-1.5 inline-flex items-center gap-0.5 text-gold" title="A New Mark">
+                  <StarMark size={11} /> new mark
                 </span>
               ) : null}
             </p>
@@ -216,9 +217,9 @@ export function TrainLog({
             <div className="flex gap-1.5">
               {(
                 [
-                  ["lift", "🏋 lift"],
-                  ["cardio", "👟 cardio"],
-                  ["rest", "🛏 rest"],
+                  ["lift", "lift"],
+                  ["cardio", "cardio"],
+                  ["rest", "rest"],
                 ] as const
               ).map(([id, label]) => (
                 <button
@@ -233,13 +234,13 @@ export function TrainLog({
                       });
                     });
                   }}
-                  className={`wobbly-sm cursor-pointer border-2 px-2 py-1 text-xs transition-all ${
+                  className={`wobbly-sm flex items-center gap-1 cursor-pointer border-2 px-2 py-1 text-xs transition-all ${
                     training === id
                       ? "border-moss-deep bg-moss text-cream"
                       : "border-ink/20 bg-cream text-ink-soft"
                   }`}
                 >
-                  {label}
+                  <WorkoutGlyph kind={id} size={13} /> {label}
                 </button>
               ))}
             </div>

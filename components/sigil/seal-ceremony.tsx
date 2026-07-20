@@ -9,6 +9,7 @@
 import { useEffect, useState } from "react";
 import { CHORDS, type SigilSpec } from "@/lib/engine/sigil";
 import { sealTone } from "@/lib/sounds";
+import { StarMark } from "@/components/glyphs";
 import { SigilGlyph } from "./sigil-glyph";
 
 const SEEN_PREFIX = "logbook_seal_seen_";
@@ -119,8 +120,8 @@ export function SealCeremony({
             </p>
           ) : null}
           {milestone ? (
-            <p className="mt-2 font-pixel text-xs tracking-wide text-violet">
-              ✦ {milestone}
+            <p className="mt-2 flex items-center justify-center gap-1 font-pixel text-xs tracking-wide text-violet">
+              <StarMark size={12} /> {milestone}
             </p>
           ) : null}
           <p className="mt-3 text-xs italic text-ink-soft">

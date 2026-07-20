@@ -132,3 +132,160 @@ export function WaterDrop({
     </svg>
   );
 }
+
+// A stroke-glyph wrapper — the shared ink register for the marks below.
+function Ink({
+  className,
+  size = 24,
+  sw = 1.7,
+  fill = "none",
+  children,
+}: GlyphProps & { sw?: number; fill?: string; children: ReactNode }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill={fill}
+      stroke="currentColor"
+      strokeWidth={sw}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      {children}
+    </svg>
+  );
+}
+
+// A four-point sparkle — the app's star, replacing ✦.
+export function StarMark({ className, size = 24 }: GlyphProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      stroke="none"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M12 2.2 L13.6 9.4 Q13.8 10.2 14.6 10.4 L21.8 12 L14.6 13.6 Q13.8 13.8 13.6 14.6 L12 21.8 L10.4 14.6 Q10.2 13.8 9.4 13.6 L2.2 12 L9.4 10.4 Q10.2 10.2 10.4 9.4 Z" />
+    </svg>
+  );
+}
+
+// A small filled heart — replacing ♥.
+export function HeartMark({ className, size = 24 }: GlyphProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      stroke="none"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M12 20.4 C12 20.4 3.6 14.8 3.6 8.8 C3.6 6.2 5.7 4.4 8 4.4 C9.9 4.4 11.4 5.6 12 7 C12.6 5.6 14.1 4.4 16 4.4 C18.3 4.4 20.4 6.2 20.4 8.8 C20.4 14.8 12 20.4 12 20.4 Z" />
+    </svg>
+  );
+}
+
+// The meals, as marks of the day's turn: a rising sun, a high sun, a moon,
+// a scatter of bites. (The stored meal id stays; only the mark is drawn.)
+export function MealGlyph({ meal, ...p }: GlyphProps & { meal: string }) {
+  switch (meal) {
+    case "breakfast":
+      return (
+        <Ink {...p}>
+          <line x1="3" y1="18" x2="21" y2="18" />
+          <path d="M7 18 A5 5 0 0 1 17 18" />
+          <path d="M12 4.5 V6.5 M5.5 8 L7 9.4 M18.5 8 L17 9.4 M3.5 14 H5.5 M18.5 14 H20.5" />
+        </Ink>
+      );
+    case "lunch":
+      return (
+        <Ink {...p}>
+          <circle cx="12" cy="12" r="4" />
+          <path d="M12 3 V5 M12 19 V21 M3 12 H5 M19 12 H21 M5.6 5.6 L7 7 M17 17 L18.4 18.4 M18.4 5.6 L17 7 M7 17 L5.6 18.4" />
+        </Ink>
+      );
+    case "dinner":
+      return (
+        <Ink {...p}>
+          <path d="M15 4 A8 8 0 1 0 15 20 A6.3 6.3 0 1 1 15 4 Z" />
+          <path d="M7 6 L7.6 7.6 L9.2 8.2 L7.6 8.8 L7 10.4 L6.4 8.8 L4.8 8.2 L6.4 7.6 Z" fill="currentColor" stroke="none" />
+        </Ink>
+      );
+    case "snacks":
+      return (
+        <Ink {...p} fill="currentColor">
+          <circle cx="8" cy="13.5" r="2" stroke="none" />
+          <circle cx="13.5" cy="9.5" r="1.7" stroke="none" />
+          <circle cx="15.5" cy="15" r="2.2" stroke="none" />
+        </Ink>
+      );
+    default:
+      return null;
+  }
+}
+
+// The ways to move: a barbell, a heartbeat, a resting moon.
+export function WorkoutGlyph({ kind, ...p }: GlyphProps & { kind: string }) {
+  switch (kind) {
+    case "lift":
+      return (
+        <Ink {...p} sw={1.8}>
+          <line x1="6" y1="12" x2="18" y2="12" />
+          <line x1="6" y1="8.5" x2="6" y2="15.5" strokeWidth="2.5" />
+          <line x1="18" y1="8.5" x2="18" y2="15.5" strokeWidth="2.5" />
+          <line x1="3.5" y1="10.2" x2="3.5" y2="13.8" />
+          <line x1="20.5" y1="10.2" x2="20.5" y2="13.8" />
+        </Ink>
+      );
+    case "cardio":
+      return (
+        <Ink {...p} sw={1.8}>
+          <path d="M3 13 H8 L10 8 L13.5 17 L15.5 13 H21" />
+        </Ink>
+      );
+    case "rest":
+      return (
+        <Ink {...p}>
+          <path d="M20 15 A8.5 8.5 0 1 1 10.5 4.2 A6.6 6.6 0 0 0 20 15 Z" />
+          <path d="M15.5 6.5 H18 L15.5 9 H18" strokeWidth="1.2" opacity="0.75" />
+        </Ink>
+      );
+    default:
+      return null;
+  }
+}
+
+// A bowl with steam — the mark for eating / assembling a dish.
+export function EatGlyph(p: GlyphProps) {
+  return (
+    <Ink {...p}>
+      <path d="M3.5 12.5 A8.5 8.5 0 0 0 20.5 12.5 Z" />
+      <line x1="2.5" y1="12.5" x2="21.5" y2="12.5" />
+      <path d="M9 8.5 Q10.2 6.8 9 5 M12 8.5 Q13.2 6.8 12 5 M15 8.5 Q16.2 6.8 15 5" opacity="0.8" />
+    </Ink>
+  );
+}
+
+// The day-stamp marks on the glade, chosen by stamp kind.
+export function StampMark({ kind, ...p }: GlyphProps & { kind: string }) {
+  switch (kind) {
+    case "heart":
+      return <HeartMark {...p} />;
+    case "lift":
+      return <WorkoutGlyph kind="lift" {...p} />;
+    case "cardio":
+      return <WorkoutGlyph kind="cardio" {...p} />;
+    case "water":
+      return <WaterDrop filled {...p} />;
+    default:
+      return <StarMark {...p} />;
+  }
+}

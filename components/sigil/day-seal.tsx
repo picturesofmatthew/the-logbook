@@ -2,6 +2,7 @@
 // name in union's color. Never a scold — an open ring just waits.
 
 import { CHORDS, LEGENDARIES, type SigilSpec } from "@/lib/engine/sigil";
+import { StarMark } from "@/components/glyphs";
 import { SigilGlyph } from "./sigil-glyph";
 
 const TIER_LABELS: Record<SigilSpec["tier"], string> = {
@@ -31,8 +32,8 @@ export function DaySeal({
       <div className="min-w-0 flex-1">
         {legendary ? (
           <>
-            <p className="font-pixel text-sm tracking-wide text-violet">
-              ✦ {legendary.name}
+            <p className="flex items-center gap-1.5 font-pixel text-sm tracking-wide text-violet">
+              <StarMark size={13} /> {legendary.name}
             </p>
             <p className="mt-0.5 text-xs italic text-ink-soft">
               {legendary.epigraph}

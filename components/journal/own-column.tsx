@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { removeEntry } from "@/app/log/actions";
 import { ceremonyChime, logChime } from "@/lib/sounds";
+import { MealGlyph } from "@/components/glyphs";
 import { totalOf } from "@/lib/engine/totals";
 import { MEALS, type JournalEntry, type Meal, type Specimen, type Target } from "@/lib/meals";
 import { Ceremony, type CeremonyData } from "./ceremony";
@@ -58,8 +59,8 @@ export function OwnColumn({
         return (
           <div key={m.id} className="flex flex-col gap-1">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-ink-soft">
-                {m.emoji} {m.label}
+              <span className="flex items-center gap-1 text-sm text-ink-soft">
+                <MealGlyph meal={m.id} size={13} /> {m.label}
               </span>
               <button
                 type="button"

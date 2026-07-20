@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { DaySeal } from "@/components/sigil/day-seal";
+import { MealGlyph, MoodFace, WaterDrop, WorkoutGlyph } from "@/components/glyphs";
 import { DISPLAY_NAMES, PROFILES, type Profile } from "@/lib/auth";
 import {
   getDayExtras,
@@ -157,8 +158,8 @@ export default async function DayPage({
                 <>
                   {mealsFor(journal[p].entries).map(({ meal, items }) => (
                     <div key={meal.id} className="mt-2">
-                      <p className="text-[10px] text-ink-soft">
-                        {meal.emoji} {meal.label}
+                      <p className="flex items-center gap-1 text-[10px] text-ink-soft">
+                        <MealGlyph meal={meal.id} size={11} /> {meal.label}
                       </p>
                       {items.map((e) => (
                         <p key={e.id} className="text-xs leading-snug">
@@ -183,7 +184,9 @@ export default async function DayPage({
 
               {dayWorkouts[p].map((w) => (
                 <div key={w.id} className="mt-2">
-                  <p className="text-[10px] text-ink-soft">🏋 {w.title}</p>
+                  <p className="flex items-center gap-1 text-[10px] text-ink-soft">
+                    <WorkoutGlyph kind="lift" size={11} /> {w.title}
+                  </p>
                   {foldWorkout(w).map((line) => (
                     <p key={line.label} className="text-xs leading-snug">
                       {line.label} — {line.detail}
@@ -192,12 +195,16 @@ export default async function DayPage({
                 </div>
               ))}
 
-              <p className="mt-2 text-[11px] text-ink-soft">
-                {extras.meta[p].waterCups > 0
-                  ? `💧 ${extras.meta[p].waterCups} cups · `
-                  : ""}
-                {extras.meta[p].mood ?? ""}
-                {weighIns[p] != null ? ` · ${weighIns[p]} lb` : ""}
+              <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-ink-soft">
+                {extras.meta[p].waterCups > 0 ? (
+                  <span className="flex items-center gap-1">
+                    <WaterDrop filled size={12} /> {extras.meta[p].waterCups} cups
+                  </span>
+                ) : null}
+                {extras.meta[p].mood ? (
+                  <MoodFace mood={extras.meta[p].mood} size={15} />
+                ) : null}
+                {weighIns[p] != null ? <span>{weighIns[p]} lb</span> : null}
               </p>
               {extras.meta[p].note ? (
                 <p className="mt-1 text-xs italic text-ink-soft">

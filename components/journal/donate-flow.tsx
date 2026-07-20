@@ -5,6 +5,7 @@ import { donateSpecimen } from "@/app/log/actions";
 import { HALLS, hallInfo, type Hall } from "@/lib/halls";
 import type { Meal } from "@/lib/meals";
 import type { CeremonyData } from "./ceremony";
+import { QuillRune } from "@/components/shell/rune-icons";
 
 export type LogResult = { message: string; ceremony?: CeremonyData };
 
@@ -192,9 +193,9 @@ export function DonateFlow({
         <button
           type="button"
           onClick={startManual}
-          className="wobbly-sm cursor-pointer border-2 border-dashed border-ink/30 bg-transparent px-3 py-2 text-ink-soft hover:border-gold"
+          className="wobbly-sm flex items-center justify-center gap-1.5 cursor-pointer border-2 border-dashed border-ink/30 bg-transparent px-3 py-2 text-ink-soft hover:border-gold"
         >
-          ✎ write it in by hand
+          <QuillRune size={14} /> write it in by hand
         </button>
       </div>
     );

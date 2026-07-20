@@ -1,6 +1,7 @@
 import { ArrivalCeremony } from "@/components/glade/arrival-ceremony";
 import { GladeScene, type BeingStages } from "@/components/glade/glade-scene";
 import { PixelSprite } from "@/components/pixel-sprite";
+import { HeartMark, StampMark, StarMark } from "@/components/glyphs";
 import { DaySeal } from "@/components/sigil/day-seal";
 import { LegendaryCeremony } from "@/components/sigil/legendary-ceremony";
 import { SealCeremony } from "@/components/sigil/seal-ceremony";
@@ -178,9 +179,9 @@ export default async function GladeHome() {
               <span
                 key={s.id}
                 title={s.label}
-                className="wobbly-sm border border-gold bg-gold-soft/70 px-2 py-0.5 text-xs"
+                className="wobbly-sm flex items-center gap-1 border border-gold bg-gold-soft/70 px-2 py-0.5 text-xs"
               >
-                {s.emoji} {s.label}
+                <StampMark kind={s.kind} size={12} /> {s.label}
               </span>
             ))}
           </div>
@@ -191,7 +192,9 @@ export default async function GladeHome() {
         </p>
         <p className="font-pixel text-[10px] tracking-wide text-ink-soft">
           {petState.name ? `${petState.name} the ${stageLabel}` : `a ${stageLabel}`}{" "}
-          · ♥ {petState.lifetimeDays}
+          ·{" "}
+          <HeartMark size={10} className="inline-block align-[-1px] text-terracotta" />{" "}
+          {petState.lifetimeDays}
           {petState.lifetimeDays === 1 ? " day" : " days"} fed
         </p>
         {foxNext ? (
@@ -239,8 +242,8 @@ export default async function GladeHome() {
                 title={`${petState.name ?? "The fox"}, a ${stageLabel} — the Glade is ${glade.tier}`}
               />
               {mood === "thriving" ? (
-                <span className="absolute -right-1 -top-1 animate-pulse font-pixel text-xs text-gold">
-                  ✦
+                <span className="absolute -right-1 -top-1 animate-pulse text-gold">
+                  <StarMark size={12} />
                 </span>
               ) : null}
             </div>

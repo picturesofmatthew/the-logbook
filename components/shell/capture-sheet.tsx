@@ -24,6 +24,8 @@ type Estimate = {
   confidence: "high" | "rough";
 };
 import { inscribeTick, logChime, ritualChime } from "@/lib/sounds";
+import { EatGlyph, MealGlyph, WorkoutGlyph } from "@/components/glyphs";
+import { PantryRune, QuillRune } from "@/components/shell/rune-icons";
 import { useShell } from "./shell-provider";
 
 type Pane = "eat" | "train";
@@ -244,7 +246,7 @@ export function CaptureSheet() {
                 : "border-ink/20 bg-cream text-ink-soft"
             }`}
           >
-            🍽 eat
+            <EatGlyph size={15} /> eat
           </button>
           <button
             type="button"
@@ -255,7 +257,7 @@ export function CaptureSheet() {
                 : "border-ink/20 bg-cream text-ink-soft"
             }`}
           >
-            🏋 train
+            <WorkoutGlyph kind="lift" size={15} /> train
           </button>
         </div>
 
@@ -267,13 +269,13 @@ export function CaptureSheet() {
                   key={m.id}
                   type="button"
                   onClick={() => setMeal(m.id)}
-                  className={`wobbly-sm flex-1 cursor-pointer border-2 px-1 py-1.5 text-xs ${
+                  className={`wobbly-sm flex flex-1 items-center justify-center gap-1 cursor-pointer border-2 px-1 py-1.5 text-xs ${
                     meal === m.id
                       ? "border-gold bg-gold-soft"
                       : "border-ink/20 bg-cream text-ink-soft"
                   }`}
                 >
-                  {m.emoji} {m.label}
+                  <MealGlyph meal={m.id} size={12} /> {m.label}
                 </button>
               ))}
             </div>
@@ -392,9 +394,9 @@ export function CaptureSheet() {
             <Link
               href="/museum"
               onClick={closeCapture}
-              className="wobbly-sm cursor-pointer border-2 border-dashed border-ink/30 px-3 py-2 text-center text-sm text-ink-soft hover:border-gold"
+              className="wobbly-sm flex items-center justify-center gap-1.5 cursor-pointer border-2 border-dashed border-ink/30 px-3 py-2 text-center text-sm text-ink-soft hover:border-gold"
             >
-              🏛 find more in the pantry →
+              <PantryRune size={15} /> find more in the pantry →
             </Link>
           </div>
         ) : (
@@ -486,9 +488,9 @@ export function CaptureSheet() {
                 <div className="flex gap-2">
                   {(
                     [
-                      ["lift", "🏋 lift"],
-                      ["cardio", "👟 cardio"],
-                      ["rest", "🛏 rest"],
+                      ["lift", "lift"],
+                      ["cardio", "cardio"],
+                      ["rest", "rest"],
                     ] as const
                   ).map(([id, text]) => (
                     <button
@@ -496,9 +498,9 @@ export function CaptureSheet() {
                       type="button"
                       disabled={pending}
                       onClick={() => markTraining(id)}
-                      className="wobbly-sm flex-1 cursor-pointer border-2 border-ink/20 bg-cream py-2 text-sm text-ink-soft hover:border-gold disabled:opacity-60"
+                      className="wobbly-sm flex flex-1 items-center justify-center gap-1 cursor-pointer border-2 border-ink/20 bg-cream py-2 text-sm text-ink-soft hover:border-gold disabled:opacity-60"
                     >
-                      {text}
+                      <WorkoutGlyph kind={id} size={14} /> {text}
                     </button>
                   ))}
                 </div>
@@ -506,9 +508,9 @@ export function CaptureSheet() {
                 <Link
                   href="/today"
                   onClick={closeCapture}
-                  className="wobbly-sm cursor-pointer border-2 border-dashed border-ink/30 px-3 py-2 text-center text-sm text-ink-soft hover:border-gold"
+                  className="wobbly-sm flex items-center justify-center gap-1.5 cursor-pointer border-2 border-dashed border-ink/30 px-3 py-2 text-center text-sm text-ink-soft hover:border-gold"
                 >
-                  ✎ the full training log →
+                  <QuillRune size={14} /> the full training log →
                 </Link>
               </>
             )}

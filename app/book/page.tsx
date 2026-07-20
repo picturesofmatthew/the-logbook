@@ -3,6 +3,7 @@ import Link from "next/link";
 import { BeingPortrait } from "@/components/glade/being-portrait";
 import { SigilGlyph } from "@/components/sigil/sigil-glyph";
 import { BestiaryRune, BookRune } from "@/components/shell/rune-icons";
+import { StarMark } from "@/components/glyphs";
 import { getArrivals, getDiscoveries, recordLegendary } from "@/lib/data";
 import { currentTz, friendlyDate, todayIso } from "@/lib/dates";
 import { BEINGS } from "@/lib/engine/beings";
@@ -93,12 +94,6 @@ export default async function BookPage({
         <p className="mt-1 text-sm text-ink-soft">
           every day you both kept, sealed and remembered
         </p>
-        <Link
-          href="/"
-          className="mt-1 inline-block text-sm text-ink-soft underline decoration-dotted underline-offset-4"
-        >
-          back to the journal
-        </Link>
       </header>
 
       <nav className="flex items-center justify-between">
@@ -160,9 +155,9 @@ export default async function BookPage({
       </section>
 
       <section>
-        <h2 className="mb-2 font-pixel text-sm tracking-wide">
-          ✦ THE LEGENDARIUM
-          <span className="ml-2 text-[10px] text-ink-soft">
+        <h2 className="mb-2 flex items-center gap-2 font-pixel text-sm tracking-wide">
+          <StarMark size={15} /> THE LEGENDARIUM
+          <span className="text-[10px] text-ink-soft">
             {discoveries.size}/{Object.keys(LEGENDARIES).length} discovered
           </span>
         </h2>
@@ -272,20 +267,6 @@ export default async function BookPage({
         </div>
       </section>
 
-      <footer className="mt-2 flex items-center justify-center gap-5 text-sm text-ink-soft">
-        <Link
-          href="/museum"
-          className="underline decoration-dotted underline-offset-4"
-        >
-          🏛 the pantry
-        </Link>
-        <Link
-          href="/trends"
-          className="underline decoration-dotted underline-offset-4"
-        >
-          📈 trends
-        </Link>
-      </footer>
     </main>
   );
 }

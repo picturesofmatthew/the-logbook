@@ -1,5 +1,7 @@
 "use client";
 
+import { StarMark } from "@/components/glyphs";
+
 export type CeremonyData = {
   icon: string;
   name: string;
@@ -25,8 +27,8 @@ export function Ceremony({
     >
       <div className="absolute inset-0 bg-ink/50" />
       <div className="ceremony-card relative w-full max-w-xs">
-        <p className="mb-3 text-center font-pixel text-sm tracking-widest text-gold-soft">
-          ✦ NEW SPECIMEN DISCOVERED ✦
+        <p className="mb-3 flex items-center justify-center gap-2 font-pixel text-sm tracking-widest text-gold-soft">
+          <StarMark size={13} /> NEW SPECIMEN DISCOVERED <StarMark size={13} />
         </p>
         <div className="wobbly border-2 border-ink/30 bg-cream p-6 text-center shadow-card">
           <span className="block text-5xl">{data.icon}</span>

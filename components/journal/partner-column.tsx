@@ -1,4 +1,4 @@
-import { MoodFace } from "@/components/glyphs";
+import { MealGlyph, MoodFace } from "@/components/glyphs";
 import { totalOf } from "@/lib/engine/totals";
 import { MEALS, type JournalEntry, type Target } from "@/lib/meals";
 import { MacroBars } from "./macro-bars";
@@ -46,8 +46,8 @@ export function PartnerColumn({
         const mealEntries = entries.filter((e) => e.meal === m.id);
         return (
           <div key={m.id} className="flex flex-col gap-1">
-            <span className="text-sm text-ink-soft">
-              {m.emoji} {m.label}
+            <span className="flex items-center gap-1 text-sm text-ink-soft">
+              <MealGlyph meal={m.id} size={13} /> {m.label}
             </span>
             {mealEntries.length === 0 ? (
               <p className="pl-1 text-xs text-ink-soft/60">—</p>

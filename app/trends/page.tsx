@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { RuledHeading } from "@/components/ruled-heading";
 import { TrendsRune } from "@/components/shell/rune-icons";
+import { HeartMark } from "@/components/glyphs";
 import {
   WeightChart,
   type ChartSeries,
@@ -127,20 +127,6 @@ export default async function TrendsPage() {
         <p className="mt-1 text-sm text-ink-soft">
           trends, drawn into the book
         </p>
-        <nav className="mt-1 flex items-center justify-center gap-4 text-sm text-ink-soft">
-          <Link
-            href="/"
-            className="underline decoration-dotted underline-offset-4"
-          >
-            back to the journal
-          </Link>
-          <Link
-            href="/book"
-            className="underline decoration-dotted underline-offset-4"
-          >
-            📖 the spellbook
-          </Link>
-        </nav>
       </header>
 
       <section className="wobbly hatch border-2 border-ink/20 bg-cream/70 p-4 shadow-card">
@@ -267,7 +253,9 @@ export default async function TrendsPage() {
                   {Number(day.slice(8))}
                 </span>
                 <span className="flex items-center gap-0.5 text-[8px] leading-tight">
-                  {monthMarks.bothDays.has(day) && day <= today ? "♥" : ""}
+                  {monthMarks.bothDays.has(day) && day <= today ? (
+                    <HeartMark size={7} className="text-terracotta" />
+                  ) : null}
                   {PROFILES.map((p) =>
                     monthMarks.training[p][day] ? (
                       <span
@@ -283,7 +271,7 @@ export default async function TrendsPage() {
           )}
         </div>
         <p className="mt-2 text-center text-[10px] text-ink-soft">
-          ♥ both logged ·{" "}
+          <HeartMark size={9} className="inline-block align-middle text-terracotta" /> both logged ·{" "}
           {PROFILES.map((p, i) => (
             <span key={p}>
               {i > 0 ? " · " : ""}

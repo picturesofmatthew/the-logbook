@@ -3,6 +3,7 @@
 import { useMemo, useState, useTransition } from "react";
 import { logEntry } from "@/app/log/actions";
 import { hallInfo } from "@/lib/halls";
+import { EatGlyph, StarMark } from "@/components/glyphs";
 import type { Meal, Specimen } from "@/lib/meals";
 import { DonateFlow, type LogResult } from "./donate-flow";
 import { RecipeBuilder } from "./recipe-builder";
@@ -259,17 +260,17 @@ export function LogDrawer({
             <button
               type="button"
               onClick={() => setMode("donate")}
-              className="wobbly-sm cursor-pointer border-2 border-dashed border-ink/30 bg-transparent px-3 py-2 text-ink-soft hover:border-gold"
+              className="wobbly-sm flex items-center justify-center gap-1.5 cursor-pointer border-2 border-dashed border-ink/30 bg-transparent px-3 py-2 text-ink-soft hover:border-gold"
             >
-              ✦ donate a new specimen
+              <StarMark size={14} /> donate a new specimen
             </button>
             {specimens.filter((s) => !s.isRecipe).length >= 2 ? (
               <button
                 type="button"
                 onClick={() => setMode("dish")}
-                className="wobbly-sm cursor-pointer border-2 border-dashed border-ink/30 bg-transparent px-3 py-2 text-ink-soft hover:border-gold"
+                className="wobbly-sm flex items-center justify-center gap-1.5 cursor-pointer border-2 border-dashed border-ink/30 bg-transparent px-3 py-2 text-ink-soft hover:border-gold"
               >
-                🍲 assemble a dish
+                <EatGlyph size={14} /> assemble a dish
               </button>
             ) : null}
           </div>

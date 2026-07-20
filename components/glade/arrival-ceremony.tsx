@@ -6,6 +6,7 @@
 import { useEffect, useState } from "react";
 import { BEINGS, type BeingId } from "@/lib/engine/beings";
 import { arrivalTone } from "@/lib/sounds";
+import { StarMark } from "@/components/glyphs";
 import { BeingPortrait } from "./being-portrait";
 
 export function ArrivalCeremony({ being }: { being: BeingId }) {
@@ -26,8 +27,8 @@ export function ArrivalCeremony({ being }: { being: BeingId }) {
     >
       <div className="absolute inset-0 bg-ink/60" />
       <div className="ceremony-card relative w-full max-w-xs">
-        <p className="mb-3 text-center font-pixel text-sm tracking-widest text-gold-soft">
-          ✦ SOMETHING HAS COME ✦
+        <p className="mb-3 flex items-center justify-center gap-2 font-pixel text-sm tracking-widest text-gold-soft">
+          <StarMark size={13} /> SOMETHING HAS COME <StarMark size={13} />
         </p>
         <div className="arch hatch border-2 border-ink/30 bg-cream p-6 pt-8 text-center shadow-card">
           <div className="flex justify-center">

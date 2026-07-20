@@ -3,7 +3,14 @@
 import type { Macros } from "./totals";
 import type { Target } from "@/lib/meals";
 
-export type Stamp = { id: string; emoji: string; label: string };
+export type StampKind =
+  | "heart"
+  | "star"
+  | "lift"
+  | "cardio"
+  | "water"
+  | "sparkle";
+export type Stamp = { id: string; kind: StampKind; emoji: string; label: string };
 
 export function stampsForDay(input: {
   people: {
@@ -21,6 +28,7 @@ export function stampsForDay(input: {
   if (input.people.length > 0 && input.people.every((p) => p.loggedAny)) {
     stamps.push({
       id: "both-logged",
+      kind: "heart",
       emoji: "♥",
       label: "both logged today",
     });
@@ -30,6 +38,7 @@ export function stampsForDay(input: {
     if (p.target && p.loggedAny && p.total.proteinG >= p.target.proteinG) {
       stamps.push({
         id: `protein-${p.name}`,
+        kind: "star",
         emoji: "★",
         label: `${p.name} hit protein`,
       });
@@ -37,6 +46,7 @@ export function stampsForDay(input: {
     if (p.training === "lift" || p.training === "cardio") {
       stamps.push({
         id: `training-${p.name}`,
+        kind: p.training === "lift" ? "lift" : "cardio",
         emoji: p.training === "lift" ? "🏋" : "👟",
         label: `${p.name} trained`,
       });
@@ -44,6 +54,7 @@ export function stampsForDay(input: {
     if (p.waterCups >= 8) {
       stamps.push({
         id: `water-${p.name}`,
+        kind: "water",
         emoji: "💧",
         label: `${p.name} watered the garden`,
       });
@@ -53,6 +64,7 @@ export function stampsForDay(input: {
   if (input.newSpecimens > 0) {
     stamps.push({
       id: "new-specimens",
+      kind: "sparkle",
       emoji: "✦",
       label:
         input.newSpecimens === 1

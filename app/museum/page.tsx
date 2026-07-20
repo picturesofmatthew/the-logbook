@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import {
   SpecimenCard,
   type SpecimenCardData,
@@ -63,17 +62,13 @@ export default async function MuseumPage() {
             " · ",
           )}
         </p>
-        <Link
-          href="/"
-          className="mt-1 inline-block text-sm text-ink-soft underline decoration-dotted underline-offset-4"
-        >
-          back to the journal
-        </Link>
       </header>
 
       {specimens.length === 0 ? (
         <div className="wobbly border-2 border-dashed border-ink/25 p-8 text-center text-ink-soft">
-          <p className="text-3xl">🏛</p>
+          <p className="flex justify-center text-ink-soft">
+            <PantryRune size={40} />
+          </p>
           <p className="mt-2">
             The halls are empty and echoing. Log your first meal to donate the
             pantry&apos;s very first specimen.
