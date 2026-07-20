@@ -117,6 +117,11 @@ body {
   --glade-ground-top: #a8b06a;
   --glade-ground-bottom: #7c8a4d;
   --glade-fauna: #43492c;
+  /* Moon-pale glow for the luminous beings and small folk (heron, moth, koi,
+     the elk, stars, wicks, dewdrops). Defined once here so it stays pale in
+     every light state rather than inverting with paper/ink — without it these
+     fills fall back to black, and the night sky loses its sparks. */
+  --color-glow: #f6efdb;
 }
 html[data-light="dusk"] {
   --glade-sky-top: #6f5a78;
