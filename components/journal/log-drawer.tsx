@@ -82,7 +82,8 @@ export function LogDrawer({
         onClick={onClose}
         className="absolute inset-0 bg-ink/30"
       />
-      <div className="relative max-h-[85dvh] w-full max-w-md overflow-y-auto rounded-t-3xl border-2 border-b-0 border-ink/20 bg-paper p-5 shadow-card">
+      <div className="relative max-h-[85dvh] w-full max-w-md overflow-y-auto overscroll-contain rounded-t-3xl border-2 border-b-0 border-ink/20 bg-paper p-5 shadow-card">
+        <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-ink/20" aria-hidden />
         {mode === "donate" ? (
           <DonateFlow
             meal={meal}
@@ -101,7 +102,7 @@ export function LogDrawer({
             onBack={() => setMode("pick")}
           />
         ) : chosen ? (
-          <div className="flex flex-col gap-4">
+          <div className="rise-in flex flex-col gap-4">
             <div className="flex items-center justify-between">
               <h3 className="font-pixel text-sm tracking-wide">
                 {chosen.icon} {chosen.name.toUpperCase()}

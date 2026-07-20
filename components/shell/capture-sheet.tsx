@@ -232,10 +232,11 @@ export function CaptureSheet() {
         role="dialog"
         aria-label="Log"
         aria-hidden={!captureOpen}
-        className={`fixed inset-x-0 bottom-0 z-50 mx-auto max-h-[86dvh] w-full max-w-md overflow-y-auto rounded-t-3xl border-2 border-b-0 border-ink/20 bg-paper p-4 pb-8 shadow-card transition-transform duration-300 ${
+        className={`fixed inset-x-0 bottom-0 z-50 mx-auto max-h-[86dvh] w-full max-w-md overflow-y-auto overscroll-contain rounded-t-3xl border-2 border-b-0 border-ink/20 bg-paper p-4 pb-8 shadow-card transition-transform duration-300 ${
           captureOpen ? "translate-y-0" : "translate-y-full"
         }`}
       >
+        <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-ink/20" aria-hidden />
         <div className="mb-4 flex gap-2">
           <button
             type="button"
@@ -304,7 +305,7 @@ export function CaptureSheet() {
             ) : null}
 
             {est ? (
-              <div className="wobbly-sm flex flex-col gap-2 border-2 border-dashed border-gold/70 bg-gold-soft/30 p-3">
+              <div className="rise-in wobbly-sm flex flex-col gap-2 border-2 border-dashed border-gold/70 bg-gold-soft/30 p-3">
                 <div className="flex items-center gap-2">
                   <span
                     className="font-pixel text-base text-terracotta"
@@ -421,7 +422,7 @@ export function CaptureSheet() {
             </div>
 
             {preview ? (
-              <div className="wobbly-sm flex flex-col gap-2 border-2 border-gold/60 bg-gold-soft/30 p-3">
+              <div className="rise-in wobbly-sm flex flex-col gap-2 border-2 border-gold/60 bg-gold-soft/30 p-3">
                 <input
                   value={preview.title}
                   onChange={(e) =>
