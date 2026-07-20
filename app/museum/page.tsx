@@ -8,6 +8,7 @@ import { DISPLAY_NAMES, PROFILES, type Profile } from "@/lib/auth";
 import { getAllSpecimens } from "@/lib/data";
 import { currentTz } from "@/lib/dates";
 import { HALLS } from "@/lib/halls";
+import { PantryRune } from "@/components/shell/rune-icons";
 import { currentProfile } from "@/lib/session";
 
 export const metadata: Metadata = {
@@ -52,7 +53,9 @@ export default async function MuseumPage() {
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-5 p-4 pb-16">
       <header className="text-center">
-        <h1 className="font-pixel text-2xl tracking-wide">🏛 THE PANTRY</h1>
+        <h1 className="flex items-center justify-center gap-2 font-pixel text-2xl tracking-wide">
+          <PantryRune size={24} /> THE PANTRY
+        </h1>
         <p className="mt-1 text-sm text-ink-soft">
           {specimens.length}{" "}
           {specimens.length === 1 ? "specimen" : "specimens"} ·{" "}

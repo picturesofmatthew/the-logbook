@@ -8,6 +8,7 @@ import {
   setWater,
 } from "@/app/day/actions";
 import { RuledHeading } from "@/components/ruled-heading";
+import { MoodFace, WaterDrop } from "@/components/glyphs";
 import type { DayMetaRow } from "@/lib/data";
 import { ritualChime } from "@/lib/sounds";
 
@@ -99,11 +100,13 @@ export function DailyRituals({
                   }),
                 );
               }}
-              className={`cursor-pointer text-lg transition-transform active:scale-125 ${
-                i < meta.waterCups ? "" : "opacity-25 grayscale"
-              }`}
+              className="cursor-pointer text-ink-soft transition-transform active:scale-125"
             >
-              💧
+              <WaterDrop
+                filled={i < meta.waterCups}
+                size={20}
+                className={i < meta.waterCups ? "" : "opacity-40"}
+              />
             </button>
           ))}
         </div>
@@ -122,11 +125,11 @@ export function DailyRituals({
                 setMood(next);
                 run(() => setMoodAction({ day, mood: next }));
               }}
-              className={`cursor-pointer text-lg transition-transform active:scale-125 ${
-                mood === m ? "" : "opacity-30 grayscale"
+              className={`cursor-pointer transition-transform active:scale-125 ${
+                mood === m ? "text-ink" : "text-ink-soft opacity-40"
               }`}
             >
-              {m}
+              <MoodFace mood={m} size={26} />
             </button>
           ))}
         </div>

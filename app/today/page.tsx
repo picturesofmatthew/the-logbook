@@ -113,6 +113,8 @@ export default async function TodayPage({
             displayName={DISPLAY_NAMES[partner]}
             entries={journal[partner].entries}
             target={journal[partner].target}
+            mood={extras.meta[partner].mood}
+            note={extras.meta[partner].note}
           />
         </div>
       </div>

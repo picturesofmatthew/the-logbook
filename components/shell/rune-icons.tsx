@@ -98,3 +98,14 @@ export function QuillRune(props: RuneProps) {
     </Svg>
   );
 }
+
+// A stag's crown — antlers branching over a still head. Marks the bestiary.
+export function BestiaryRune(props: RuneProps) {
+  return (
+    <Svg {...props}>
+      <path d="M9.6 20 Q12 21.8 14.4 20 Q15.8 17 12 16 Q8.2 17 9.6 20 Z" />
+      <path d="M10 16 Q8.2 12.4 9 8.6 M9 10.4 Q7.2 9.4 5.6 9.8 M9.2 8.8 Q8.4 7.2 6.8 6.8" />
+      <path d="M14 16 Q15.8 12.4 15 8.6 M15 10.4 Q16.8 9.4 18.4 9.8 M14.8 8.8 Q15.6 7.2 17.2 6.8" />
+    </Svg>
+  );
+}

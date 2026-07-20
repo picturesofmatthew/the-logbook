@@ -1,3 +1,4 @@
+import { MoodFace } from "@/components/glyphs";
 import { totalOf } from "@/lib/engine/totals";
 import { MEALS, type JournalEntry, type Target } from "@/lib/meals";
 import { MacroBars } from "./macro-bars";
@@ -6,20 +7,39 @@ export function PartnerColumn({
   displayName,
   entries,
   target,
+  mood,
+  note,
 }: {
   displayName: string;
   entries: JournalEntry[];
   target: Target;
+  mood?: string | null;
+  note?: string | null;
 }) {
   const total = totalOf(
     entries.map((e) => ({ ...e.food, servings: e.servings })),
   );
+  const hasLogged = entries.length > 0;
 
   return (
     <section className="flex flex-col gap-3">
       <h2 className="font-pixel text-sm tracking-wide text-ink-soft">
         {displayName.toUpperCase()}
       </h2>
+      {hasLogged && (mood || note) ? (
+        <div className="flex items-start gap-1.5 text-ink-soft">
+          {mood ? (
+            <span className="shrink-0 pt-0.5">
+              <MoodFace mood={mood} size={18} />
+            </span>
+          ) : null}
+          {note ? (
+            <span className="text-[11px] italic leading-snug">
+              &ldquo;{note}&rdquo;
+            </span>
+          ) : null}
+        </div>
+      ) : null}
       <MacroBars total={total} target={target} />
 
       {MEALS.map((m) => {

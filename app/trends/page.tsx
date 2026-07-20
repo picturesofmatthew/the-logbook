@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { RuledHeading } from "@/components/ruled-heading";
+import { TrendsRune } from "@/components/shell/rune-icons";
 import {
   WeightChart,
   type ChartSeries,
@@ -120,7 +121,9 @@ export default async function TrendsPage() {
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-5 p-4 pb-16">
       <header className="text-center">
-        <h1 className="font-pixel text-2xl tracking-wide">📈 THE CHART PLATES</h1>
+        <h1 className="flex items-center justify-center gap-2 font-pixel text-2xl tracking-wide">
+          <TrendsRune size={24} /> THE CHART PLATES
+        </h1>
         <p className="mt-1 text-sm text-ink-soft">
           trends, drawn into the book
         </p>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { BeingPortrait } from "@/components/glade/being-portrait";
 import { SigilGlyph } from "@/components/sigil/sigil-glyph";
+import { BestiaryRune, BookRune } from "@/components/shell/rune-icons";
 import { getArrivals, getDiscoveries, recordLegendary } from "@/lib/data";
 import { currentTz, friendlyDate, todayIso } from "@/lib/dates";
 import { BEINGS } from "@/lib/engine/beings";
@@ -86,7 +87,9 @@ export default async function BookPage({
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-5 p-4 pb-16">
       <header className="text-center">
-        <h1 className="font-pixel text-2xl tracking-wide">📖 THE SPELLBOOK</h1>
+        <h1 className="flex items-center justify-center gap-2 font-pixel text-2xl tracking-wide">
+          <BookRune size={24} /> THE SPELLBOOK
+        </h1>
         <p className="mt-1 text-sm text-ink-soft">
           every day you both kept, sealed and remembered
         </p>
@@ -199,9 +202,9 @@ export default async function BookPage({
       </section>
 
       <section>
-        <h2 className="mb-2 font-pixel text-sm tracking-wide">
-          🦌 THE BESTIARY
-          <span className="ml-2 text-[10px] text-ink-soft">
+        <h2 className="mb-2 flex items-center gap-2 font-pixel text-sm tracking-wide">
+          <BestiaryRune size={16} /> THE BESTIARY
+          <span className="text-[10px] text-ink-soft">
             {arrivedCount}/{BEINGS.length} arrived
           </span>
         </h2>
