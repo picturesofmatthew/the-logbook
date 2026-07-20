@@ -73,6 +73,34 @@ body {
   background-size: 22px 22px;
   color: var(--color-ink);
   font-family: var(--font-sans), ui-rounded, system-ui, sans-serif;
+  /* Digits line up in columns across the whole app. */
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Interaction — one tactile language for every control ──
+   Keyboard focus is a hand-drawn dashed ring in gold, shown only to keyboard
+   users, so touch stays clean. Inputs keep their gold border as the focus
+   tell, so they opt out of the ring. */
+:where(a, button, [role="button"], summary):focus-visible {
+  outline: 2px dashed var(--color-gold);
+  outline-offset: 3px;
+}
+:where(input, textarea, select):focus-visible {
+  outline: none;
+}
+/* Every button gives a little under the thumb. Kept low-specificity with
+   :where() so component-specific presses (the big CTAs' lift, the water
+   droplets' bloom) still win. */
+:where(button, [role="button"]) {
+  transition: transform 0.09s ease-out;
+}
+:where(button, [role="button"]):active {
+  transform: scale(0.97);
+}
+@media (prefers-reduced-motion: reduce) {
+  :where(button, [role="button"]):active {
+    transform: none;
+  }
 }
 
 /* Hand-drawn wobble for cards and buttons */

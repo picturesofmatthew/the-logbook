@@ -6,7 +6,7 @@ import { isMuted, setMuted, subscribeMuted } from "@/lib/sounds";
 import { GladeRune } from "./rune-icons";
 
 const chip =
-  "flex items-center gap-2 border-[1.5px] border-ink/25 bg-cream/70 px-2.5 py-1.5 text-ink shadow-[0_1px_0_rgba(74,59,42,0.15)]";
+  "flex items-center gap-2 border-[1.5px] border-ink/25 bg-cream/70 px-2.5 py-1.5 text-ink shadow-[0_1px_0_rgba(74,59,42,0.15)] transition-all hover:border-ink/40 active:scale-[0.97]";
 
 export function TopBar({
   name,

@@ -15,16 +15,16 @@ function Bar({
   return (
     <div className="flex items-center gap-1.5">
       <span className="w-3 font-pixel text-[10px] text-ink-soft">{label}</span>
-      <div className="h-2 flex-1 overflow-hidden rounded-full bg-paper-deep">
+      <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-paper-deep">
         {max ? (
           <div
-            className={`h-full rounded-full ${over ? "bg-terracotta-soft" : "bg-moss"}`}
+            className={`h-full rounded-full transition-[width] duration-500 ease-out ${over ? "bg-terracotta-soft" : "bg-moss"}`}
             style={{ width: `${pct}%` }}
           />
         ) : null}
       </div>
       <span
-        className={`w-14 text-right font-pixel text-[10px] ${over ? "text-terracotta" : "text-ink-soft"}`}
+        className={`w-14 text-right font-pixel text-[11px] ${over ? "text-terracotta" : "text-ink-soft"}`}
       >
         {Math.round(value)}
         {max != null ? `/${max}` : ""}g

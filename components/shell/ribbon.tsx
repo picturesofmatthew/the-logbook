@@ -48,7 +48,7 @@ function Tab({
     <Link
       href={href}
       transitionTypes={[transitionType]}
-      className="flex flex-col items-center gap-1"
+      className="flex flex-col items-center gap-1 transition-transform active:scale-95"
     >
       <span
         className={`carve grid h-9 w-9 place-items-center ${

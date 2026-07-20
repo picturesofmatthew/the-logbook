@@ -100,7 +100,7 @@ export function DailyRituals({
                   }),
                 );
               }}
-              className="cursor-pointer text-ink-soft transition-transform active:scale-125"
+              className="cursor-pointer p-1 text-ink-soft transition-transform active:scale-125"
             >
               <WaterDrop
                 filled={i < meta.waterCups}
@@ -125,7 +125,7 @@ export function DailyRituals({
                 setMood(next);
                 run(() => setMoodAction({ day, mood: next }));
               }}
-              className={`cursor-pointer transition-transform active:scale-125 ${
+              className={`cursor-pointer p-0.5 transition-transform active:scale-125 ${
                 mood === m ? "text-ink" : "text-ink-soft opacity-40"
               }`}
             >
