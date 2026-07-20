@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { DailyRituals } from "@/components/journal/daily-rituals";
 import { OwnColumn } from "@/components/journal/own-column";
-import { PartnerColumn } from "@/components/journal/partner-column";
+import { PartnerGlance } from "@/components/journal/partner-glance";
 import { TrainLog } from "@/components/journal/train-log";
 import { TodayRune } from "@/components/shell/rune-icons";
 import { DISPLAY_NAMES, partnerOf } from "@/lib/auth";
@@ -99,7 +99,7 @@ export default async function TodayPage({
         )}
       </nav>
 
-      <div className="wobbly grid grid-cols-2 gap-4 border-2 border-ink/20 bg-cream/70 p-4 shadow-card">
+      <div className="wobbly border-2 border-ink/20 bg-cream/70 p-4 shadow-card">
         <OwnColumn
           displayName={DISPLAY_NAMES[profile]}
           day={day}
@@ -108,16 +108,14 @@ export default async function TodayPage({
           specimens={specimens}
           recents={recents}
         />
-        <div className="border-l-2 border-dashed border-ink/15 pl-4">
-          <PartnerColumn
-            displayName={DISPLAY_NAMES[partner]}
-            entries={journal[partner].entries}
-            target={journal[partner].target}
-            mood={extras.meta[partner].mood}
-            note={extras.meta[partner].note}
-          />
-        </div>
       </div>
+      <PartnerGlance
+        displayName={DISPLAY_NAMES[partner]}
+        entries={journal[partner].entries}
+        target={journal[partner].target}
+        mood={extras.meta[partner].mood}
+        note={extras.meta[partner].note}
+      />
 
       <DailyRituals day={day} meta={extras.meta[profile]} weighInLb={weighInLb} />
 
