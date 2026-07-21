@@ -1,10 +1,10 @@
 "use client";
 
 import { useActionState } from "react";
-import { namePet } from "@/app/pet/actions";
+import { nameFamiliar } from "@/app/familiar/actions";
 
 export function NameForm() {
-  const [state, formAction, pending] = useActionState(namePet, null);
+  const [state, formAction, pending] = useActionState(nameFamiliar, null);
 
   return (
     <form action={formAction} className="flex flex-col gap-1">

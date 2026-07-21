@@ -17,8 +17,8 @@ import {
   dayMeta,
   dreams,
   entries,
+  familiar,
   foods,
-  pet,
   sigilDiscoveries,
   targets,
   weighIns,
@@ -26,7 +26,10 @@ import {
   workoutSets,
 } from "@/db/schema";
 import { PROFILES, type Profile } from "@/lib/auth";
-import { addDays, diffDays } from "@/lib/dates";
+import { diffDays } from "@/lib/dates";
+import { buildKeeperDay } from "@/lib/engine/keeper-day";
+import type { KeeperDay } from "@/lib/engine/sigil";
+import { totalOf } from "@/lib/engine/totals";
 import {
   bestByExercise,
   splitFamilyFor,
@@ -86,36 +89,45 @@ export async function getAllSpecimens(): Promise<Specimen[]> {
   return rows as Specimen[];
 }
 
-export type PetStateRaw = {
+export type FamiliarStateRaw = {
   name: string | null;
   adoptedAt: Date;
   lifetimeDays: number;
-  currentRun: number;
   loggedToday: Profile[];
   daysSinceAnyEntry: number | null;
 };
 
-export async function getPetState(today: string): Promise<PetStateRaw> {
-  const [petRow] = await db.select().from(pet).where(eq(pet.id, 1));
-
-  const dayRows = await db
+// The one definition of a "both-logged day": both keepers logged food that
+// day. This is the same rule the sigil engine encodes as
+// `moss.loggedAny && ember.loggedAny` (a logged food always carries a hall and
+// calories) — surfaced here at the DB level for the counts that don't need a
+// full ledger scan. Pass a range to scope it to a span (e.g. one month).
+export async function bothLoggedDays(range?: {
+  start: string;
+  end: string;
+}): Promise<Set<string>> {
+  const rows = await db
     .select({ day: entries.day, n: countDistinct(entries.profileId) })
     .from(entries)
+    .where(
+      range
+        ? and(gte(entries.day, range.start), lte(entries.day, range.end))
+        : undefined,
+    )
     .groupBy(entries.day);
+  return new Set(rows.filter((r) => Number(r.n) >= 2).map((r) => r.day));
+}
 
-  const bothDays = new Set(
-    dayRows.filter((r) => Number(r.n) >= 2).map((r) => r.day),
-  );
+export async function getFamiliarState(
+  today: string,
+): Promise<FamiliarStateRaw> {
+  const [familiarRow] = await db
+    .select()
+    .from(familiar)
+    .where(eq(familiar.id, 1));
+
+  const bothDays = await bothLoggedDays();
   const lifetimeDays = bothDays.size;
-
-  // Run of consecutive both-logged days. An unfinished today doesn't break
-  // it — the run just waits.
-  let currentRun = 0;
-  let cursor = bothDays.has(today) ? today : addDays(today, -1);
-  while (bothDays.has(cursor)) {
-    currentRun += 1;
-    cursor = addDays(cursor, -1);
-  }
 
   const todayRows = await db
     .selectDistinct({ p: entries.profileId })
@@ -125,14 +137,15 @@ export async function getPetState(today: string): Promise<PetStateRaw> {
     .map((r) => r.p)
     .filter((p): p is Profile => PROFILES.includes(p as Profile));
 
-  const lastDay = dayRows.reduce((mx, r) => (r.day > mx ? r.day : mx), "");
+  // Days since anyone logged at all — feeds the fox's mood. Never a streak.
+  const [lastRow] = await db.select({ last: max(entries.day) }).from(entries);
+  const lastDay = lastRow?.last ?? null;
   const daysSinceAnyEntry = lastDay ? diffDays(today, lastDay) : null;
 
   return {
-    name: petRow?.name ?? null,
-    adoptedAt: petRow?.adoptedAt ?? new Date(),
+    name: familiarRow?.name ?? null,
+    adoptedAt: familiarRow?.adoptedAt ?? new Date(),
     lifetimeDays,
-    currentRun,
     loggedToday,
     daysSinceAnyEntry,
   };
@@ -241,14 +254,7 @@ export async function getMonthMarks(monthPrefix: string): Promise<{
 }> {
   const start = `${monthPrefix}-01`;
   const end = `${monthPrefix}-31`;
-  const dayRows = await db
-    .select({ day: entries.day, n: countDistinct(entries.profileId) })
-    .from(entries)
-    .where(and(gte(entries.day, start), lte(entries.day, end)))
-    .groupBy(entries.day);
-  const bothDays = new Set(
-    dayRows.filter((r) => Number(r.n) >= 2).map((r) => r.day),
-  );
+  const bothDays = await bothLoggedDays({ start, end });
 
   const metaRows = await db
     .select()
@@ -383,6 +389,35 @@ export async function getExerciseHistories(
     };
   }
   return result;
+}
+
+// One keeper's day assembled from the per-day data-function outputs. The home
+// glade and a day's page in the spellbook share this exact assembly, so a day
+// can never seal differently between them. (The ledger builds its KeeperDays a
+// second way — from bulk range queries — but through the same buildKeeperDay.)
+export function keeperDayFromDay(
+  p: Profile,
+  d: {
+    journal: JournalDay;
+    meta: Record<Profile, DayMetaRow>;
+    workouts: Record<Profile, WorkoutView[]>;
+    histories: Record<Profile, ExerciseHistory>;
+    firstLogs: Record<Profile, number | null>;
+  },
+): KeeperDay {
+  const total = totalOf(
+    d.journal[p].entries.map((e) => ({ ...e.food, servings: e.servings })),
+  );
+  return buildKeeperDay({
+    calories: total.calories,
+    proteinG: total.proteinG,
+    halls: [...new Set(d.journal[p].entries.map((e) => e.food.hall))],
+    target: d.journal[p].target,
+    meta: d.meta[p],
+    workouts: d.workouts[p],
+    historyBest: d.histories[p].best,
+    firstLoggedAtMs: d.firstLogs[p],
+  });
 }
 
 // ── Legendary discoveries ──

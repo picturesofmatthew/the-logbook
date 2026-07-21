@@ -3,7 +3,7 @@
 // Consistency calls creatures, and the KIND of consistency decides who: each
 // being listens for its own chord family across the whole history. Beings
 // arrive at a threshold, deepen through trust stages, and never leave.
-// The fox is founding and lives in lib/engine/pet.ts, untouched.
+// The fox (the familiar) is founding and lives in lib/engine/familiar.ts, untouched.
 
 import type { ChordId, LegendaryId } from "./sigil";
 import type { GladeTier } from "./glade";

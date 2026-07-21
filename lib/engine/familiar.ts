@@ -1,14 +1,14 @@
-// The fox's growth and moods — pure functions.
+// The familiar's growth and moods — pure functions.
 //
 // Growth is driven by LIFETIME days both people logged (never regresses;
 // a missed day pauses growth, it never shrinks antlers). Mood is a daily
-// expression layered on top. The fox is never sick and never scolds —
+// expression layered on top. The familiar is never sick and never scolds —
 // at worst, it gets a little lonely.
 
-export type PetStageId = "kit" | "yearling" | "young" | "adult" | "elder";
+export type FamiliarStageId = "kit" | "yearling" | "young" | "adult" | "elder";
 
-export const PET_STAGES: {
-  id: PetStageId;
+export const FAMILIAR_STAGES: {
+  id: FamiliarStageId;
   label: string;
   minDays: number;
 }[] = [
@@ -19,9 +19,9 @@ export const PET_STAGES: {
   { id: "elder", label: "elder fox", minDays: 90 },
 ];
 
-export function stageForDays(lifetimeDays: number): PetStageId {
-  let stage: PetStageId = "kit";
-  for (const s of PET_STAGES) {
+export function stageForDays(lifetimeDays: number): FamiliarStageId {
+  let stage: FamiliarStageId = "kit";
+  for (const s of FAMILIAR_STAGES) {
     if (lifetimeDays >= s.minDays) stage = s.id;
   }
   return stage;
@@ -31,18 +31,18 @@ export function nextStageIn(lifetimeDays: number): {
   label: string;
   daysLeft: number;
 } | null {
-  const next = PET_STAGES.find((s) => s.minDays > lifetimeDays);
+  const next = FAMILIAR_STAGES.find((s) => s.minDays > lifetimeDays);
   return next
     ? { label: next.label, daysLeft: next.minDays - lifetimeDays }
     : null;
 }
 
-export type PetMood = "thriving" | "cozy" | "waiting" | "lonely";
+export type FamiliarMood = "thriving" | "cozy" | "waiting" | "lonely";
 
 export function moodFor(input: {
   loggedTodayCount: number;
   daysSinceAnyEntry: number | null;
-}): PetMood {
+}): FamiliarMood {
   if (input.loggedTodayCount >= 2) return "thriving";
   if (input.loggedTodayCount === 1) return "cozy";
   if (input.daysSinceAnyEntry != null && input.daysSinceAnyEntry >= 2) {
@@ -51,7 +51,7 @@ export function moodFor(input: {
   return "waiting";
 }
 
-const SPEECH: Record<PetMood, string[]> = {
+const SPEECH: Record<FamiliarMood, string[]> = {
   thriving: [
     "Both of you! The den is warm tonight.",
     "A full logbook makes the antlers tingle.",
@@ -77,7 +77,7 @@ const SPEECH: Record<PetMood, string[]> = {
 
 // Deterministic within a day so speech doesn't change on every render.
 export function speechFor(
-  mood: PetMood,
+  mood: FamiliarMood,
   daySeed: string,
   missingName?: string,
 ): string {

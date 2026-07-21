@@ -1,3 +1,10 @@
+// ⚑ ARCHIVED — PARKED, NOT IN THE BUILD.
+// This is the Convex schema from the Expo/Convex/Rive native-rewrite
+// exploration (LAUNCH-PATH.md), kept for reference to learn/iterate from if the
+// native realtime path is ever revived. The live app is the Next.js + Neon
+// (Postgres) PWA; this directory is excluded from tsconfig and ships nothing.
+// Do not delete. See convex/README.md.
+//
 // Signed × Sealed — Convex backend spine.
 //
 // The realtime-native backend (LAUNCH-PATH.md). Mirrors the pure engine types

@@ -25,10 +25,11 @@ export default async function ShorePage({
   const dream = glade.dream;
   let boat = glade.boat;
 
-  // Dev tuning aid: ?planks=N previews the vessel at N planks without touching
-  // data — lets us see the whole assembly arc before real days accrue.
+  // Dev-only tuning aid: ?planks=N previews the vessel at N planks without
+  // touching data — lets us see the whole assembly arc before real days accrue.
+  // Gated to development so it can never be a live progress backdoor in prod.
   const sp = await searchParams;
-  if (boat && sp.planks != null) {
+  if (boat && sp.planks != null && process.env.NODE_ENV !== "production") {
     const n = Math.max(0, Math.min(boat.plankGoal, Math.round(Number(sp.planks)) || 0));
     boat = {
       ...boat,

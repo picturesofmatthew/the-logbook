@@ -3,48 +3,48 @@
 // same engine, bigger world.
 
 import { PixelSprite } from "@/components/pixel-sprite";
-import { PET_PALETTE, PET_SPRITES } from "@/components/sprites";
-import { NameForm } from "@/components/pet/name-form";
-import type { PetStateRaw } from "@/lib/data";
+import { FAMILIAR_PALETTE, FAMILIAR_SPRITES } from "@/components/sprites";
+import { NameForm } from "@/components/familiar/name-form";
+import type { FamiliarStateRaw } from "@/lib/data";
 import type { GladeState } from "@/lib/ledger";
 import {
   moodFor,
   nextStageIn,
   speechFor,
   stageForDays,
-  PET_STAGES,
-} from "@/lib/engine/pet";
+  FAMILIAR_STAGES,
+} from "@/lib/engine/familiar";
 import { DISPLAY_NAMES, PROFILES } from "@/lib/auth";
 import { GladeScene, type BeingStages } from "./glade-scene";
 
 export function GladeHeader({
-  petState,
+  familiarState,
   today,
   dayNumber,
   glade,
   paleElk,
   hearthDay,
 }: {
-  petState: PetStateRaw;
+  familiarState: FamiliarStateRaw;
   today: string;
   dayNumber: number;
   glade: GladeState;
   paleElk: boolean;
   hearthDay: boolean;
 }) {
-  const stage = stageForDays(petState.lifetimeDays);
-  const stageLabel = PET_STAGES.find((s) => s.id === stage)?.label ?? stage;
+  const stage = stageForDays(familiarState.lifetimeDays);
+  const stageLabel = FAMILIAR_STAGES.find((s) => s.id === stage)?.label ?? stage;
   const mood = moodFor({
-    loggedTodayCount: petState.loggedToday.length,
-    daysSinceAnyEntry: petState.daysSinceAnyEntry,
+    loggedTodayCount: familiarState.loggedToday.length,
+    daysSinceAnyEntry: familiarState.daysSinceAnyEntry,
   });
-  const missing = PROFILES.find((p) => !petState.loggedToday.includes(p));
+  const missing = PROFILES.find((p) => !familiarState.loggedToday.includes(p));
   const speech = speechFor(
     mood,
     today + mood,
     missing ? DISPLAY_NAMES[missing] : undefined,
   );
-  const next = nextStageIn(petState.lifetimeDays);
+  const next = nextStageIn(familiarState.lifetimeDays);
 
   const stages = Object.fromEntries(
     glade.beings.map((b) => [b.id, b.stage]),
@@ -57,7 +57,7 @@ export function GladeHeader({
           tier={glade.tier}
           beings={stages}
           paleElk={paleElk}
-          inklings={petState.loggedToday.length}
+          inklings={familiarState.loggedToday.length}
           hearthDay={hearthDay}
         />
         {/* The fox lives in the scene, by the lantern. */}
@@ -67,10 +67,10 @@ export function GladeHeader({
           }`}
         >
           <PixelSprite
-            map={PET_SPRITES[stage]}
-            palette={PET_PALETTE}
+            map={FAMILIAR_SPRITES[stage]}
+            palette={FAMILIAR_PALETTE}
             className="idle-bounce h-12 w-12 pixelated"
-            title={`${petState.name ?? "The fox"}, a ${stageLabel} — the Glade is ${glade.tier}`}
+            title={`${familiarState.name ?? "The fox"}, a ${stageLabel} — the Glade is ${glade.tier}`}
           />
           {mood === "thriving" ? (
             <span className="absolute -right-1 -top-1 animate-pulse font-pixel text-xs text-gold">
@@ -82,9 +82,9 @@ export function GladeHeader({
 
       <div className="flex items-center gap-3 p-3 pt-2">
         <div className="min-w-0 flex-1">
-          {petState.name ? (
+          {familiarState.name ? (
             <p className="truncate font-pixel text-sm tracking-wide">
-              {petState.name}
+              {familiarState.name}
               <span className="ml-1.5 text-[10px] text-ink-soft">
                 the {stageLabel}
               </span>
@@ -96,9 +96,8 @@ export function GladeHeader({
             “{speech}”
           </p>
           <p className="mt-0.5 text-[11px] text-ink-soft/80">
-            ♥ {petState.lifetimeDays}{" "}
-            {petState.lifetimeDays === 1 ? "day" : "days"} fed together
-            {petState.currentRun >= 2 ? ` · ${petState.currentRun} in a row` : ""}
+            ♥ {familiarState.lifetimeDays}{" "}
+            {familiarState.lifetimeDays === 1 ? "day" : "days"} fed together
             {next ? ` · ${next.daysLeft} to ${next.label}` : ""}
           </p>
         </div>

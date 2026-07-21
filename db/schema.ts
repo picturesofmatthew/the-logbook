@@ -140,9 +140,10 @@ export const dayMeta = pgTable(
   (t) => [primaryKey({ columns: [t.profileId, t.day] })],
 );
 
-// The shared arctic fox. Exactly one row. Mood and growth stage are always
-// derived from logging data, never stored.
-export const pet = pgTable("pet", {
+// The shared familiar (an arctic fox). Exactly one row. Mood and growth stage
+// are always derived from logging data, never stored. (The physical table stays
+// named "pet" until the multi-user pass renames it and adds household_id.)
+export const familiar = pgTable("pet", {
   id: integer("id").primaryKey().default(1),
   name: text("name"),
   adoptedAt: timestamp("adopted_at").defaultNow().notNull(),
@@ -196,7 +197,7 @@ export const beingArrivals = pgTable("being_arrivals", {
 // is `active` at a time; reached shores are kept as `reached` history. Planks
 // are never stored — a plank is a both-logged day on/after `startedDay`,
 // derived from the ledger. Only the Dream itself and the once-ever arrival
-// moment (`reachedDay`) live here. Modeled on the singleton `pet`, but the
+// moment (`reachedDay`) live here. Modeled on the singleton `familiar`, but the
 // "choose your next shore" arc means more than one row over time.
 export const dreams = pgTable("dreams", {
   id: serial("id").primaryKey(),

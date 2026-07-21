@@ -11,12 +11,12 @@ import {
   getJournalDay,
   getWeighIn,
   getWorkoutsForDay,
+  keeperDayFromDay,
   recordLegendary,
   type WorkoutView,
 } from "@/lib/data";
 import { addDays, currentTz, friendlyDate, todayIso } from "@/lib/dates";
-import { buildKeeperDay } from "@/lib/engine/keeper-day";
-import { composeSigil, type KeeperDay } from "@/lib/engine/sigil";
+import { composeSigil } from "@/lib/engine/sigil";
 import { totalOf } from "@/lib/engine/totals";
 import { MEALS, type JournalEntry } from "@/lib/meals";
 import { getFirstBothDay } from "@/lib/ledger";
@@ -73,27 +73,26 @@ export default async function DayPage({
   ]);
   const weighIns = { matthew: matthewWeighIn, kennedy: kennedyWeighIn };
 
-  const totals = {} as Record<Profile, ReturnType<typeof totalOf>>;
-  const keeperDay = (p: Profile): KeeperDay => {
-    totals[p] = totalOf(
-      journal[p].entries.map((e) => ({ ...e.food, servings: e.servings })),
-    );
-    return buildKeeperDay({
-      calories: totals[p].calories,
-      proteinG: totals[p].proteinG,
-      halls: [...new Set(journal[p].entries.map((e) => e.food.hall))],
-      target: journal[p].target,
-      meta: extras.meta[p],
-      workouts: dayWorkouts[p],
-      historyBest: histories[p].best,
-      firstLoggedAtMs: firstLogs[p],
-    });
-  };
+  const totals = Object.fromEntries(
+    PROFILES.map((p) => [
+      p,
+      totalOf(
+        journal[p].entries.map((e) => ({ ...e.food, servings: e.servings })),
+      ),
+    ]),
+  ) as Record<Profile, ReturnType<typeof totalOf>>;
 
+  const dayData = {
+    journal,
+    meta: extras.meta,
+    workouts: dayWorkouts,
+    histories,
+    firstLogs,
+  };
   const spec = composeSigil({
     day,
-    moss: keeperDay("matthew"),
-    ember: keeperDay("kennedy"),
+    moss: keeperDayFromDay("matthew", dayData),
+    ember: keeperDayFromDay("kennedy", dayData),
     firstPage: firstBothDay === day,
   });
   if (spec.legendary) await recordLegendary(spec.legendary, day);

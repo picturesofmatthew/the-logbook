@@ -1,9 +1,9 @@
-// Pixel maps for the arctic fox. Chars map to PET_PALETTE colors; unmapped
+// Pixel maps for the arctic fox. Chars map to FAMILIAR_PALETTE colors; unmapped
 // chars ('.') are transparent. The fox grows antlers as Matthew & Kennedy log
-// days together — stage art below, stage thresholds in lib/engine/pet.ts.
+// days together — stage art below, stage thresholds in lib/engine/familiar.ts.
 // scripts/gen-icons.mjs renders the kit into the app icons (adult at ship).
 
-export const PET_PALETTE: Record<string, string> = {
+export const FAMILIAR_PALETTE: Record<string, string> = {
   "#": "#4a3b2a", // cocoa ink (outline, eyes, nose, antlers)
   c: "#fbf6ea", // arctic cream (body)
   s: "#ece0c6", // warm shadow (snout)
@@ -12,7 +12,7 @@ export const PET_PALETTE: Record<string, string> = {
   m: "#7c8a4d", // moss (accents)
 };
 
-export const PET_KIT = [
+export const FAMILIAR_KIT = [
   "................",
   "..##........##..",
   ".#tt#......#tt#.",
@@ -31,7 +31,7 @@ export const PET_KIT = [
   ".....######.....",
 ];
 
-export const PET_YEARLING = [
+export const FAMILIAR_YEARLING = [
   "...g........g...",
   "...#........#...",
   "..##........##..",
@@ -72,7 +72,7 @@ const GROWN_FACE = [
   "......############......",
 ];
 
-export const PET_YOUNG = [
+export const FAMILIAR_YOUNG = [
   "........................",
   "........................",
   "........................",
@@ -86,7 +86,7 @@ export const PET_YOUNG = [
   ...GROWN_FACE,
 ];
 
-export const PET_ADULT = [
+export const FAMILIAR_ADULT = [
   "........................",
   ".....g............g.....",
   ".....#..g......g..#.....",
@@ -100,7 +100,7 @@ export const PET_ADULT = [
   ...GROWN_FACE,
 ];
 
-export const PET_ELDER = [
+export const FAMILIAR_ELDER = [
   ".....g..g......g..g.....",
   ".....#..#.g..g.#..#.....",
   "......#.#.#..#.#.#......",
@@ -114,10 +114,10 @@ export const PET_ELDER = [
   ...GROWN_FACE,
 ];
 
-export const PET_SPRITES = {
-  kit: PET_KIT,
-  yearling: PET_YEARLING,
-  young: PET_YOUNG,
-  adult: PET_ADULT,
-  elder: PET_ELDER,
+export const FAMILIAR_SPRITES = {
+  kit: FAMILIAR_KIT,
+  yearling: FAMILIAR_YEARLING,
+  young: FAMILIAR_YOUNG,
+  adult: FAMILIAR_ADULT,
+  elder: FAMILIAR_ELDER,
 } as const;

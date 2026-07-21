@@ -8,7 +8,7 @@ import { DaySeal } from "@/components/sigil/day-seal";
 import { LegendaryCeremony } from "@/components/sigil/legendary-ceremony";
 import { SealCeremony } from "@/components/sigil/seal-ceremony";
 import { ShoreArrivalCeremony } from "@/components/sigil/shore-arrival-ceremony";
-import { PET_PALETTE, PET_SPRITES } from "@/components/sprites";
+import { FAMILIAR_PALETTE, FAMILIAR_SPRITES } from "@/components/sprites";
 import { DISPLAY_NAMES, PROFILES, type Profile } from "@/lib/auth";
 import {
   getArrivals,
@@ -16,8 +16,9 @@ import {
   getExerciseHistories,
   getFirstLogTimes,
   getJournalDay,
-  getPetState,
+  getFamiliarState,
   getWorkoutsForDay,
+  keeperDayFromDay,
   reachShore,
   recordArrival,
   recordLegendary,
@@ -25,9 +26,8 @@ import {
 import { diffDays, todayIso } from "@/lib/dates";
 import { getGladeState } from "@/lib/ledger";
 import { paleElkGlimpsed, type BeingId } from "@/lib/engine/beings";
-import { buildKeeperDay } from "@/lib/engine/keeper-day";
-import { moodFor, nextStageIn, PET_STAGES, speechFor, stageForDays } from "@/lib/engine/pet";
-import { composeSigil, type KeeperDay } from "@/lib/engine/sigil";
+import { moodFor, nextStageIn, FAMILIAR_STAGES, speechFor, stageForDays } from "@/lib/engine/familiar";
+import { composeSigil } from "@/lib/engine/sigil";
 import { totalOf } from "@/lib/engine/totals";
 import { stampsForDay } from "@/lib/engine/stamps";
 import { currentProfile } from "@/lib/session";
@@ -52,9 +52,9 @@ export default async function GladeHome() {
   const day = today;
   const isToday = true;
 
-  const [journal, petState, extras] = await Promise.all([
+  const [journal, familiarState, extras] = await Promise.all([
     getJournalDay(day),
-    getPetState(today),
+    getFamiliarState(today),
     getDayExtras(day),
   ]);
   const [dayWorkouts, firstLogs, histories, glade] = await Promise.all([
@@ -64,26 +64,17 @@ export default async function GladeHome() {
     getGladeState(today),
   ]);
 
-  const keeperDay = (p: Profile): KeeperDay => {
-    const total = totalOf(
-      journal[p].entries.map((e) => ({ ...e.food, servings: e.servings })),
-    );
-    return buildKeeperDay({
-      calories: total.calories,
-      proteinG: total.proteinG,
-      halls: [...new Set(journal[p].entries.map((e) => e.food.hall))],
-      target: journal[p].target,
-      meta: extras.meta[p],
-      workouts: dayWorkouts[p],
-      historyBest: histories[p].best,
-      firstLoggedAtMs: firstLogs[p],
-    });
+  const dayData = {
+    journal,
+    meta: extras.meta,
+    workouts: dayWorkouts,
+    histories,
+    firstLogs,
   };
-
   const sigil = composeSigil({
     day,
-    moss: keeperDay("matthew"),
-    ember: keeperDay("kennedy"),
+    moss: keeperDayFromDay("matthew", dayData),
+    ember: keeperDayFromDay("kennedy", dayData),
   });
   const notLogged = PROFILES.filter((p) => journal[p].entries.length === 0);
   const missingName =
@@ -147,13 +138,13 @@ export default async function GladeHome() {
   });
 
   // The fox living in the ground band.
-  const stage = stageForDays(petState.lifetimeDays);
-  const stageLabel = PET_STAGES.find((s) => s.id === stage)?.label ?? stage;
+  const stage = stageForDays(familiarState.lifetimeDays);
+  const stageLabel = FAMILIAR_STAGES.find((s) => s.id === stage)?.label ?? stage;
   const mood = moodFor({
-    loggedTodayCount: petState.loggedToday.length,
-    daysSinceAnyEntry: petState.daysSinceAnyEntry,
+    loggedTodayCount: familiarState.loggedToday.length,
+    daysSinceAnyEntry: familiarState.daysSinceAnyEntry,
   });
-  const missing = PROFILES.find((p) => !petState.loggedToday.includes(p));
+  const missing = PROFILES.find((p) => !familiarState.loggedToday.includes(p));
   const speech = speechFor(
     mood,
     today + mood,
@@ -180,7 +171,7 @@ export default async function GladeHome() {
         : `${DISPLAY_NAMES[closer]} closed the ring`;
 
   // The fox's next growth mark — a gentle pull forward, in both-logged days.
-  const foxNext = nextStageIn(petState.lifetimeDays);
+  const foxNext = nextStageIn(familiarState.lifetimeDays);
 
   return (
     <main
@@ -277,14 +268,14 @@ export default async function GladeHome() {
               tier={glade.tier}
               beings={beingStages}
               paleElk={paleElk}
-              inklings={petState.loggedToday.length}
+              inklings={familiarState.loggedToday.length}
               hearthDay={isToday && hearthDay}
               mossLit={
-                petState.loggedToday.includes("matthew") ||
+                familiarState.loggedToday.includes("matthew") ||
                 dayWorkouts.matthew.length > 0
               }
               emberLit={
-                petState.loggedToday.includes("kennedy") ||
+                familiarState.loggedToday.includes("kennedy") ||
                 dayWorkouts.kennedy.length > 0
               }
             />
@@ -295,10 +286,10 @@ export default async function GladeHome() {
             >
               <div className="relative flex flex-col items-center">
                 <PixelSprite
-                  map={PET_SPRITES[stage]}
-                  palette={PET_PALETTE}
+                  map={FAMILIAR_SPRITES[stage]}
+                  palette={FAMILIAR_PALETTE}
                   className="idle-bounce h-11 w-11 pixelated"
-                  title={`${petState.name ?? "The fox"}, a ${stageLabel} — the Glade is ${glade.tier}`}
+                  title={`${familiarState.name ?? "The fox"}, a ${stageLabel} — the Glade is ${glade.tier}`}
                 />
                 <span
                   className="-mt-1 h-1.5 w-7 rounded-[50%] bg-ink/25 blur-[1.5px]"
@@ -321,10 +312,10 @@ export default async function GladeHome() {
           “{speech}”
         </p>
         <p className="mt-0.5 font-pixel text-[9px] tracking-wide text-ink-soft/70">
-          {petState.name ? `${petState.name} the ${stageLabel}` : `a ${stageLabel}`} ·{" "}
+          {familiarState.name ? `${familiarState.name} the ${stageLabel}` : `a ${stageLabel}`} ·{" "}
           <HeartMark size={9} className="inline-block align-[-1px] text-terracotta" />{" "}
-          {petState.lifetimeDays}
-          {petState.lifetimeDays === 1 ? " day" : " days"} fed
+          {familiarState.lifetimeDays}
+          {familiarState.lifetimeDays === 1 ? " day" : " days"} fed
           {foxNext
             ? ` · ${foxNext.daysLeft === 1 ? "one day" : `${foxNext.daysLeft} days`} to the ${foxNext.label}`
             : ""}
@@ -352,7 +343,7 @@ export default async function GladeHome() {
           spec={sigil}
           day={day}
           closerLine={closerLine}
-          sealedCount={petState.lifetimeDays}
+          sealedCount={familiarState.lifetimeDays}
           suppressed={reachedShore || newlyDiscovered || newBeing != null}
           dreamName={glade.dream?.name}
           planksLaid={glade.boat?.planksLaid}

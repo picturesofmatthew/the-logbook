@@ -3,7 +3,7 @@
 // whole history grows seals retroactively the moment it is read. The same
 // pass feeds the Glade: chords call beings, effort sets vitality.
 
-import { and, asc, countDistinct, eq, gte, inArray, lte } from "drizzle-orm";
+import { and, asc, eq, gte, inArray, lte } from "drizzle-orm";
 import { db } from "@/db";
 import {
   dayMeta,
@@ -14,7 +14,7 @@ import {
   workoutSets,
 } from "@/db/schema";
 import { PROFILES, type Profile } from "@/lib/auth";
-import { getActiveDream, type DreamRow } from "@/lib/data";
+import { bothLoggedDays, getActiveDream, type DreamRow } from "@/lib/data";
 import { beingStates, type BeingState, type LedgerDay } from "@/lib/engine/beings";
 import { boatState, type BoatDay, type BoatState } from "@/lib/engine/boat";
 import {
@@ -65,14 +65,7 @@ const emptyFacts = (): DayFacts => ({
 
 // The earliest day both keepers logged — the First Page.
 export async function getFirstBothDay(): Promise<string | null> {
-  const rows = await db
-    .select({ day: entries.day, n: countDistinct(entries.profileId) })
-    .from(entries)
-    .groupBy(entries.day);
-  const both = rows
-    .filter((r) => Number(r.n) >= 2)
-    .map((r) => r.day)
-    .sort();
+  const both = [...(await bothLoggedDays())].sort();
   return both[0] ?? null;
 }
 

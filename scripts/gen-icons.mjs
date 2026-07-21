@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
-// Keep in sync with components/sprites.ts (PET_ADULT) — the antlered fox.
+// Keep in sync with components/sprites.ts (FAMILIAR_ADULT) — the antlered fox.
 const SPRITE = [
   "........................",
   ".....g............g.....",

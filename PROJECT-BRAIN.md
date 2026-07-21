@@ -8,7 +8,7 @@ the doc map. Last updated 2026-07-21.*
 - **Act One is LIVE** — a deployed Next.js 16 + Neon PWA at signedxsealed.com (serving from the
   `inklight-v1-polish` branch, prod on Vercel). The core loop works today on real phones: the
   two-keeper seal composing from both users' data, the full sigil engine (chords/tiers/legendaries),
-  the glade + beings, the spellbook, fast food/workout logging, ceremonies, sound. 44/44 engine tests
+  the glade + beings, the spellbook, fast food/workout logging, ceremonies, sound. 50/50 engine tests
   pass. Two hardcoded users (matthew/kennedy), passcode-gated.
 - **This session (overnight 2026-07-20 → 21) made three big moves** — see the decision log.
 - **Nothing here is thrown away.** The stack decision + foundation + register are the playbook for the
@@ -17,7 +17,7 @@ the doc map. Last updated 2026-07-21.*
 ## The thesis (one line)
 
 Both keepers log → the day composes its **sigil** → the completion **ceremony** fires → a **spell** is
-cast → a **plank** lays on the **bridge** toward the couple's **Dream** (far shore, e.g. Kauai).
+cast → a **plank** sets into the **boat** that carries you toward the couple's **Dream** (far shore, e.g. Kauai).
 Retention = the spell you can only cast together + the accumulating shared book. (`THE-SIGIL-TURN.md`)
 
 ## The decision (made 2026-07-21)
@@ -41,16 +41,18 @@ Three threads (all on the free stack, SVG/CSS — not Rive yet):
 Fold in the cheap `RISK-REGISTER.md` fixes as we touch these: the **colorblind seal** (shape/texture
 per keeper + Okabe–Ito palette), the **canonical-couple-day** rule, and the bigger design change —
 **standalone value for one keeper's half + an async ~36–48h close window** (so one partner is never
-stranded). Then the **bridge-to-Kauai Phase 0** + a 30-day both-of-you retention test.
+stranded). Then the **boat-to-Kauai Phase 0** + a 30-day both-of-you retention test.
 
 ## The document map (read order)
 
 | Doc | What it is |
 |---|---|
 | **PROJECT-BRAIN.md** (this) | Orientation, state, decision log, doc map. Read first. |
+| **ROADMAP.md** | The phased build plan (Foundation → Art/UI → Coffers → Multi-user v1) — "what we're building, in what order." |
 | **THE-SIGIL-TURN.md** | The current thesis: sigil-as-spell, the emblem ladder, the four books, creatures demoted to a summoned bonus. |
 | **RISK-REGISTER.md** | The 4-agent contingency findings, deduped + ranked by severity + phase. The "what to watch." |
-| **ACT-TWO-THE-FAR-SHORE.md** | The far shore / bridge / Dream + **§Phase 0, the lean validate-first plan** (re-promoted). |
+| **ACT-TWO-THE-FAR-SHORE.md** | The far shore / boat / Dream + **§Phase 0, the lean validate-first plan** (re-promoted). |
+| **COFFERS.md** | The real-money trip-fund research + funding decision (witness-not-holder; manual tracker → couple-owned rail; **never Stripe Connect**). Verified deep-research, 2026-07-21. |
 | **DIRECTION.md** + **art/ART-BIBLE.md** + **art/tokens.json** | Inklight art direction, palette, emblem-ladder materials, DTCG tokens. |
 | **art/RIVE-SEAL-BLUEPRINT.md** | Rive authoring spec — the view model mirrors `SigilSpec` 1:1. |
 | **art/asset-sheets.md** + **art/prompts.md** | AI-gen bootstrap boards + the Inklight prompt library (free via Google AI Studio). |
@@ -66,7 +68,7 @@ stranded). Then the **bridge-to-Kauai Phase 0** + a 30-day both-of-you retention
    bonus; IA → a shelf of four books; the emblem ladder (material escalates with tier).
 2. **Native stack decided, then deferred** — Expo + Convex + Rive + Clerk + reader-model billing, via a
    4-agent adversarial round; $0-until-users. **Deferred** by the contingency round (#4).
-3. **Sigil engine → registry** (`lib/engine/sigil.ts`), 44/44 tests still green. Convex `seals` store
+3. **Sigil engine → registry** (`lib/engine/sigil.ts`), 50/50 tests still green. Convex `seals` store
    chord/legendary as strings → adding a component is one engine edit, no schema change.
 4. **Contingency round → validate-first reframe** (`RISK-REGISTER.md`) — the recommended next path.
 5. **Foundation laid** — ART-BIBLE, tokens, RIVE-SEAL-BLUEPRINT, convex/schema, asset-sheets.

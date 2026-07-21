@@ -9,7 +9,7 @@ import {
   tdeeFromBmr,
 } from "../lib/engine/tdee";
 import { add, scale, totalOf, ZERO } from "../lib/engine/totals";
-import { moodFor, nextStageIn, speechFor, stageForDays } from "../lib/engine/pet";
+import { moodFor, nextStageIn, speechFor, stageForDays } from "../lib/engine/familiar";
 import { stampsForDay } from "../lib/engine/stamps";
 
 test("dates: addDays crosses month and year boundaries", () => {
@@ -63,7 +63,7 @@ test("totals: scale, add, and sum entries", () => {
   assert.equal(scale(chicken, 2).calories, 330);
 });
 
-test("pet: growth stages hit their thresholds and never regress order", () => {
+test("familiar:growth stages hit their thresholds and never regress order", () => {
   assert.equal(stageForDays(0), "kit");
   assert.equal(stageForDays(6), "kit");
   assert.equal(stageForDays(7), "yearling");
@@ -78,7 +78,7 @@ test("pet: growth stages hit their thresholds and never regress order", () => {
   assert.equal(nextStageIn(90), null);
 });
 
-test("pet: moods are gentle — never punished for eating, only absence", () => {
+test("familiar:moods are gentle — never punished for eating, only absence", () => {
   assert.equal(moodFor({ loggedTodayCount: 2, daysSinceAnyEntry: 0 }), "thriving");
   assert.equal(moodFor({ loggedTodayCount: 1, daysSinceAnyEntry: 0 }), "cozy");
   assert.equal(moodFor({ loggedTodayCount: 0, daysSinceAnyEntry: 1 }), "waiting");
@@ -86,7 +86,7 @@ test("pet: moods are gentle — never punished for eating, only absence", () => 
   assert.equal(moodFor({ loggedTodayCount: 0, daysSinceAnyEntry: null }), "waiting");
 });
 
-test("pet: speech is deterministic for a given day and fills the blank", () => {
+test("familiar:speech is deterministic for a given day and fills the blank", () => {
   const a = speechFor("cozy", "2026-07-18cozy", "Kennedy");
   const b = speechFor("cozy", "2026-07-18cozy", "Kennedy");
   assert.equal(a, b);
