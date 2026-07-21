@@ -73,10 +73,10 @@ Enable "retain IDs/names on export" so the runtime targets these directly.
     4. `union-bloom` (800ms) — violet blooms at the union *(only if `completed`)*.
     5. `orrery` (4000ms, overlapping) — the ring rotates slowly.
     6. `spark` (1000ms) — the emitter fires ink-dot motes outward.
-    7. `plank` (700ms) — fire the `onPlank` event; the app animates the bridge plank.
+    7. `plank` (700ms) — fire the `onPlank` event; the app animates the boat plank.
   - Material escalates by swapping `material/*` overlay + `core/*` by `tier` at settle.
 - **Events out (for the app to catch):** `onCeremonyEnd`, `onPlank`. The app wires these to the
-  bridge-plank animation, haptics, and the low warm legendary tone.
+  boat-plank animation, haptics, and the low warm legendary tone.
 
 ## Particles & the legendary glass (the two research-flagged spots)
 

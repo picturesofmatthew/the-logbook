@@ -14,7 +14,7 @@ The spine is borrowed, in spirit, from *The Alchemist*: when you commit to your 
 
 Everything in Act Two must serve that sentence, and everything must wear the Inklight costume. The moment the crowdfunding or the sponsorship or the community looks like a fintech feature bolted onto a grimoire, it dies. If they feel like they were always part of the book, it's cohesive *and* beautiful.
 
-**IP discipline (same law as the Glade):** we borrow *the spirit* of the treasure-journey — the far shore, the conspiring world, the pilgrimage — in **our own language**. We never use the book's title, characters, or coined terms as product assets. "Personal Legend" is Coelho's phrase and stays out of the UI; ours are **the Dream**, **the far shore**, **your treasure**, **the bridge**.
+**IP discipline (same law as the Glade):** we borrow *the spirit* of the treasure-journey — the far shore, the conspiring world, the pilgrimage — in **our own language**. We never use the book's title, characters, or coined terms as product assets. "Personal Legend" is Coelho's phrase and stays out of the UI; ours are **the Dream**, **the far shore**, **your treasure**, **the boat**.
 
 ---
 
@@ -41,8 +41,8 @@ Act One's loop was *log → seal → the world grows*. Act Two wraps that in a *
 ```
 THE PACT  ──►  THE KEEPING  ──►  THE RECKONING  ──►  rest  ──►  (a new Pact)
 (promise,      (daily seal;       (verified payoff;
- name the      the bridge         the Dream made
- Dream)        reaches)           real, or a quiet season)
+ name the      the boat           the Dream made
+ Dream)        sails)             real, or a quiet season)
 ```
 
 The daily *act* never gets more complex. The season's richness — the Pact, the Coffer, the Commons — is **set once and witnessed daily**, never daily work.
@@ -62,22 +62,22 @@ This is the emotional peak Act One was missing: **making the promise, out loud, 
 
 *Data:* a `seasons` row (goal spec, dream, start/end, status) + both keepers' signatures.
 
-### 2 · The Dream & the Bridge — the far shore
+### 2 · The Dream & the Boat — the far shore
 
-The Dream renders as a **far shore beyond the Glade, across the ocean** — for Matthew & Kennedy, a warm green Kauai coastline you can *almost* make out through the haze. Between here and there: open water, and a **bridge you build.**
+The Dream renders as a **far shore beyond the Glade, across the ocean** — for Matthew & Kennedy, a warm green Kauai coastline you can *almost* make out through the haze. Between here and there: open water, and a **boat you build.**
 
-- **Every day you both seal lays a plank.** The bridge reaches further; the far shore sharpens; Kauai comes into focus.
-- **Hard weeks, the sea runs rough** and the shore blurs — but the bridge **never washes away**. You don't *lose* planks, you simply don't lay new ones (never-punish, made literal).
+- **Every day you both seal sets a plank into the boat.** The vessel rises plank by plank; the far shore sharpens; Kauai comes into focus.
+- **Hard weeks, the sea runs rough** and the shore blurs — but the planks **never wash away**. You don't *lose* planks, you simply don't set new ones (never-punish, made literal).
 - **Blessings from your Circle** (below) are lights strung along the water, guiding the way across.
-- **Arrival is the Reckoning:** the bridge lands on the shore, and the treasure is real.
+- **Arrival is the Reckoning:** the boat arrives at the shore, and the treasure is real.
 
-This is the fix for the hollowness: the daily seal stops being abstract "progress" and becomes *a plank on the bridge to Kauai.* The Glade grows lush from consistency (the retention texture); the bridge grows toward the Dream (the driver). Two things, one continuous world.
+This is the fix for the hollowness: the daily seal stops being abstract "progress" and becomes *a plank in the boat to Kauai.* The Glade grows lush from consistency (the retention texture); the boat sails toward the Dream (the driver). Two things, one continuous world.
 
-*Progress model:* bridge length = f(days the Pact was kept ÷ days elapsed), with visual states from "just left the shore" to "landing." Keep it honest and legible; never punitive.
+*Progress model:* every both-logged day sets **a plank** into the boat — planks are derived from the ledger, never stored, and they only accrue. The **vessel scales with the Dream's gravity**: a light goal builds a dory (≤21 planks), a middling one a sloop (≤55), a grand one a full tall ship (~90 planks — a three-month deficit). Its parts **rig on as the planks accrue** — keel and hull first, then deck, masts, and sails — and **legendary or resonant days set a golden plank**. Keep it honest and legible; never punitive.
 
 ### 3 · The Keeping — the daily act (unchanged, protected)
 
-Still: **log fast, seal, watch the bridge reach.** The single biggest existential risk to the whole product is **logging friction** — two busy people must both log daily for months. Guardrails:
+Still: **log fast, seal, watch the boat near.** The single biggest existential risk to the whole product is **logging friction** — two busy people must both log daily for months. Guardrails:
 
 - Protect the **15-second seal**. Rigorous macros are an *opt-in layer for the gym-serious*, never a tax on the ritual.
 - Lean on one-tap recents (built), and pursue **faster capture** over time — photo-of-meal estimate, "same as yesterday," voice. The lighter the daily act, the longer the season survives.
@@ -117,17 +117,17 @@ The day real money is on the line, **fraud is guaranteed.** Keeping the Pact mus
 
 ### 7 · The Reckoning — the season's end
 
-- **Kept** (objectively): the bridge lands on the far shore, the Glade blooms fully radiant, the Coffer opens, and **the Dream is real** — Kauai is booked. A ceremony larger than anything in the app. *You didn't hit a macro goal; you crossed an ocean together.*
-- **Not kept:** **no rot, no red.** A **quiet season** — the Glade wintered but alive, the bridge paused mid-water, waiting. The Stake rolls forward to the next season — or, gorgeously, you may **gift it to another couple's Dream** (generosity as the anti-punishment). Then you rest, and someday make a new Pact.
+- **Kept** (objectively): the boat arrives at the far shore, the Glade blooms fully radiant, the Coffer opens, and **the Dream is real** — Kauai is booked. A ceremony larger than anything in the app. *You didn't hit a macro goal; you crossed an ocean together.*
+- **Not kept:** **no rot, no red.** A **quiet season** — the Glade wintered but alive, the boat becalmed mid-water, waiting. The Stake rolls forward to the next season — or, gorgeously, you may **gift it to another couple's Dream** (generosity as the anti-punishment). Then you rest, and someday make a new Pact.
 
 ---
 
 ## Why this lasts a year (the retention spine, extended)
 
 - **The Dream is the driver; the world is the reward.** You open it because you're both walking to Kauai and your partner is counting on you today.
-- **No streaks; accumulating, un-loseable memory** (the book, the Glade, the bridge, the constellation of blessings).
+- **No streaks; accumulating, un-loseable memory** (the book, the Glade, the boat, the constellation of blessings).
 - **Two-player-mandatory** — accountability + relationship ritual, not solo willpower.
-- **Never-punish** — everyone lapses; coming back is always warm; a paused bridge is not a broken one.
+- **Never-punish** — everyone lapses; coming back is always warm; a becalmed boat is not a broken one.
 - **Community as love, not comparison** — the conspiring world.
 - **Seasons give rhythm** — intent, a finish, a rest — the cadence disciplined people actually want, not an infinite dopamine loop.
 
@@ -143,9 +143,9 @@ The day real money is on the line, **fraud is guaranteed.** Keeping the Pact mus
 
 ## Aesthetic coherence (how it stays beautiful)
 
-- **Everything is named in the world's voice:** the Pact, the Dream, the far shore, the bridge, the Coffer, the Stake, the Circle, the Patron, the Commons, the blessing, the attestation, the Reckoning.
+- **Everything is named in the world's voice:** the Pact, the Dream, the far shore, the boat, the Coffer, the Stake, the Circle, the Patron, the Commons, the blessing, the attestation, the Reckoning.
 - **Violet stays reserved for union** — the Pact-sealing and the Reckoning are the biggest violet moments in the app.
-- **The far shore + ocean + bridge** live in the existing palette and light script — Kauai renders warm and specific by day, silvered by moon at night.
+- **The far shore + ocean + boat** live in the existing palette and light script — Kauai renders warm and specific by day, silvered by moon at night.
 - **Blessings are motes** — the system already exists; they just become personal and persistent.
 - **The Alchemist is spirit, never asset** (see IP discipline up top).
 
@@ -155,8 +155,8 @@ The day real money is on the line, **fraud is guaranteed.** Keeping the Pact mus
 
 Each phase is gated on the previous one *proving out*. The vision is the north star; the first build is small.
 
-**Phase 0 — The bridge that proves it (private, tiny, now).**
-Just Matthew & Kennedy, on the current two-hardcoded-user setup. Build: the **Pact** (set goal + Dream), the **far shore (Kauai)** on the horizon, and the **bridge** that lays a plank each day you both seal. *No money, no Circle, no Commons, no verification.* The only question it answers: **does watching the bridge reach toward Kauai get the two of you to open it every single day for a month?** If yes, everything else is worth building. If no, we learned it for free. **This needs almost no new infrastructure** — it's a rendering + a `seasons` row.
+**Phase 0 — The boat that proves it (BUILT + deployed).**
+Just Matthew & Kennedy, on the current two-hardcoded-user setup. **Shipped:** the **Dream** (goal + far shore), the **far shore (Kauai)** on the horizon, and the **boat** that takes a plank each day you both seal — with a dedicated **`/shore` focus view** where the vessel is built in full. *No money, no Circle, no Commons, no verification yet.* The only question it answers: **does watching the boat sail toward Kauai get the two of you to open it every single day for a month?** If yes, everything else is worth building. If no, we learn it for free. **It needed almost no new infrastructure** — a rendering (`lib/engine/boat.ts`, pure + tested) + a `dreams` row.
 
 **Phase 1 — The Circle + Attestation (the first money spring).**
 Requires the deferred **multi-tenant foundation** (households schema + `household_id` on every table, per-user auth, invite pairing) — *any* real other person implies this. Then the **Circle** (pledge-released-on-verified-achievement) + **weigh-in/log attestation** + payment rails. Lawyer engaged before the first line. The Stake can ride the same rails.
@@ -173,7 +173,7 @@ Sponsor grand prizes; seasonal world-skins (autumn/winter/spring — long-arc fr
 
 1. **Simplicity is the product.** The daily seal stays ~15 seconds forever. All Act-Two richness is ambient, set-once, witnessed — never daily friction.
 2. **Money means a lawyer from sketch one.** The Circle is cleanest; avoid the sub-redistribution-by-vote lottery entirely; verification is not optional once cash is real.
-3. **Two-player is the moat *and* the single point of failure.** Design **graceful degradation** for the one-sided week (the present partner can "hold the bridge"; solo days still feed the Glade at a lower rate; the love-tap gently pulls the other back). The app must never feel *dead* when one person lapses.
+3. **Two-player is the moat *and* the single point of failure.** Design **graceful degradation** for the one-sided week (the present partner can "hold the boat"; solo days still feed the Glade at a lower rate; the love-tap gently pulls the other back). The app must never feel *dead* when one person lapses.
 4. **One builder.** Sequence ruthlessly. Prove Phase 0 before touching money or community.
 
 ---
@@ -196,6 +196,6 @@ New tables/fields, at altitude (not final):
 
 ## The one-line north star
 
-*Two people, one promise, a bridge across the water toward the thing they've always wanted — and a sky slowly filling with the lights of everyone who believes they'll make it.*
+*Two people, one promise, a boat across the water toward the thing they've always wanted — and a sky slowly filling with the lights of everyone who believes they'll make it.*
 
 That's the app. Everything we build gets measured against it.

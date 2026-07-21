@@ -1,6 +1,11 @@
+> **Superseded in emphasis (2026-07-21).** This doc's **pet-raising** focus is superseded by
+> `THE-SIGIL-TURN.md` — the **sigil is the hero**; the creatures (the familiar included) are demoted
+> to a quiet bonus. For art direction, **`art/ART-BIBLE.md` is now the single source of truth**. Kept
+> here for its research foundation, palette, and roster detail — but read those two first.
+
 # Inklight — Art Direction & Overhaul Plan (v3)
 
-*The Logbook's second act: crisp ink over lantern-lit gouache, bound in an arcane book, opening onto the Glade.*
+*Signed × Sealed — the art direction: crisp ink over lantern-lit gouache, bound in an arcane book, opening onto the Glade.*
 *v1 2026-07-19 (research-backed direction) · v2 same day (sigil engine, spellbook, violet, bestiary) · v3 same day: rosters filled per Matthew ("fill and iterate"), structured workout logging added, Glade vitality system, small-folk variety, art production = Matthew via ChatGPT + human direction.*
 
 ---
@@ -110,7 +115,7 @@ Variety unlocks with vitality; count tracks overall consistency. Each family: si
 Consistency calls creatures; the *kind* of consistency decides who. Each being: one chord family, one Glade zone, trust stages (evolving art), one signature idle. Nothing ever leaves.
 
 **Founding**
-1. **The Fox** — day 0. Five-stage antler-revelation arc (engine live, thresholds unchanged). Anchors the lantern.
+1. **The Fox — the familiar** — day 0. Five-stage antler-revelation arc (engine live, thresholds unchanged). Anchors the lantern. *(Demoted to a quiet bonus — the sigil is the hero now; see `THE-SIGIL-TURN.md`.)*
 
 **First wave** *(ship with Phase 3 — proposed: Stag + Heron)*
 2. **The Stag** — called by Iron Chord / Anvil family. Anchors the tree line. Trust arc: yearling → crowned elder; antlers leaf out at Radiant vitality.
@@ -169,6 +174,6 @@ Techniques and principles, never assets. The sigil grammar, the small folk, the 
 - ~~3 · Small folk~~ — **decided**: varied kodama-style population (wicks + mosslings + inklings + dewdrops + emberlings).
 - ~~5 · The hands~~ — **decided**: Matthew via ChatGPT + human direction; engine starts on placeholder geometry.
 - ~~6 · Chords & legendaries~~ / ~~7 · Bestiary~~ — **drafted in full above (mine); iterate as we see them in-app.**
-- **2 · The fox** — still assumed protagonist/founding spirit; unconfirmed.
+- **2 · The fox (the familiar)** — no longer the protagonist: **demoted** to a quiet familiar/bonus (the sigil is the hero, per `THE-SIGIL-TURN.md`).
 - **8 · Glade vs. Vale** — Matthew's naming call (spec currently says Glade).
 - **9 · First wave** — proposed Stag + Heron alongside the Fox; confirm or swap (Moth if you want the spooky-soft tone in wave one).

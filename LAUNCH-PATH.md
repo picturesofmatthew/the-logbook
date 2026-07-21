@@ -1,3 +1,8 @@
+> **PARKED (2026-07-21).** This native **Expo + Convex + Rive** rewrite is **parked** —
+> reconsidered only once **multiple users are willing to pay**. The plan of record is the **current
+> Next.js 16 + Neon PWA** (live at signedxsealed.com); **$0 until users** is the law. Everything
+> below is the deferred playbook, kept intact for the day migration is back on the table.
+
 # Signed × Sealed — The Path to v1 on the Stores
 
 *Build + render + ship plan of record. **Stack decided 2026-07-20 via a 4-agent adversarial round**

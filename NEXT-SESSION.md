@@ -34,7 +34,7 @@ Matthew's spine-commit on spend before Phase 2.** Original scoping notes preserv
 
 ---
 
-## 2 · Macro / calorie estimation logic
+## 2 · Macro / calorie estimation logic — ✅ concrete gaps fixed in Phase 4
 
 **Goal:** make macro/calorie numbers more trustworthy and easier to get right — without ever breaking the never-punishing tone (no red numbers, uncertainty shown gently).
 
@@ -44,7 +44,7 @@ Matthew's spine-commit on spend before Phase 2.** Original scoping notes preserv
 - `components/journal/donate-flow.tsx`: pick a USDA result → prefill a specimen card, OR "write it in by hand" (kcal/P/C/F typed raw, zero assist). Recipes sum ingredient macros (`createRecipe` in `app/log/actions.ts`).
 - `lib/engine/totals.ts` (add/scale/sum) and `lib/engine/tdee.ts` (Mifflin-St Jeor + activity multipliers + calorie floor) are pure + tested.
 
-**Concrete gaps found (2026-07-20)**
+**Concrete gaps found (2026-07-20) — ✅ all resolved in Phase 4** (`scaleToServing` handles g/ml/oz/household portions, `atwaterCheck` cross-check added, natural-language food-parse shipped, real FDC key wired; see `PHASE-4-HANDOFF.md`). Kept below as the record. The still-open part is the forward-looking LLM-estimator question in "Questions to answer."
 - **Non-gram servings are wrong.** `lib/usda.ts:69-76` — ml, oz, or "1 cup" foods skip scaling, keep raw per-100g numbers, and mislabel them `"100 g"`. The card silently misstates the portion. First thing to fix.
 - **No Atwater cross-check.** Nothing validates that kcal ≈ P·4 + C·4 + F·9. A cheap sanity/confidence signal (and a gentle "these don't quite add up" nudge) is missing.
 - **Manual entry has no help** — the "write it in by hand" path is a blank 4-field form.

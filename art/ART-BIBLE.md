@@ -68,8 +68,8 @@ the default.
 Stillness is the resting state. **The completion ceremony is the one permitted break** — the app's
 magic peak. Its vocabulary (timings in `tokens.json`): ink **draws itself** on → **gold leaf ignites**
 along the strokes → **chord-runes light** in sequence → **violet blooms** at the union → the ring
-**rotates like an orrery** → **ink-dot motes spark off** and drift → the **plank materializes** on the
-bridge, drawn in the same ink. Magical, unmistakably our book.
+**rotates like an orrery** → **ink-dot motes spark off** and drift → the **plank sets into the
+boat**, drawn in the same ink. Magical, unmistakably our book.
 
 ## The seal's grammar (matches the engine exactly)
 

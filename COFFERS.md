@@ -16,6 +16,10 @@ pass.
 
 ---
 
+## Related: the product vision (the three springs)
+
+The coffer's *in-world* design already exists in **`ACT-TWO-THE-FAR-SHORE.md` §4** — the **three springs**: **the Stake** (you two wager your own skin, returned when you keep the pact), **the Circle** (the people who love you *pledge to your Dream, released only on a verified achievement* — this is the crowdfunding), and **the Patron** (a sponsor funds a grand Dream). This doc is the **money-flow / compliance layer** beneath that vision — read them together. One tension to resolve: ACT-TWO's *Stake* implies holding & returning the couple's own money, which must ride a **rail the couple owns** (below), never an app-side wallet.
+
 ## The one principle: **witness, not holder**
 
 The coffer's whole safety comes from one rule: **the app never holds, moves, or transmits money.**

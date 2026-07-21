@@ -190,7 +190,7 @@ left→right) of a single seal casting, so we can time it in code:
 4. **The union** — violet blooming at the point where the two halves meet; the ring at full
    illumination, rotating (show a slight rotation vs. frame 3).
 5. **The spark-off** — ink-dot motes flying outward and drifting (our particles — sparks, not flare).
-6. **The plank** — a single bridge plank materializing, drawn in the same ink, the seal's light
+6. **The plank** — a single plank setting into the boat, drawn in the same ink, the seal's light
    settling onto it.
 
 Also paint, isolated: a small library of **spark/mote shapes** (ink-dot bursts, gold flecks, a violet

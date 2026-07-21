@@ -7,7 +7,7 @@ fuses the sigil engine with `ACT-TWO-THE-FAR-SHORE.md`. Living — iterate as we
 
 ## The turn, in one line
 
-**The sigil is the spell. The spell lays the plank. The planks become the bridge to the far shore.**
+**The sigil is the spell. The spell lays the plank. Each plank sets into the boat; the boat carries you to the far shore.**
 
 We are no longer raising a pet. The maturing-creature loop is demoted from *the game* to *a bonus*.
 The focal point of the entire app is the **sigil** — the daily seal both keepers compose together —
@@ -16,12 +16,12 @@ and the **magic of casting it.**
 ## The causal spine (the daily loop)
 
 > both keepers log → the day composes its **sigil** → the **completion ceremony** fires (the magic
-> moment) → a **spell** is cast → a **plank** appears on the **bridge** → the **far shore** (the
+> moment) → a **spell** is cast → a **plank** sets into the **boat** → the **far shore** (the
 > Dream — Matthew & Kennedy's is Kauai) draws one step closer.
 
 Everything the app does now points at that one moment. Retention flows from it: not "show up or the
 pet is sad" (streak-logic in a cuter coat), but **the spell you can only cast together, and the
-bridge that only grows when you both show up.** Two-player-mandatory *magic*, not guilt. This is the
+boat that only grows when you both show up.** Two-player-mandatory *magic*, not guilt. This is the
 moat — an incumbent solo tracker cannot retrofit a spell that requires two hands.
 
 ## The sigil, elevated
@@ -69,7 +69,7 @@ The one place we let motion break the stillness:
 - **gold leaf ignites** along the lines; the ring **rotates like an orrery**;
 - **violet blooms** at the union point where the two halves meet;
 - **ink-dot motes** spark off and drift (our particles — sparks, not lens-flare);
-- the "portal" is not a hole in space — it is the **plank materializing on the bridge, drawn in the
+- the "portal" is not a hole in space — it is the **plank setting into the boat, drawn in the
   same ink.**
 
 Magical, and unmistakably *our book*. Deserves its own motion spec (frames + timing) before build.
@@ -104,7 +104,7 @@ a chore on a phone checked daily).
 | Book (proposed) | Holds | The feeling |
 |---|---|---|
 | **The Scrapbook** *(or "The Days")* | daily entries — food, mood, the note, someday a photo | photo album / long diary — the **human** record |
-| **The Spellbook** *(or "The Grimoire")* | sigils cast + the bridge & the Dream advancing | the heart — the **arcane** record |
+| **The Spellbook** *(or "The Grimoire")* | sigils cast + the boat & the Dream advancing | the heart — the **arcane** record |
 | **The Compendium** *(or "The Field Book")* | beings + pantry/museum + artifacts + glade details | everything collected by casting |
 | **The Almanac** *(or "The Ledger")* | trends, numbers, patterns over time | the quiet data book |
 
@@ -117,7 +117,7 @@ Deliberate split so two don't overlap: **Scrapbook = the human record** (what yo
   legendary), the completion-ceremony frames, and the four book-spines/covers are now the lead
   assets. Beings drop to bonus priority. See `art/asset-sheets.md` (re-prioritized).
 - **Engine:** the sigil engine (`lib/engine/sigil.ts`) is already the core; add **chord-runes** (a
-  rune per chord seated in the seal) and the **spell → plank → bridge** link (the bridge/Dream from
+  rune per chord seated in the seal) and the **spell → plank → boat** link (the boat/Dream from
   Act Two becomes the sigil's output surface).
 - **IA:** the single `/book` becomes a **shelf of four books**; the pantry is absorbed into the
   Compendium.

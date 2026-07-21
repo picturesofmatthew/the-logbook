@@ -1,6 +1,6 @@
 # Inklight — Art Prompt Library
 
-*For Matthew's master-generation sessions (ChatGPT + human art direction). Every asset obeys the style constants; per-asset prompts below are starting points to iterate from. Engine runs on placeholder geometry until masters drop in — no asset blocks code.*
+*For master-generation sessions. **Generation pipeline of record: `art/asset-sheets.md`** (Nano Banana → Scenario → Recraft) — the earlier "ChatGPT + human art direction" spine is superseded. Every asset obeys the style constants; per-asset prompts below are starting points to iterate from. Engine runs on placeholder geometry until masters drop in — no asset blocks code.*
 
 ## Style constants (paste into every prompt)
 
