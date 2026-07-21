@@ -49,6 +49,7 @@ stranded). Then the **boat-to-Kauai Phase 0** + a 30-day both-of-you retention t
 |---|---|
 | **PROJECT-BRAIN.md** (this) | Orientation, state, decision log, doc map. Read first. |
 | **ROADMAP.md** | The phased build plan (Foundation → Art/UI → Coffers → Multi-user v1) — "what we're building, in what order." |
+| **SIGIL-HANDOFF.md** | The developed seal: its grammar, the swappable parts registry (`components/sigil/glyphs.ts`), and what's next. **Read to continue the sigil/art work.** |
 | **THE-SIGIL-TURN.md** | The current thesis: sigil-as-spell, the emblem ladder, the four books, creatures demoted to a summoned bonus. |
 | **RISK-REGISTER.md** | The 4-agent contingency findings, deduped + ranked by severity + phase. The "what to watch." |
 | **ACT-TWO-THE-FAR-SHORE.md** | The far shore / boat / Dream + **§Phase 0, the lean validate-first plan** (re-promoted). |
