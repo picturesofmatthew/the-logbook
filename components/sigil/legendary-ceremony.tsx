@@ -6,21 +6,34 @@
 
 import { useEffect, useState } from "react";
 import { LEGENDARIES, type LegendaryId, type SigilSpec } from "@/lib/engine/sigil";
-import { legendaryTone } from "@/lib/sounds";
+import { legendaryTone, plankTone } from "@/lib/sounds";
 import { StarMark } from "@/components/glyphs";
+import { PlankBeat } from "./plank-beat";
 import { SigilGlyph } from "./sigil-glyph";
 
 export function LegendaryCeremony({
   legendary,
   spec,
+  dreamName,
+  planksLaid,
+  remaining,
 }: {
   legendary: LegendaryId;
   spec: SigilSpec;
+  // A legendary day also sets a plank — a golden one — into the boat.
+  dreamName?: string;
+  planksLaid?: number | null;
+  remaining?: number | null;
 }) {
   const [open, setOpen] = useState(true);
+  const laysPlank = planksLaid != null && dreamName != null;
   useEffect(() => {
     legendaryTone();
-  }, []);
+    const plank = laysPlank ? window.setTimeout(() => plankTone(), 1900) : undefined;
+    return () => {
+      if (plank) window.clearTimeout(plank);
+    };
+  }, [laysPlank]);
   if (!open) return null;
   const l = LEGENDARIES[legendary];
 
@@ -47,6 +60,12 @@ export function LegendaryCeremony({
           <p className="wobbly-sm mt-4 inline-block border border-violet/50 bg-paper-deep px-3 py-1 text-xs">
             inked into the spellbook, forever
           </p>
+          <PlankBeat
+            dreamName={dreamName}
+            planksLaid={planksLaid}
+            remaining={remaining}
+            golden
+          />
         </div>
         <p className="mt-3 text-center text-xs text-cream/90">
           tap anywhere to continue

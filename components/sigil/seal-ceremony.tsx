@@ -8,8 +8,9 @@
 
 import { useEffect, useState } from "react";
 import { CHORDS, type SigilSpec } from "@/lib/engine/sigil";
-import { sealTone } from "@/lib/sounds";
+import { plankTone, sealTone } from "@/lib/sounds";
 import { StarMark } from "@/components/glyphs";
+import { PlankBeat } from "./plank-beat";
 import { SigilGlyph } from "./sigil-glyph";
 
 const SEEN_PREFIX = "logbook_seal_seen_";
@@ -54,15 +55,23 @@ export function SealCeremony({
   closerLine,
   sealedCount,
   suppressed,
+  dreamName,
+  planksLaid,
+  remaining,
 }: {
   spec: SigilSpec;
   day: string;
   closerLine?: string | null;
   sealedCount?: number;
   suppressed: boolean;
+  // The boat toward the far shore — the second beat: a plank is set.
+  dreamName?: string;
+  planksLaid?: number | null;
+  remaining?: number | null;
 }) {
   const [stage, setStage] = useState<"hidden" | "shown" | "fading">("hidden");
   const milestone = sealedCount != null ? MILESTONES[sealedCount] : undefined;
+  const laysPlank = planksLaid != null && dreamName != null;
 
   useEffect(() => {
     let seen = false;
@@ -77,14 +86,20 @@ export function SealCeremony({
       setStage("shown");
       sealTone();
     }, 250);
-    const fade = window.setTimeout(() => setStage("fading"), 3850);
-    const done = window.setTimeout(() => setStage("hidden"), 4350);
+    // The second beat: the plank draws itself into the boat (CSS-timed to
+    // ~1.45s after the card shows) — meet it with a dry wooden knock.
+    const plank = laysPlank
+      ? window.setTimeout(() => plankTone(), 1700)
+      : undefined;
+    const fade = window.setTimeout(() => setStage("fading"), laysPlank ? 4600 : 3850);
+    const done = window.setTimeout(() => setStage("hidden"), laysPlank ? 5100 : 4350);
     return () => {
       window.clearTimeout(show);
+      if (plank) window.clearTimeout(plank);
       window.clearTimeout(fade);
       window.clearTimeout(done);
     };
-  }, [day, suppressed]);
+  }, [day, suppressed, laysPlank]);
 
   if (stage === "hidden") return null;
 
@@ -124,6 +139,12 @@ export function SealCeremony({
               <StarMark size={12} /> {milestone}
             </p>
           ) : null}
+          <PlankBeat
+            dreamName={dreamName}
+            planksLaid={planksLaid}
+            remaining={remaining}
+            golden={spec.tier === "legendary" || spec.tier === "resonant"}
+          />
           <p className="mt-3 text-xs italic text-ink-soft">
             another page kept, together
           </p>

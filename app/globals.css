@@ -321,6 +321,45 @@ html[data-light="night"] .glade-day-only {
   }
 }
 
+/* A plank laying itself on the bridge — the second beat of the seal ceremony.
+   The copy rises in a moment after the ring closes; the board draws on from
+   the near end, in the same ink. */
+.plank-beat {
+  opacity: 0;
+  animation: plank-appear 0.5s ease-out 1.3s forwards;
+}
+@keyframes plank-appear {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.plank-draw {
+  transform-box: fill-box;
+  transform-origin: left center;
+  transform: scaleX(0);
+  animation: plank-draw 0.7s cubic-bezier(0.4, 0, 0.2, 1) 1.45s forwards;
+}
+@keyframes plank-draw {
+  to {
+    transform: scaleX(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .plank-beat {
+    animation: none;
+    opacity: 1;
+  }
+  .plank-draw {
+    animation: none;
+    transform: none;
+  }
+}
+
 /* Ambient motes — a few warm specks drifting up through the glade sky, so a
    quiet day still breathes and a sealed one feels alive. */
 .mote {

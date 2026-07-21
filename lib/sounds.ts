@@ -156,3 +156,28 @@ export function inscribeTick(): void {
   tone(ac, 220, 0, 0.05, 0.05);
   tone(ac, 330, 0.05, 0.06, 0.035);
 }
+
+// A dry wooden knock for a plank set into the boat — the board meets, then
+// settles. Small and grounded; the shared reward of a day sealed together.
+export function plankTone(): void {
+  if (isMuted()) return;
+  const ac = audioCtx();
+  if (!ac) return;
+  tone(ac, 174.61, 0, 0.08, 0.05); // F3 — the board meets
+  tone(ac, 130.81, 0.06, 0.14, 0.038); // C3 — the settle
+}
+
+// The grandest sound in the app, saved for reaching a far shore: a full warm
+// major swell rising into a bright shimmer — the couple arrives, together.
+export function shoreArrivalTone(): void {
+  if (isMuted()) return;
+  const ac = audioCtx();
+  if (!ac) return;
+  swell(ac, 130.81, 0, 2.4, 0.05); // C3
+  swell(ac, 196, 0.14, 2.2, 0.045); // G3
+  swell(ac, 261.63, 0.3, 2.0, 0.04); // C4
+  swell(ac, 329.63, 0.46, 1.9, 0.034); // E4
+  swell(ac, 392, 0.62, 1.8, 0.03); // G4
+  tone(ac, 1046.5, 1.2, 0.5, 0.03); // C6 — landfall
+  tone(ac, 1567.98, 1.45, 0.6, 0.022); // G6 — the shimmer
+}

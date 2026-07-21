@@ -6,6 +6,7 @@ import {
   eq,
   gte,
   inArray,
+  isNull,
   lte,
   max,
   min,
@@ -14,6 +15,7 @@ import { db } from "@/db";
 import {
   beingArrivals,
   dayMeta,
+  dreams,
   entries,
   foods,
   pet,
@@ -421,6 +423,91 @@ export async function recordArrival(
 export async function getArrivals(): Promise<Map<string, string>> {
   const rows = await db.select().from(beingArrivals);
   return new Map(rows.map((r) => [r.beingId, r.day]));
+}
+
+// ── The Dream / the boat to the far shore ──
+// Exactly one shore is `active` at a time; reached shores are kept as history.
+// Planks are never stored — they are derived from the ledger (lib/engine/boat).
+// Only the Dream itself and the once-ever arrival moment live in the table.
+
+export type DreamRow = {
+  id: number;
+  name: string;
+  distanceDays: number;
+  startedDay: string;
+  reachedDay: string | null;
+  status: "active" | "reached";
+};
+
+export async function getActiveDream(): Promise<DreamRow | null> {
+  const [row] = await db
+    .select()
+    .from(dreams)
+    .where(eq(dreams.status, "active"))
+    .orderBy(desc(dreams.id))
+    .limit(1);
+  return row ?? null;
+}
+
+// Past shores, most recent first — the "shores reached" record.
+export async function getReachedShores(): Promise<DreamRow[]> {
+  return db
+    .select()
+    .from(dreams)
+    .where(eq(dreams.status, "reached"))
+    .orderBy(desc(dreams.reachedDay));
+}
+
+// Rename / re-scope the active shore (the light setter). Targets the active row.
+export async function updateActiveDream(fields: {
+  name: string;
+  distanceDays: number;
+}): Promise<void> {
+  await db
+    .update(dreams)
+    .set({ name: fields.name, distanceDays: fields.distanceDays })
+    .where(eq(dreams.status, "active"));
+}
+
+// The arrival gate — claim-once, like recordLegendary. The first render where
+// the boat is whole stamps `reachedDay` and throws the arrival ceremony; the
+// Dream stays `active` (the finished vessel keeps showing) until the couple
+// chooses the next shore. Returns true only for the request that landed it.
+export async function reachShore(
+  dreamId: number,
+  day: string,
+): Promise<boolean> {
+  const rows = await db
+    .update(dreams)
+    .set({ reachedDay: day })
+    .where(
+      and(
+        eq(dreams.id, dreamId),
+        eq(dreams.status, "active"),
+        isNull(dreams.reachedDay),
+      ),
+    )
+    .returning({ id: dreams.id });
+  return rows.length > 0;
+}
+
+// Choose the next shore: archive the reached one, begin a fresh vessel. The new
+// boat counts from `startedDay` (the arrival day), so its hull starts bare.
+export async function chooseNextShore(fields: {
+  name: string;
+  distanceDays: number;
+  startedDay: string;
+}): Promise<void> {
+  await db
+    .update(dreams)
+    .set({ status: "reached" })
+    .where(eq(dreams.status, "active"));
+  await db.insert(dreams).values({
+    name: fields.name,
+    distanceDays: fields.distanceDays,
+    startedDay: fields.startedDay,
+    status: "active",
+  });
 }
 
 // The specimens this person logs most recently — the quick-tap grid.

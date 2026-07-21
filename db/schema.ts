@@ -191,3 +191,24 @@ export const beingArrivals = pgTable("being_arrivals", {
   day: date("day").notNull(),
   arrivedAt: timestamp("arrived_at").defaultNow().notNull(),
 });
+
+// The shared Dream — the far shore both keepers build toward. Exactly one row
+// is `active` at a time; reached shores are kept as `reached` history. Planks
+// are never stored — a plank is a both-logged day on/after `startedDay`,
+// derived from the ledger. Only the Dream itself and the once-ever arrival
+// moment (`reachedDay`) live here. Modeled on the singleton `pet`, but the
+// "choose your next shore" arc means more than one row over time.
+export const dreams = pgTable("dreams", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  // Both-logged days (planks) to reach the shore. No deadline; never regresses.
+  distanceDays: integer("distance_days").notNull(),
+  // The day this vessel's build began counting from.
+  startedDay: date("started_day").notNull(),
+  // Set once, when the couple arrives — gates the arrival ceremony (claim-once).
+  reachedDay: date("reached_day"),
+  status: text("status", { enum: ["active", "reached"] })
+    .notNull()
+    .default("active"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});

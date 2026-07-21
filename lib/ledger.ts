@@ -14,7 +14,9 @@ import {
   workoutSets,
 } from "@/db/schema";
 import { PROFILES, type Profile } from "@/lib/auth";
+import { getActiveDream, type DreamRow } from "@/lib/data";
 import { beingStates, type BeingState, type LedgerDay } from "@/lib/engine/beings";
+import { boatState, type BoatDay, type BoatState } from "@/lib/engine/boat";
 import {
   gladeTier,
   tierForScore,
@@ -269,12 +271,42 @@ export type GladeState = {
   beings: BeingState[];
   // The most recent legendary day, if any — the Pale Elk listens for it.
   lastLegendaryDay: string | null;
+  // The far shore and the boat you're building toward it — derived from the
+  // same ledger scan.
+  dream: DreamRow | null;
+  boat: BoatState | null;
 };
 
 export async function getGladeState(today: string): Promise<GladeState> {
-  const firstDay = await getFirstEntryDay();
+  const [firstDay, dream] = await Promise.all([
+    getFirstEntryDay(),
+    getActiveDream(),
+  ]);
+
+  // Planks ride the same ledger the beings do — a completed day since this
+  // vessel's build began sets one. No second full-history scan.
+  const boatFrom = (entriesForBoat: LedgerEntry[]): BoatState | null => {
+    if (!dream) return null;
+    const boatDays: BoatDay[] = entriesForBoat.map((e) => ({
+      day: e.day,
+      completed: e.spec.completed,
+      tier: e.spec.tier,
+    }));
+    return boatState(boatDays, {
+      name: dream.name,
+      plankGoal: dream.distanceDays,
+      startedDay: dream.startedDay,
+    });
+  };
+
   if (!firstDay) {
-    return { tier: "hushed", beings: beingStates([]), lastLegendaryDay: null };
+    return {
+      tier: "hushed",
+      beings: beingStates([]),
+      lastLegendaryDay: null,
+      dream,
+      boat: boatFrom([]),
+    };
   }
 
   const ledger = await buildLedgerRange(firstDay, today, today);
@@ -310,6 +342,8 @@ export async function getGladeState(today: string): Promise<GladeState> {
     ),
     beings: beingStates(history),
     lastLegendaryDay,
+    dream,
+    boat: boatFrom(ledger),
   };
 }
 

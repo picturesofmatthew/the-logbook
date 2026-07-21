@@ -1,10 +1,13 @@
+import Link from "next/link";
 import { ArrivalCeremony } from "@/components/glade/arrival-ceremony";
 import { GladeScene, type BeingStages } from "@/components/glade/glade-scene";
+import { HorizonGlimpse } from "@/components/glade/horizon-glimpse";
 import { PixelSprite } from "@/components/pixel-sprite";
 import { HeartMark, StampMark, StarMark } from "@/components/glyphs";
 import { DaySeal } from "@/components/sigil/day-seal";
 import { LegendaryCeremony } from "@/components/sigil/legendary-ceremony";
 import { SealCeremony } from "@/components/sigil/seal-ceremony";
+import { ShoreArrivalCeremony } from "@/components/sigil/shore-arrival-ceremony";
 import { PET_PALETTE, PET_SPRITES } from "@/components/sprites";
 import { DISPLAY_NAMES, PROFILES, type Profile } from "@/lib/auth";
 import {
@@ -15,6 +18,7 @@ import {
   getJournalDay,
   getPetState,
   getWorkoutsForDay,
+  reachShore,
   recordArrival,
   recordLegendary,
 } from "@/lib/data";
@@ -119,6 +123,15 @@ export default async function GladeHome() {
   });
   if (paleElk) await recordArrival("pale-elk", today);
 
+  // The boat is whole and the far shore is reached — the rarest moment, claimed
+  // once. The request that stamps `reachedDay` throws the arrival ceremony; the
+  // Dream stays active (the finished vessel keeps showing) until the couple
+  // chooses the next one.
+  const reachedShore =
+    glade.boat?.complete && glade.dream && glade.dream.reachedDay == null
+      ? await reachShore(glade.dream.id, today)
+      : false;
+
   const stamps = stampsForDay({
     people: PROFILES.map((p) => ({
       name: DISPLAY_NAMES[p],
@@ -177,9 +190,9 @@ export default async function GladeHome() {
           "linear-gradient(180deg, var(--glade-sky-top) 0%, var(--glade-sky-bottom) 58%, var(--glade-ground-top) 100%)",
       }}
     >
-      {/* SKY — the ring narrates the day, up top */}
+      {/* THE SIGIL — the day's seal, the hero of the home */}
       <div className="flex flex-col items-center gap-3 px-6 pt-16 pb-2 text-center">
-        <div className="w-full max-w-[280px]">
+        <div className="w-full max-w-[300px]">
           <DaySeal spec={sigil} missingName={missingName} isToday={isToday} />
         </div>
 
@@ -196,28 +209,11 @@ export default async function GladeHome() {
             ))}
           </div>
         ) : null}
-
-        <p className="max-w-[240px] text-[11px] italic leading-snug text-ink-soft">
-          “{speech}”
-        </p>
-        <p className="font-pixel text-[10px] tracking-wide text-ink-soft">
-          {petState.name ? `${petState.name} the ${stageLabel}` : `a ${stageLabel}`}{" "}
-          ·{" "}
-          <HeartMark size={10} className="inline-block align-[-1px] text-terracotta" />{" "}
-          {petState.lifetimeDays}
-          {petState.lifetimeDays === 1 ? " day" : " days"} fed
-        </p>
-        {foxNext ? (
-          <p className="text-[10px] italic leading-snug text-ink-soft/80">
-            {foxNext.daysLeft === 1 ? "one day" : `${foxNext.daysLeft} days`} to
-            the {foxNext.label}
-          </p>
-        ) : null}
       </div>
 
       {/* ambient motes, drifting up through the sky's empty middle */}
       <div
-        className="pointer-events-none absolute inset-x-0 top-[34%] bottom-[20%] overflow-hidden"
+        className="pointer-events-none absolute inset-x-0 top-[22%] bottom-[48%] overflow-hidden"
         aria-hidden
       >
         {MOTES.map((m, i) => (
@@ -242,12 +238,40 @@ export default async function GladeHome() {
       {/* push the world to the foot of the screen */}
       <div className="flex-1" />
 
-      {/* THE WORLD — skyless so the page gradient shows straight through (no
-          seam), cropped to the treeline + ground, sitting above the ribbon.
-          The keepers' lanterns light within it by who has logged. */}
-      <div className="relative h-[140px] overflow-hidden">
+      {/* THE GLIMPSE — the home's window onto the quest. The sea, the far shore
+          glowing, your vessel sailing toward it. Tap to travel there and build
+          the ship in full. */}
+      {glade.dream && glade.boat ? (
+        <Link
+          href="/shore"
+          className="relative block"
+          aria-label={`Toward ${glade.dream.name} — ${glade.boat.planksLaid} of ${glade.boat.plankGoal} planks set. Tap to look toward it.`}
+        >
+          <HorizonGlimpse boat={glade.boat} dreamName={glade.dream.name} />
+          <div className="px-6 pb-1 pt-1 text-center">
+            <p className="font-pixel text-[10px] tracking-widest text-ink-soft">
+              toward {glade.dream.name}
+            </p>
+            <div className="mx-auto mt-1 h-[3px] w-40 max-w-[68%] overflow-hidden rounded-full bg-ink/10">
+              <div
+                className="h-full rounded-full bg-gold"
+                style={{
+                  width: `${Math.min(100, Math.round((glade.boat.planksLaid / glade.boat.plankGoal) * 100))}%`,
+                }}
+              />
+            </div>
+            <p className="mt-1 font-pixel text-[9px] tracking-wide text-ink-soft/70">
+              {glade.boat.planksLaid} of {glade.boat.plankGoal} planks
+            </p>
+          </div>
+        </Link>
+      ) : null}
+
+      {/* THE GLADE — demoted to a quiet strip at the foot; the fox and the
+          creatures live here as ambient life, no longer the focus. */}
+      <div className="relative h-[150px] overflow-hidden">
         <div className="absolute inset-x-0 bottom-0 flex justify-center">
-          <div className="relative w-[132%] shrink-0">
+          <div className="relative w-[128%] shrink-0">
             <GladeScene
               skyless
               tier={glade.tier}
@@ -273,17 +297,16 @@ export default async function GladeHome() {
                 <PixelSprite
                   map={PET_SPRITES[stage]}
                   palette={PET_PALETTE}
-                  className="idle-bounce h-14 w-14 pixelated"
+                  className="idle-bounce h-11 w-11 pixelated"
                   title={`${petState.name ?? "The fox"}, a ${stageLabel} — the Glade is ${glade.tier}`}
                 />
-                {/* a soft shadow so the fox sits on the grass, not above it */}
                 <span
-                  className="-mt-1 h-1.5 w-8 rounded-[50%] bg-ink/25 blur-[1.5px]"
+                  className="-mt-1 h-1.5 w-7 rounded-[50%] bg-ink/25 blur-[1.5px]"
                   aria-hidden
                 />
                 {mood === "thriving" ? (
                   <span className="absolute -right-0.5 top-0 animate-pulse text-gold">
-                    <StarMark size={12} />
+                    <StarMark size={11} />
                   </span>
                 ) : null}
               </div>
@@ -292,18 +315,48 @@ export default async function GladeHome() {
         </div>
       </div>
 
-      {/* ceremonies — overlays that fire on arrival */}
-      {newlyDiscovered && sigil.legendary ? (
-        <LegendaryCeremony legendary={sigil.legendary} spec={sigil} />
+      {/* the fox's quiet voice — small at the foot, ambient */}
+      <div className="px-6 pb-2 text-center">
+        <p className="mx-auto max-w-[240px] text-[10px] italic leading-snug text-ink-soft/80">
+          “{speech}”
+        </p>
+        <p className="mt-0.5 font-pixel text-[9px] tracking-wide text-ink-soft/70">
+          {petState.name ? `${petState.name} the ${stageLabel}` : `a ${stageLabel}`} ·{" "}
+          <HeartMark size={9} className="inline-block align-[-1px] text-terracotta" />{" "}
+          {petState.lifetimeDays}
+          {petState.lifetimeDays === 1 ? " day" : " days"} fed
+          {foxNext
+            ? ` · ${foxNext.daysLeft === 1 ? "one day" : `${foxNext.daysLeft} days`} to the ${foxNext.label}`
+            : ""}
+        </p>
+      </div>
+
+      {/* ceremonies — overlays that fire on arrival, grandest first. Reaching
+          the far shore outranks a legendary, a legendary a being, a being the
+          plain seal; a grander one suppresses the rest for the night. */}
+      {reachedShore && glade.dream ? (
+        <ShoreArrivalCeremony dreamName={glade.dream.name} />
       ) : null}
-      {newBeing ? <ArrivalCeremony being={newBeing} /> : null}
+      {!reachedShore && newlyDiscovered && sigil.legendary ? (
+        <LegendaryCeremony
+          legendary={sigil.legendary}
+          spec={sigil}
+          dreamName={glade.dream?.name}
+          planksLaid={glade.boat?.planksLaid}
+          remaining={glade.boat?.remaining}
+        />
+      ) : null}
+      {!reachedShore && newBeing ? <ArrivalCeremony being={newBeing} /> : null}
       {sigil.completed && isToday ? (
         <SealCeremony
           spec={sigil}
           day={day}
           closerLine={closerLine}
           sealedCount={petState.lifetimeDays}
-          suppressed={newlyDiscovered || newBeing != null}
+          suppressed={reachedShore || newlyDiscovered || newBeing != null}
+          dreamName={glade.dream?.name}
+          planksLaid={glade.boat?.planksLaid}
+          remaining={glade.boat?.remaining}
         />
       ) : null}
     </main>
