@@ -4,7 +4,16 @@
 
 ---
 
-## 1 · Art-generation tooling
+## 1 · Art-generation tooling — ✅ RESOLVED 2026-07-20
+
+**Pipeline of record → `art/asset-sheets.md`.** Research finding: **ChatGPT is the wrong spine** (no
+style-lock, weak character continuity, GPT Image 2 can't do transparent alpha). The pipeline is
+**Bootstrap → Lock → Produce**: generate cohesive Inklight *boards* in **Nano Banana Pro** to
+manufacture 12–15 masters → train a **Scenario** style model (+ character models, multi-LoRA merge)
+to mass-produce on-style/on-alpha frames → **Recraft** (V3 for the set) for native-SVG sigils, with
+`autotrace -centerline` fallback → wire **fal.ai + Recraft MCP** for in-loop gen. ~$60–80/mo full
+(lean start ~$20–25). The 6 boards + prompts + workflow are all in `art/asset-sheets.md`. **Pending
+Matthew's spine-commit on spend before Phase 2.** Original scoping notes preserved below.
 
 **Goal:** find a pipeline that produces higher-quality Inklight assets than the hand-authored SVG we ship today — *if* one exists that stays palette-locked and style-consistent. Matthew's call: Inklight is a prototype language; if something brilliant shows up, we move to it.
 
