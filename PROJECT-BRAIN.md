@@ -76,6 +76,18 @@ logo/wordmark** (two crossed into one — on-thesis). Run a **USPTO + App Store/
 (watch "Signed Sealed Delivered" — Stevie Wonder + Hallmark — for SEO/TM) before locking. Verdict:
 strong, on-brand name; the purchases were not a mistake.
 
+**App Store cross-reference (2026-07-21, via iTunes Search API):** **no name collision** — nothing in
+the App Store is called "Signed x Sealed" / "Signed Sealed" in the couples space *or anywhere*; the
+couples category (Paired 8M, Between, PairStreak, Twig…) has no "Sealed"-named app. **BUT the search
+term "signed sealed" is owned by the e-signature category** (DocuSign, Signeasy, SignNow, Adobe
+Acrobat Sign) — a *findability*, not a *trademark*, problem. **Store strategy: keep the brand + add a
+category descriptor** ("Signed x Sealed: A Ritual for Two"); build the subtitle/keyword field around
+couples/together/long-distance terms, not "signed sealed"; let the app rank on its own unique token.
+**Still to verify (session search budget spent): live Google Play + USPTO checks.** **GTM spine:** the
+invite is the growth engine (two-player = built-in referral; the half-lit seal one partner *sends* is
+the acquisition unit); beachhead = long-distance couples; founder-led content via @picturesofmatthew
+(the ornate seals are the ad); a $0 waitlist landing now.
+
 ## Guardrails (carried)
 
 - **$0 until users** (Matthew, hard constraint). The whole path is free-tier; reader/MoR billing and
