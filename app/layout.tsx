@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Baloo_2, Pixelify_Sans } from "next/font/google";
+import { Fraunces, Hanken_Grotesk } from "next/font/google";
 import { cookies } from "next/headers";
 import { CaptureSheet } from "@/components/shell/capture-sheet";
 import { PageTransition } from "@/components/shell/page-transition";
@@ -13,13 +13,17 @@ import { currentTz, todayIso } from "@/lib/dates";
 import { hourInTz, lightStateForHour } from "@/lib/light";
 import "./globals.css";
 
-const baloo = Baloo_2({
-  variable: "--font-baloo",
+// Inklight type. Fraunces carries the grimoire display voice (a warm, soft
+// old-style serif); Hanken Grotesk carries readable body/UI text and data.
+// NOTE: the `font-pixel` utility now maps to Fraunces — the name is a leftover
+// from the retired pixel language and gets renamed to `font-display` later.
+const body = Hanken_Grotesk({
+  variable: "--font-body",
   subsets: ["latin"],
 });
 
-const pixelify = Pixelify_Sans({
-  variable: "--font-pixelify",
+const display = Fraunces({
+  variable: "--font-display",
   subsets: ["latin"],
 });
 
@@ -66,7 +70,7 @@ export default async function RootLayout({
     <html
       lang="en"
       data-light={light}
-      className={`${baloo.variable} ${pixelify.variable} h-full antialiased`}
+      className={`${body.variable} ${display.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col font-sans">
         <TzSync />

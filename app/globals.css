@@ -21,8 +21,8 @@
   --color-violet: #8d7aa8;
   --color-violet-bright: #c9b3e3;
 
-  --font-sans: var(--font-baloo);
-  --font-pixel: var(--font-pixelify);
+  --font-sans: var(--font-body);
+  --font-pixel: var(--font-display);
 
   --radius-card: 1.25rem;
   --shadow-card: 0 2px 0 0 color-mix(in srgb, #4a3b2a 18%, transparent),
@@ -72,7 +72,7 @@ body {
   );
   background-size: 22px 22px;
   color: var(--color-ink);
-  font-family: var(--font-sans), ui-rounded, system-ui, sans-serif;
+  font-family: var(--font-sans), system-ui, sans-serif;
   /* Digits line up in columns across the whole app. */
   font-variant-numeric: tabular-nums;
 }
