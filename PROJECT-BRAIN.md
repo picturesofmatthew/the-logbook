@@ -20,23 +20,28 @@ Both keepers log → the day composes its **sigil** → the completion **ceremon
 cast → a **plank** lays on the **bridge** toward the couple's **Dream** (far shore, e.g. Kauai).
 Retention = the spell you can only cast together + the accumulating shared book. (`THE-SIGIL-TURN.md`)
 
-## The one open decision
+## The decision (made 2026-07-21)
 
-**Validate-first vs build-native-now.** A 4-lens adversarial contingency round (product, technical,
-business, scope) converged: the two-player-mandatory same-day close is the magic AND the fragility,
-and we were about to *rewrite* an un-validated loop natively instead of testing it cheaply on the
-working PWA. **Recommended (strongly — all lenses): brakes on the rewrite; fix-and-validate on the PWA
-first.** Awaiting Matthew's explicit confirm before re-pointing the plan of record.
+**Continue on the current free Next.js / Neon / Vercel PWA. The native Expo/Convex/Rive rewrite
+(`LAUNCH-PATH.md`) is PARKED — reconsidered only once multiple users are willing to pay.** $0 until
+users. This resolves the validate-first-vs-build-native fork: a 4-lens contingency round showed the
+native rewrite reaches parity with a *working* app while adding zero retention evidence and colliding
+with the STR launch + the Asia move + debt — so we build and validate on what already runs, for free.
 
-## The immediate next step (the recommended path, $0)
+## Next up — development on the current PWA
 
-On the LIVE PWA (no new stack):
-1. Fix the **core-loop cluster** (RISK-REGISTER Tier 1): an async ~36–48h close window + standalone
-   value for one person's half + a graceful absent-partner state.
-2. Cheap wins that apply regardless: the **colorblind seal** (shape/texture per keeper + an Okabe–Ito
-   palette) and the **canonical-couple-day** rule in the engine.
-3. Build the **bridge-to-Kauai Phase 0** (`ACT-TWO-THE-FAR-SHORE.md` §Phase 0 — "a render + a row").
-4. Run a **30-day both-of-you retention test.** Gate everything downstream on it.
+Three threads (all on the free stack, SVG/CSS — not Rive yet):
+1. **The core sigil system** — enhance the SVG `SigilGlyph`: the composed seal, chord-runes, the
+   emblem-ladder tiers (open→common→fine→resonant→legendary), and the completion ceremony in SVG/CSS.
+2. **The logging overhaul** — faster time-to-first-value (log-first, lore-later) + the macro/calorie
+   estimation fixes (`NEXT-SESSION.md` §2).
+3. **Compendium organization** — the four-books IA; the Compendium (beings + pantry/museum + artifacts)
+   as one navigable book in `/book`.
+
+Fold in the cheap `RISK-REGISTER.md` fixes as we touch these: the **colorblind seal** (shape/texture
+per keeper + Okabe–Ito palette), the **canonical-couple-day** rule, and the bigger design change —
+**standalone value for one keeper's half + an async ~36–48h close window** (so one partner is never
+stranded). Then the **bridge-to-Kauai Phase 0** + a 30-day both-of-you retention test.
 
 ## The document map (read order)
 
