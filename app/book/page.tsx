@@ -88,7 +88,7 @@ export default async function BookPage({
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-5 p-4 pb-16">
       <header className="text-center">
-        <h1 className="flex items-center justify-center gap-2 font-pixel text-2xl tracking-wide">
+        <h1 className="flex items-center justify-center gap-2 font-display text-2xl tracking-wide">
           <BookRune size={24} /> THE SPELLBOOK
         </h1>
         <p className="mt-1 text-sm text-ink-soft">
@@ -103,7 +103,7 @@ export default async function BookPage({
         >
           ◀
         </Link>
-        <p className="font-pixel text-sm tracking-wide">
+        <p className="font-display text-sm tracking-wide">
           {monthLabel.toLowerCase()}
           <span className="ml-2 text-[10px] text-ink-soft">
             {sealedCount} sealed
@@ -128,7 +128,7 @@ export default async function BookPage({
           {["s", "m", "t", "w", "t", "f", "s"].map((d, i) => (
             <span
               key={`${d}${i}`}
-              className="font-pixel text-[9px] text-ink-soft/70"
+              className="font-display text-[9px] text-ink-soft/70"
             >
               {d}
             </span>
@@ -155,7 +155,7 @@ export default async function BookPage({
       </section>
 
       <section>
-        <h2 className="mb-2 flex items-center gap-2 font-pixel text-sm tracking-wide">
+        <h2 className="mb-2 flex items-center gap-2 font-display text-sm tracking-wide">
           <StarMark size={15} /> THE LEGENDARIUM
           <span className="text-[10px] text-ink-soft">
             {discoveries.size}/{Object.keys(LEGENDARIES).length} discovered
@@ -171,7 +171,7 @@ export default async function BookPage({
                 className="wobbly-sm flex flex-col items-center border-2 border-violet/50 bg-cream/70 p-2 text-center shadow-card"
               >
                 <SigilGlyph spec={legendarySpec(id)} size={56} />
-                <p className="font-pixel text-[10px] leading-tight text-violet">
+                <p className="font-display text-[10px] leading-tight text-violet">
                   {LEGENDARIES[id].name}
                 </p>
                 <p className="mt-0.5 text-[10px] italic leading-tight text-ink-soft">
@@ -187,7 +187,7 @@ export default async function BookPage({
                 className="wobbly-sm hatch flex flex-col items-center justify-center border-2 border-dashed border-ink/25 p-2 py-4 text-center"
               >
                 <span className="text-2xl opacity-40">?</span>
-                <p className="mt-1 font-pixel text-[10px] text-ink-soft/70">
+                <p className="mt-1 font-display text-[10px] text-ink-soft/70">
                   undiscovered
                 </p>
               </div>
@@ -197,7 +197,7 @@ export default async function BookPage({
       </section>
 
       <section>
-        <h2 className="mb-2 flex items-center gap-2 font-pixel text-sm tracking-wide">
+        <h2 className="mb-2 flex items-center gap-2 font-display text-sm tracking-wide">
           <BestiaryRune size={16} /> THE BESTIARY
           <span className="text-[10px] text-ink-soft">
             {arrivedCount}/{BEINGS.length} arrived
@@ -216,7 +216,7 @@ export default async function BookPage({
                 <div className="flex h-24 items-center justify-center">
                   <BeingPortrait being={def.id} stage={stage} />
                 </div>
-                <p className="font-pixel text-[10px] capitalize leading-tight">
+                <p className="font-display text-[10px] capitalize leading-tight">
                   {def.name}
                 </p>
                 <p className="mt-0.5 text-[10px] italic leading-tight text-ink-soft">
@@ -227,7 +227,7 @@ export default async function BookPage({
                   {arrivedOn ? ` · since ${friendlyDate(arrivedOn, tz)}` : ""}
                 </p>
                 {state && state.stage < 3 && state.nextAt != null ? (
-                  <p className="mt-0.5 font-pixel text-[9px] tracking-wide text-gold">
+                  <p className="mt-0.5 font-display text-[9px] tracking-wide text-gold">
                     deeper trust — {state.nextAt - state.count} more
                   </p>
                 ) : null}
@@ -238,14 +238,14 @@ export default async function BookPage({
                 className="wobbly-sm hatch flex flex-col items-center justify-center border-2 border-dashed border-ink/25 p-2 py-4 text-center"
               >
                 <span className="text-2xl opacity-40">?</span>
-                <p className="mt-1 font-pixel text-[10px] text-ink-soft/70">
+                <p className="mt-1 font-display text-[10px] text-ink-soft/70">
                   still in the wood
                 </p>
                 <p className="mt-0.5 text-[10px] italic leading-tight text-ink-soft/70">
                   {def.line}
                 </p>
                 {state && state.count > 0 && state.nextAt != null ? (
-                  <p className="mt-1 font-pixel text-[9px] tracking-wide text-moss-deep">
+                  <p className="mt-1 font-display text-[9px] tracking-wide text-moss-deep">
                     the wood stirs — {state.nextAt - state.count} more
                   </p>
                 ) : null}
@@ -255,7 +255,7 @@ export default async function BookPage({
           {elkGlimpsedOn ? (
             <div className="wobbly-sm lantern-pool col-span-2 flex flex-col items-center border-2 border-violet/50 bg-cream/70 p-3 text-center shadow-card">
               <BeingPortrait being="pale-elk" />
-              <p className="mt-1 font-pixel text-[10px] capitalize leading-tight text-violet">
+              <p className="mt-1 font-display text-[10px] capitalize leading-tight text-violet">
                 the Pale Elk
               </p>
               <p className="mt-0.5 text-[10px] italic leading-tight text-ink-soft">

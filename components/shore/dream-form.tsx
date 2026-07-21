@@ -23,7 +23,7 @@ export function DreamForm({
   const [state, formAction, pending] = useActionState(action, null);
   return (
     <form action={formAction} className="flex flex-col gap-3">
-      <label className="flex flex-col gap-1 font-pixel text-[10px] tracking-wide text-ink-soft">
+      <label className="flex flex-col gap-1 font-display text-[10px] tracking-wide text-ink-soft">
         the shore
         <input
           name="name"
@@ -33,7 +33,7 @@ export function DreamForm({
           className="wobbly-sm border border-ink/20 bg-cream px-3 py-2 font-sans text-sm text-ink outline-none focus:border-violet/50"
         />
       </label>
-      <label className="flex flex-col gap-1 font-pixel text-[10px] tracking-wide text-ink-soft">
+      <label className="flex flex-col gap-1 font-display text-[10px] tracking-wide text-ink-soft">
         planks to build the vessel (both-logged days)
         <input
           name="distance"
@@ -47,12 +47,12 @@ export function DreamForm({
       <button
         type="submit"
         disabled={pending}
-        className="wobbly-sm self-start border border-violet/50 bg-violet-soft/40 px-4 py-2 font-pixel text-xs tracking-widest text-violet disabled:opacity-50"
+        className="wobbly-sm self-start border border-violet/50 bg-violet-soft/40 px-4 py-2 font-display text-xs tracking-widest text-violet disabled:opacity-50"
       >
         {pending ? "setting…" : cta}
       </button>
       {state?.error ? (
-        <p className="font-pixel text-[10px] tracking-wide text-terracotta">
+        <p className="font-display text-[10px] tracking-wide text-terracotta">
           {state.error}
         </p>
       ) : null}

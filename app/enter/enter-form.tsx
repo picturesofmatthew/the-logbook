@@ -18,7 +18,7 @@ export function EnterForm() {
   return (
     <form action={formAction} className="flex flex-col gap-5">
       <fieldset className="flex flex-col gap-2">
-        <legend className="mb-1 font-pixel text-sm tracking-wide text-ink-soft">
+        <legend className="mb-1 font-display text-sm tracking-wide text-ink-soft">
           WHO GOES THERE?
         </legend>
         <div className="grid grid-cols-2 gap-3">
@@ -40,7 +40,7 @@ export function EnterForm() {
       </fieldset>
 
       <label className="flex flex-col gap-1">
-        <span className="font-pixel text-sm tracking-wide text-ink-soft">
+        <span className="font-display text-sm tracking-wide text-ink-soft">
           SECRET WORD
         </span>
         <input
@@ -53,7 +53,7 @@ export function EnterForm() {
       </label>
 
       {state?.error ? (
-        <p className="text-center font-pixel text-sm text-terracotta">
+        <p className="text-center font-display text-sm text-terracotta">
           {state.error}
         </p>
       ) : null}

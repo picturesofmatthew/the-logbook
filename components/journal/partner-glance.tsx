@@ -26,7 +26,7 @@ export function PartnerGlance({
   return (
     <section className="wobbly-sm flex flex-col gap-2.5 border-2 border-dashed border-ink/25 bg-cream/50 p-4">
       <div className="flex items-center justify-between gap-2">
-        <h2 className="font-pixel text-xs tracking-wide text-ink-soft">
+        <h2 className="font-display text-xs tracking-wide text-ink-soft">
           {displayName.toUpperCase()}
         </h2>
         {mood ? (

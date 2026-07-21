@@ -49,7 +49,7 @@ export function OwnColumn({
 
   return (
     <section className="flex flex-col gap-3">
-      <h2 className="font-pixel text-sm tracking-wide">
+      <h2 className="font-display text-sm tracking-wide">
         {displayName.toUpperCase()}
       </h2>
       <MacroBars total={total} target={target} />
@@ -91,7 +91,7 @@ export function OwnColumn({
                         <span className="text-ink-soft"> ×{e.servings}</span>
                       ) : null}
                     </span>
-                    <span className="font-pixel text-[11px] text-ink-soft">
+                    <span className="font-display text-[11px] text-ink-soft">
                       {Math.round(e.food.calories * e.servings)}
                     </span>
                     <button

@@ -25,7 +25,7 @@ export function NameForm() {
         </button>
       </div>
       {state?.error ? (
-        <p className="font-pixel text-[10px] text-terracotta">{state.error}</p>
+        <p className="font-display text-[10px] text-terracotta">{state.error}</p>
       ) : null}
     </form>
   );

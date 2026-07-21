@@ -121,7 +121,7 @@ export default async function TrendsPage() {
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-5 p-4 pb-16">
       <header className="text-center">
-        <h1 className="flex items-center justify-center gap-2 font-pixel text-2xl tracking-wide">
+        <h1 className="flex items-center justify-center gap-2 font-display text-2xl tracking-wide">
           <TrendsRune size={24} /> THE CHART PLATES
         </h1>
         <p className="mt-1 text-sm text-ink-soft">
@@ -140,7 +140,7 @@ export default async function TrendsPage() {
           <div className="mt-3 grid grid-cols-2 gap-3">
             {series.map((s) => (
               <div key={s.name}>
-                <p className="flex items-center gap-1.5 font-pixel text-[10px] tracking-wide text-ink-soft">
+                <p className="flex items-center gap-1.5 font-display text-[10px] tracking-wide text-ink-soft">
                   <span
                     className="inline-block h-2.5 w-2.5 rounded-sm"
                     style={{ backgroundColor: s.color }}
@@ -156,7 +156,7 @@ export default async function TrendsPage() {
                           { month: "short", day: "numeric" },
                         )}
                       </span>
-                      <span className="font-pixel">{p.weightLb} lb</span>
+                      <span className="font-display">{p.weightLb} lb</span>
                     </li>
                   ))}
                 </ul>
@@ -175,7 +175,7 @@ export default async function TrendsPage() {
         ) : (
           <table className="w-full text-xs">
             <thead>
-              <tr className="text-left font-pixel text-[10px] text-ink-soft">
+              <tr className="text-left font-display text-[10px] text-ink-soft">
                 <th className="pb-1 font-normal">WEEK</th>
                 {PROFILES.map((p) => (
                   <th key={p} className="pb-1 text-right font-normal">
@@ -194,9 +194,9 @@ export default async function TrendsPage() {
                     <td key={i} className="py-1.5 text-right">
                       {c ? (
                         <>
-                          <span className="font-pixel">{c.avgCal}</span>
+                          <span className="font-display">{c.avgCal}</span>
                           <span className="text-ink-soft"> kcal · </span>
-                          <span className="font-pixel">{c.avgProtein}</span>
+                          <span className="font-display">{c.avgProtein}</span>
                           <span className="text-ink-soft">
                             g P ({c.logged}d)
                           </span>
@@ -219,7 +219,7 @@ export default async function TrendsPage() {
           {["s", "m", "t", "w", "t", "f", "s"].map((d, i) => (
             <span
               key={`${d}${i}`}
-              className="font-pixel text-[9px] text-ink-soft"
+              className="font-display text-[9px] text-ink-soft"
             >
               {d}
             </span>

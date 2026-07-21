@@ -14,7 +14,7 @@ function Bar({
   const pct = max ? Math.min((value / max) * 100, 100) : 0;
   return (
     <div className="flex items-center gap-1.5">
-      <span className="w-3 font-pixel text-[10px] text-ink-soft">{label}</span>
+      <span className="w-3 font-display text-[10px] text-ink-soft">{label}</span>
       <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-paper-deep">
         {max ? (
           <div
@@ -24,7 +24,7 @@ function Bar({
         ) : null}
       </div>
       <span
-        className={`w-14 text-right font-pixel text-[11px] ${over ? "text-terracotta" : "text-ink-soft"}`}
+        className={`w-14 text-right font-display text-[11px] ${over ? "text-terracotta" : "text-ink-soft"}`}
       >
         {Math.round(value)}
         {max != null ? `/${max}` : ""}g
@@ -47,11 +47,11 @@ export function MacroBars({
     <div className="flex flex-col gap-1">
       <div className="flex items-baseline justify-between">
         <span
-          className={`font-pixel text-sm ${overCal ? "text-terracotta" : ""}`}
+          className={`font-display text-sm ${overCal ? "text-terracotta" : ""}`}
         >
           {Math.round(total.calories).toLocaleString()}
         </span>
-        <span className="font-pixel text-[10px] text-ink-soft">
+        <span className="font-display text-[10px] text-ink-soft">
           {target ? `of ${target.calories.toLocaleString()} kcal` : "kcal"}
         </span>
       </div>

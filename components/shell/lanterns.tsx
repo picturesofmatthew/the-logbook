@@ -50,7 +50,7 @@ function Lantern({ name, lit }: { name: string; lit: boolean }) {
           />
         </svg>
       </span>
-      <span className="font-pixel text-[9px] uppercase tracking-widest text-ink-soft">
+      <span className="font-display text-[9px] uppercase tracking-widest text-ink-soft">
         {name}
       </span>
       <span className="text-[9px] text-ink-soft/70">

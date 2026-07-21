@@ -114,14 +114,14 @@ export function SealCeremony({
     >
       <div className="absolute inset-0 bg-ink/45" />
       <div className="ceremony-card relative w-full max-w-xs">
-        <p className="mb-3 text-center font-pixel text-sm tracking-widest text-violet-bright">
+        <p className="mb-3 text-center font-display text-sm tracking-widest text-violet-bright">
           the ring closes
         </p>
         <div className="wobbly lantern-pool border-2 border-violet/50 bg-cream p-6 text-center shadow-card">
           <div className="flex justify-center">
             <SigilGlyph spec={spec} size={110} bloom />
           </div>
-          <p className="mt-3 font-pixel text-sm text-ink">
+          <p className="mt-3 font-display text-sm text-ink">
             {TIER_LINES[spec.tier]}
           </p>
           {spec.chords.length > 0 ? (
@@ -130,12 +130,12 @@ export function SealCeremony({
             </p>
           ) : null}
           {closerLine ? (
-            <p className="mt-2 font-pixel text-[10px] tracking-wide text-ink-soft">
+            <p className="mt-2 font-display text-[10px] tracking-wide text-ink-soft">
               {closerLine}
             </p>
           ) : null}
           {milestone ? (
-            <p className="mt-2 flex items-center justify-center gap-1 font-pixel text-xs tracking-wide text-violet">
+            <p className="mt-2 flex items-center justify-center gap-1 font-display text-xs tracking-wide text-violet">
               <StarMark size={12} /> {milestone}
             </p>
           ) : null}

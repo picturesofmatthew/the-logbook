@@ -14,16 +14,15 @@ import { hourInTz, lightStateForHour } from "@/lib/light";
 import "./globals.css";
 
 // Inklight type. Fraunces carries the grimoire display voice (a warm, soft
-// old-style serif); Hanken Grotesk carries readable body/UI text and data.
-// NOTE: the `font-pixel` utility now maps to Fraunces — the name is a leftover
-// from the retired pixel language and gets renamed to `font-display` later.
+// old-style serif, via the `font-display` utility); Hanken Grotesk carries
+// readable body/UI text and data (the default `font-sans`).
 const body = Hanken_Grotesk({
   variable: "--font-body",
   subsets: ["latin"],
 });
 
 const display = Fraunces({
-  variable: "--font-display",
+  variable: "--font-fraunces",
   subsets: ["latin"],
 });
 

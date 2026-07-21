@@ -22,7 +22,7 @@ type SearchResult = {
 
 const inputCls =
   "wobbly-sm border-2 border-ink/30 bg-cream px-3 py-2 outline-none focus:border-gold w-full";
-const labelCls = "font-pixel text-[10px] tracking-wide text-ink-soft";
+const labelCls = "font-display text-[10px] tracking-wide text-ink-soft";
 
 export function DonateFlow({
   meal,
@@ -150,7 +150,7 @@ export function DonateFlow({
     return (
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
-          <h3 className="font-pixel text-sm tracking-wide">NEW SPECIMEN</h3>
+          <h3 className="font-display text-sm tracking-wide">NEW SPECIMEN</h3>
           <button
             type="button"
             onClick={onBack}
@@ -204,7 +204,7 @@ export function DonateFlow({
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <h3 className="font-pixel text-sm tracking-wide">SPECIMEN CARD</h3>
+        <h3 className="font-display text-sm tracking-wide">SPECIMEN CARD</h3>
         <button
           type="button"
           onClick={() => setDrafting(false)}
@@ -296,7 +296,7 @@ export function DonateFlow({
           >
             −
           </button>
-          <span className="w-10 text-center font-pixel">{servings}</span>
+          <span className="w-10 text-center font-display">{servings}</span>
           <button
             type="button"
             onClick={() => setServings(Math.min(20, servings + 0.5))}
@@ -308,7 +308,7 @@ export function DonateFlow({
       </div>
 
       {error ? (
-        <p className="text-center font-pixel text-xs text-terracotta">{error}</p>
+        <p className="text-center font-display text-xs text-terracotta">{error}</p>
       ) : null}
 
       <button

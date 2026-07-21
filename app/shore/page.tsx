@@ -42,7 +42,7 @@ export default async function ShorePage({
   return (
     <main className="mx-auto flex min-h-[calc(100dvh-6rem)] w-full max-w-md flex-col gap-6 px-6 py-8">
       <header className="text-center">
-        <p className="font-pixel text-sm tracking-widest text-violet-bright">
+        <p className="font-display text-sm tracking-widest text-violet-bright">
           THE FAR SHORE
         </p>
       </header>
@@ -57,12 +57,12 @@ export default async function ShorePage({
           <section className="text-center">
             <h1 className="font-serif text-2xl text-ink">{dream.name}</h1>
             {boat.complete ? (
-              <p className="mt-1 font-pixel text-xs tracking-wide text-violet">
+              <p className="mt-1 font-display text-xs tracking-wide text-violet">
                 the vessel is whole — you sail for {dream.name}
               </p>
             ) : (
               <p className="mt-1 text-sm text-ink-soft">
-                <span className="font-pixel text-ink">{boat.planksLaid}</span> of{" "}
+                <span className="font-display text-ink">{boat.planksLaid}</span> of{" "}
                 {boat.plankGoal} planks set ·{" "}
                 {boat.remaining === 1
                   ? "one plank from setting sail"
@@ -70,7 +70,7 @@ export default async function ShorePage({
               </p>
             )}
             {boat.goldenCount > 0 ? (
-              <p className="mt-1 font-pixel text-[10px] tracking-wide text-gold">
+              <p className="mt-1 font-display text-[10px] tracking-wide text-gold">
                 {boat.goldenCount} golden{" "}
                 {boat.goldenCount === 1 ? "plank" : "planks"} in the hull — the
                 brightest days
@@ -81,7 +81,7 @@ export default async function ShorePage({
           {/* the coffers — the real fund for the journey. Designed next; the slot
               lives here so it's visible where it will land. */}
           <section className="wobbly border border-dashed border-ink/20 bg-cream/40 p-4 text-center">
-            <p className="font-pixel text-[10px] tracking-widest text-ink-soft">
+            <p className="font-display text-[10px] tracking-widest text-ink-soft">
               THE COFFERS
             </p>
             <p className="mt-1 text-xs italic text-ink-soft/80">
@@ -104,7 +104,7 @@ export default async function ShorePage({
               </>
             ) : (
               <>
-                <p className="font-pixel text-[10px] tracking-widest text-ink-soft">
+                <p className="font-display text-[10px] tracking-widest text-ink-soft">
                   THE DREAM
                 </p>
                 <DreamForm
@@ -121,7 +121,7 @@ export default async function ShorePage({
           {/* shores reached — the record of voyages made */}
           {reached.length > 0 ? (
             <section className="flex flex-col gap-1.5">
-              <p className="font-pixel text-[10px] tracking-widest text-ink-soft">
+              <p className="font-display text-[10px] tracking-widest text-ink-soft">
                 SHORES REACHED
               </p>
               <ul className="flex flex-col gap-1">
@@ -148,7 +148,7 @@ export default async function ShorePage({
 
       <Link
         href="/"
-        className="mt-auto self-center font-pixel text-[10px] tracking-widest text-ink-soft"
+        className="mt-auto self-center font-display text-[10px] tracking-widest text-ink-soft"
       >
         ← back to the glade
       </Link>

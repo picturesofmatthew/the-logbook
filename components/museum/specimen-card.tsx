@@ -54,7 +54,7 @@ export function SpecimenCard({ s }: { s: SpecimenCardData }) {
             ) : null}
             {s.name}
           </span>
-          <span className="block font-pixel text-[10px] text-ink-soft">
+          <span className="block font-display text-[10px] text-ink-soft">
             {Math.round(s.calories)} kcal
           </span>
         </span>

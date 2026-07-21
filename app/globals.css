@@ -22,7 +22,7 @@
   --color-violet-bright: #c9b3e3;
 
   --font-sans: var(--font-body);
-  --font-pixel: var(--font-display);
+  --font-display: var(--font-fraunces);
 
   --radius-card: 1.25rem;
   --shadow-card: 0 2px 0 0 color-mix(in srgb, #4a3b2a 18%, transparent),

@@ -114,7 +114,7 @@ export default async function DayPage({
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-4 p-4 pb-16">
       <header className="text-center">
-        <p className="font-pixel text-sm tracking-wide">
+        <p className="font-display text-sm tracking-wide">
           {friendlyDate(day, tz).toLowerCase()}
         </p>
         <Link
@@ -142,7 +142,7 @@ export default async function DayPage({
               }
             >
               <p
-                className={`font-pixel text-xs tracking-wide ${
+                className={`font-display text-xs tracking-wide ${
                   p === "matthew" ? "text-moss-deep" : "text-terracotta"
                 }`}
               >

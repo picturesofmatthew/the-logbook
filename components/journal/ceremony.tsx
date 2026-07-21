@@ -27,12 +27,12 @@ export function Ceremony({
     >
       <div className="absolute inset-0 bg-ink/50" />
       <div className="ceremony-card relative w-full max-w-xs">
-        <p className="mb-3 flex items-center justify-center gap-2 font-pixel text-sm tracking-widest text-gold-soft">
+        <p className="mb-3 flex items-center justify-center gap-2 font-display text-sm tracking-widest text-gold-soft">
           <StarMark size={13} /> NEW SPECIMEN DISCOVERED <StarMark size={13} />
         </p>
         <div className="wobbly border-2 border-ink/30 bg-cream p-6 text-center shadow-card">
           <span className="block text-5xl">{data.icon}</span>
-          <p className="mt-2 font-pixel text-lg leading-tight">{data.name}</p>
+          <p className="mt-2 font-display text-lg leading-tight">{data.name}</p>
           <p className="mt-1 text-sm text-ink-soft">{data.hallLabel}</p>
           <p className="text-sm text-ink-soft">
             {data.servingLabel} · {Math.round(data.calories)} kcal

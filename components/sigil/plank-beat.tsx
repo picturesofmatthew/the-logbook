@@ -41,7 +41,7 @@ export function PlankBeat({
           fill={golden ? "var(--color-gold)" : "var(--color-ink)"}
         />
       </svg>
-      <p className="font-pixel text-[10px] tracking-wide text-ink-soft">
+      <p className="font-display text-[10px] tracking-wide text-ink-soft">
         {golden ? "a golden plank" : "a plank"} set into the boat{tail}
       </p>
     </div>

@@ -27,14 +27,14 @@ export function ArrivalCeremony({ being }: { being: BeingId }) {
     >
       <div className="absolute inset-0 bg-ink/60" />
       <div className="ceremony-card relative w-full max-w-xs">
-        <p className="mb-3 flex items-center justify-center gap-2 font-pixel text-sm tracking-widest text-gold-soft">
+        <p className="mb-3 flex items-center justify-center gap-2 font-display text-sm tracking-widest text-gold-soft">
           <StarMark size={13} /> SOMETHING HAS COME <StarMark size={13} />
         </p>
         <div className="arch hatch border-2 border-ink/30 bg-cream p-6 pt-8 text-center shadow-card">
           <div className="flex justify-center">
             <BeingPortrait being={being} />
           </div>
-          <p className="mt-2 font-pixel text-lg capitalize leading-tight">
+          <p className="mt-2 font-display text-lg capitalize leading-tight">
             {def.name}
           </p>
           <p className="mt-1 text-sm italic text-ink-soft">{def.line}</p>

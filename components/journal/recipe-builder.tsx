@@ -7,7 +7,7 @@ import type { LogResult } from "./donate-flow";
 
 const inputCls =
   "wobbly-sm border-2 border-ink/30 bg-cream px-3 py-2 outline-none focus:border-gold w-full";
-const labelCls = "font-pixel text-[10px] tracking-wide text-ink-soft";
+const labelCls = "font-display text-[10px] tracking-wide text-ink-soft";
 
 type Item = { specimen: Specimen; servings: number };
 
@@ -101,7 +101,7 @@ export function RecipeBuilder({
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <h3 className="font-pixel text-sm tracking-wide">ASSEMBLE A DISH</h3>
+        <h3 className="font-display text-sm tracking-wide">ASSEMBLE A DISH</h3>
         <button
           type="button"
           onClick={onBack}
@@ -127,7 +127,7 @@ export function RecipeBuilder({
               >
                 −
               </button>
-              <span className="w-8 text-center font-pixel text-xs">
+              <span className="w-8 text-center font-display text-xs">
                 {i.servings}
               </span>
               <button
@@ -147,7 +147,7 @@ export function RecipeBuilder({
       )}
 
       {items.length > 0 ? (
-        <p className="text-center font-pixel text-[11px] text-ink-soft">
+        <p className="text-center font-display text-[11px] text-ink-soft">
           {Math.round(sum.calories)} kcal · P{Math.round(sum.proteinG)} · C
           {Math.round(sum.carbsG)} · F{Math.round(sum.fatG)}
         </p>
@@ -171,7 +171,7 @@ export function RecipeBuilder({
             >
               <span>{s.icon}</span>
               <span className="min-w-0 flex-1 truncate">{s.name}</span>
-              <span className="font-pixel text-[10px] text-ink-soft">
+              <span className="font-display text-[10px] text-ink-soft">
                 {Math.round(s.calories)}
               </span>
             </button>
@@ -210,7 +210,7 @@ export function RecipeBuilder({
           >
             −
           </button>
-          <span className="w-10 text-center font-pixel">{servings}</span>
+          <span className="w-10 text-center font-display">{servings}</span>
           <button
             type="button"
             onClick={() => setServings(Math.min(20, servings + 0.5))}
@@ -222,7 +222,7 @@ export function RecipeBuilder({
       </div>
 
       {error ? (
-        <p className="text-center font-pixel text-xs text-terracotta">{error}</p>
+        <p className="text-center font-display text-xs text-terracotta">{error}</p>
       ) : null}
 
       <button

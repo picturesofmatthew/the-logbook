@@ -2,13 +2,12 @@ import Link from "next/link";
 import { ArrivalCeremony } from "@/components/glade/arrival-ceremony";
 import { GladeScene, type BeingStages } from "@/components/glade/glade-scene";
 import { HorizonGlimpse } from "@/components/glade/horizon-glimpse";
-import { PixelSprite } from "@/components/pixel-sprite";
-import { HeartMark, StampMark, StarMark } from "@/components/glyphs";
+import { FamiliarGlyph } from "@/components/familiar/familiar-glyph";
+import { StampMark } from "@/components/glyphs";
 import { DaySeal } from "@/components/sigil/day-seal";
 import { LegendaryCeremony } from "@/components/sigil/legendary-ceremony";
 import { SealCeremony } from "@/components/sigil/seal-ceremony";
 import { ShoreArrivalCeremony } from "@/components/sigil/shore-arrival-ceremony";
-import { FAMILIAR_PALETTE, FAMILIAR_SPRITES } from "@/components/sprites";
 import { DISPLAY_NAMES, PROFILES, type Profile } from "@/lib/auth";
 import {
   getArrivals,
@@ -26,7 +25,7 @@ import {
 import { diffDays, todayIso } from "@/lib/dates";
 import { getGladeState } from "@/lib/ledger";
 import { paleElkGlimpsed, type BeingId } from "@/lib/engine/beings";
-import { moodFor, nextStageIn, FAMILIAR_STAGES, speechFor, stageForDays } from "@/lib/engine/familiar";
+import { stageForDays } from "@/lib/engine/familiar";
 import { composeSigil } from "@/lib/engine/sigil";
 import { totalOf } from "@/lib/engine/totals";
 import { stampsForDay } from "@/lib/engine/stamps";
@@ -137,22 +136,10 @@ export default async function GladeHome() {
     newSpecimens: extras.newSpecimens,
   });
 
-  // The fox living in the ground band.
-  const stage = stageForDays(familiarState.lifetimeDays);
-  const stageLabel = FAMILIAR_STAGES.find((s) => s.id === stage)?.label ?? stage;
-  const mood = moodFor({
-    loggedTodayCount: familiarState.loggedToday.length,
-    daysSinceAnyEntry: familiarState.daysSinceAnyEntry,
-  });
-  const missing = PROFILES.find((p) => !familiarState.loggedToday.includes(p));
-  const speech = speechFor(
-    mood,
-    today + mood,
-    missing ? DISPLAY_NAMES[missing] : undefined,
-  );
   const beingStages = Object.fromEntries(
     glade.beings.map((b) => [b.id, b.stage]),
   ) as BeingStages;
+  const familiarStage = stageForDays(familiarState.lifetimeDays);
 
   // Who set down the second lantern — the keeper whose log closed the ring
   // today (the later first-log wins). Named only when both times are known.
@@ -170,9 +157,6 @@ export default async function GladeHome() {
         ? "you closed the ring"
         : `${DISPLAY_NAMES[closer]} closed the ring`;
 
-  // The fox's next growth mark — a gentle pull forward, in both-logged days.
-  const foxNext = nextStageIn(familiarState.lifetimeDays);
-
   return (
     <main
       className="relative -mt-16 flex min-h-[calc(100dvh-6rem)] flex-col overflow-hidden"
@@ -182,10 +166,8 @@ export default async function GladeHome() {
       }}
     >
       {/* THE SIGIL — the day's seal, the hero of the home */}
-      <div className="flex flex-col items-center gap-3 px-6 pt-16 pb-2 text-center">
-        <div className="w-full max-w-[300px]">
-          <DaySeal spec={sigil} missingName={missingName} isToday={isToday} />
-        </div>
+      <div className="flex flex-col items-center gap-4 px-6 pt-14 pb-3 text-center">
+        <DaySeal spec={sigil} missingName={missingName} isToday={isToday} />
 
         {stamps.length > 0 ? (
           <div className="flex flex-wrap items-center justify-center gap-1.5">
@@ -240,7 +222,7 @@ export default async function GladeHome() {
         >
           <HorizonGlimpse boat={glade.boat} dreamName={glade.dream.name} />
           <div className="px-6 pb-1 pt-1 text-center">
-            <p className="font-pixel text-[10px] tracking-widest text-ink-soft">
+            <p className="font-display text-[10px] tracking-widest text-ink-soft">
               toward {glade.dream.name}
             </p>
             <div className="mx-auto mt-1 h-[3px] w-40 max-w-[68%] overflow-hidden rounded-full bg-ink/10">
@@ -251,14 +233,14 @@ export default async function GladeHome() {
                 }}
               />
             </div>
-            <p className="mt-1 font-pixel text-[9px] tracking-wide text-ink-soft/70">
+            <p className="mt-1 font-display text-[9px] tracking-wide text-ink-soft/70">
               {glade.boat.planksLaid} of {glade.boat.plankGoal} planks
             </p>
           </div>
         </Link>
       ) : null}
 
-      {/* THE GLADE — demoted to a quiet strip at the foot; the fox and the
+      {/* THE GLADE — demoted to a quiet strip at the foot; the familiar and the
           creatures live here as ambient life, no longer the focus. */}
       <div className="relative h-[150px] overflow-hidden">
         <div className="absolute inset-x-0 bottom-0 flex justify-center">
@@ -279,47 +261,16 @@ export default async function GladeHome() {
                 dayWorkouts.kennedy.length > 0
               }
             />
-            <div
-              className={`absolute bottom-[6%] left-1/2 -translate-x-1/2 ${
-                mood === "lonely" ? "opacity-80 saturate-50" : ""
-              }`}
-            >
-              <div className="relative flex flex-col items-center">
-                <PixelSprite
-                  map={FAMILIAR_SPRITES[stage]}
-                  palette={FAMILIAR_PALETTE}
-                  className="idle-bounce h-11 w-11 pixelated"
-                  title={`${familiarState.name ?? "The fox"}, a ${stageLabel} — the Glade is ${glade.tier}`}
-                />
-                <span
-                  className="-mt-1 h-1.5 w-7 rounded-[50%] bg-ink/25 blur-[1.5px]"
-                  aria-hidden
-                />
-                {mood === "thriving" ? (
-                  <span className="absolute -right-0.5 top-0 animate-pulse text-gold">
-                    <StarMark size={11} />
-                  </span>
-                ) : null}
-              </div>
+            <div className="absolute bottom-[8%] left-1/2 -translate-x-1/2">
+              <FamiliarGlyph
+                stage={familiarStage}
+                size={62}
+                className="idle-bounce"
+                title={`${familiarState.name ?? "the fox"}, a ${familiarStage} — the glade is ${glade.tier}`}
+              />
             </div>
           </div>
         </div>
-      </div>
-
-      {/* the fox's quiet voice — small at the foot, ambient */}
-      <div className="px-6 pb-2 text-center">
-        <p className="mx-auto max-w-[240px] text-[10px] italic leading-snug text-ink-soft/80">
-          “{speech}”
-        </p>
-        <p className="mt-0.5 font-pixel text-[9px] tracking-wide text-ink-soft/70">
-          {familiarState.name ? `${familiarState.name} the ${stageLabel}` : `a ${stageLabel}`} ·{" "}
-          <HeartMark size={9} className="inline-block align-[-1px] text-terracotta" />{" "}
-          {familiarState.lifetimeDays}
-          {familiarState.lifetimeDays === 1 ? " day" : " days"} fed
-          {foxNext
-            ? ` · ${foxNext.daysLeft === 1 ? "one day" : `${foxNext.daysLeft} days`} to the ${foxNext.label}`
-            : ""}
-        </p>
       </div>
 
       {/* ceremonies — overlays that fire on arrival, grandest first. Reaching

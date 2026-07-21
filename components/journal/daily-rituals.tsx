@@ -13,7 +13,7 @@ import type { DayMetaRow } from "@/lib/data";
 import { ritualChime } from "@/lib/sounds";
 
 const MOODS = ["😊", "😌", "😤", "🥱", "🥲"];
-const labelCls = "font-pixel text-[10px] tracking-wide text-ink-soft";
+const labelCls = "font-display text-[10px] tracking-wide text-ink-soft";
 
 export function DailyRituals({
   day,
@@ -162,7 +162,7 @@ export function DailyRituals({
       </div>
 
       {error ? (
-        <p className="text-center font-pixel text-xs text-terracotta">{error}</p>
+        <p className="text-center font-display text-xs text-terracotta">{error}</p>
       ) : null}
     </section>
   );

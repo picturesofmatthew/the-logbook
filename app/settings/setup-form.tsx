@@ -28,7 +28,7 @@ export type SetupInitial = {
 
 const inputCls =
   "wobbly-sm border-2 border-ink/30 bg-cream px-3 py-2 text-lg outline-none focus:border-gold w-full";
-const labelCls = "font-pixel text-xs tracking-wide text-ink-soft";
+const labelCls = "font-display text-xs tracking-wide text-ink-soft";
 
 export function SetupForm({ initial }: { initial: SetupInitial }) {
   const [state, formAction, pending] = useActionState<SetupState, FormData>(
@@ -100,7 +100,7 @@ export function SetupForm({ initial }: { initial: SetupInitial }) {
   return (
     <form action={formAction} className="flex flex-col gap-6">
       <section className="wobbly border-2 border-ink/20 bg-cream/70 p-6 shadow-card">
-        <h2 className="mb-4 font-pixel text-lg tracking-wide">ABOUT YOU</h2>
+        <h2 className="mb-4 font-display text-lg tracking-wide">ABOUT YOU</h2>
         <div className="flex flex-col gap-4">
           <div className="grid grid-cols-2 gap-3">
             {(["male", "female"] as const).map((s) => (
@@ -198,11 +198,11 @@ export function SetupForm({ initial }: { initial: SetupInitial }) {
       </section>
 
       <section className="wobbly border-2 border-ink/20 bg-cream/70 p-6 shadow-card">
-        <h2 className="mb-1 font-pixel text-lg tracking-wide">YOUR TARGETS</h2>
+        <h2 className="mb-1 font-display text-lg tracking-wide">YOUR TARGETS</h2>
         {tdee ? (
           <p className="mb-4 text-ink-soft">
             Maintenance is about{" "}
-            <span className="font-pixel text-ink">{tdee.toLocaleString()}</span>{" "}
+            <span className="font-display text-ink">{tdee.toLocaleString()}</span>{" "}
             kcal a day. Pick a pace:
           </p>
         ) : (
@@ -287,7 +287,7 @@ export function SetupForm({ initial }: { initial: SetupInitial }) {
       </section>
 
       {state?.error ? (
-        <p className="text-center font-pixel text-sm text-terracotta">
+        <p className="text-center font-display text-sm text-terracotta">
           {state.error}
         </p>
       ) : null}

@@ -104,7 +104,7 @@ export function LogDrawer({
         ) : chosen ? (
           <div className="rise-in flex flex-col gap-4">
             <div className="flex items-center justify-between">
-              <h3 className="font-pixel text-sm tracking-wide">
+              <h3 className="font-display text-sm tracking-wide">
                 {chosen.icon} {chosen.name.toUpperCase()}
               </h3>
               <button
@@ -128,7 +128,7 @@ export function LogDrawer({
                 −
               </button>
               <div className="text-center">
-                <span className="block font-pixel text-2xl">{servings}</span>
+                <span className="block font-display text-2xl">{servings}</span>
                 <span className="block text-xs text-ink-soft">
                   {Math.round(chosen.calories * servings)} kcal
                 </span>
@@ -142,7 +142,7 @@ export function LogDrawer({
               </button>
             </div>
             {error ? (
-              <p className="text-center font-pixel text-xs text-terracotta">
+              <p className="text-center font-display text-xs text-terracotta">
                 {error}
               </p>
             ) : null}
@@ -158,7 +158,7 @@ export function LogDrawer({
         ) : (
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
-              <h3 className="font-pixel text-sm tracking-wide">
+              <h3 className="font-display text-sm tracking-wide">
                 ADD TO {meal.toUpperCase()}
               </h3>
               <button
@@ -179,7 +179,7 @@ export function LogDrawer({
 
             {recents.length > 0 && !search ? (
               <>
-                <p className="font-pixel text-[10px] tracking-wide text-ink-soft">
+                <p className="font-display text-[10px] tracking-wide text-ink-soft">
                   RECENT · one tap logs one serving
                 </p>
                 <div className="grid grid-cols-4 gap-1.5">
@@ -208,12 +208,12 @@ export function LogDrawer({
             ) : null}
 
             {error ? (
-              <p className="text-center font-pixel text-xs text-terracotta">
+              <p className="text-center font-display text-xs text-terracotta">
                 {error}
               </p>
             ) : null}
 
-            <p className="font-pixel text-[10px] tracking-wide text-ink-soft">
+            <p className="font-display text-[10px] tracking-wide text-ink-soft">
               {search ? "MATCHES" : "THE WHOLE COLLECTION"}
             </p>
             {filtered.length === 0 ? (
@@ -249,7 +249,7 @@ export function LogDrawer({
                           {recentIds.has(s.id) ? " · recent" : ""}
                         </span>
                       </span>
-                      <span className="font-pixel text-xs text-ink-soft">
+                      <span className="font-display text-xs text-ink-soft">
                         {Math.round(s.calories)}
                       </span>
                     </button>

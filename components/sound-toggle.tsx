@@ -12,7 +12,7 @@ export function SoundToggle() {
 
   return (
     <section className="wobbly flex items-center justify-between border-2 border-ink/20 bg-cream/70 p-4 shadow-card">
-      <span className="font-pixel text-sm tracking-wide">CHIMES</span>
+      <span className="font-display text-sm tracking-wide">CHIMES</span>
       <button
         type="button"
         onClick={() => {

@@ -46,14 +46,14 @@ export function LegendaryCeremony({
     >
       <div className="absolute inset-0 bg-ink/60" />
       <div className="ceremony-card relative w-full max-w-xs">
-        <p className="mb-3 flex items-center justify-center gap-2 font-pixel text-sm tracking-widest text-violet-bright">
+        <p className="mb-3 flex items-center justify-center gap-2 font-display text-sm tracking-widest text-violet-bright">
           <StarMark size={13} /> A LEGENDARY SIGIL <StarMark size={13} />
         </p>
         <div className="wobbly hatch lantern-pool border-2 border-violet/60 bg-cream p-6 text-center shadow-card">
           <div className="flex justify-center">
             <SigilGlyph spec={spec} size={120} bloom />
           </div>
-          <p className="mt-2 font-pixel text-lg leading-tight text-violet">
+          <p className="mt-2 font-display text-lg leading-tight text-violet">
             {l.name}
           </p>
           <p className="mt-1 text-sm italic text-ink-soft">{l.epigraph}</p>

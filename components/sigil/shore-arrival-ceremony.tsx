@@ -26,11 +26,11 @@ export function ShoreArrivalCeremony({ dreamName }: { dreamName: string }) {
     >
       <div className="absolute inset-0 bg-ink/70" />
       <div className="ceremony-card relative w-full max-w-xs">
-        <p className="mb-3 flex items-center justify-center gap-2 font-pixel text-sm tracking-widest text-gold">
+        <p className="mb-3 flex items-center justify-center gap-2 font-display text-sm tracking-widest text-gold">
           <StarMark size={13} /> LANDFALL <StarMark size={13} />
         </p>
         <div className="wobbly hatch lantern-pool border-2 border-gold/70 bg-cream p-6 text-center shadow-card">
-          <p className="font-pixel text-[10px] tracking-widest text-violet-bright">
+          <p className="font-display text-[10px] tracking-widest text-violet-bright">
             the far shore, reached
           </p>
           <h2 className="mt-2 font-serif text-3xl leading-tight text-ink">
@@ -42,7 +42,7 @@ export function ShoreArrivalCeremony({ dreamName }: { dreamName: string }) {
           <Link
             href="/shore"
             onClick={(e) => e.stopPropagation()}
-            className="wobbly-sm mt-4 inline-block border border-violet/50 bg-violet-soft/40 px-4 py-2 font-pixel text-xs tracking-widest text-violet"
+            className="wobbly-sm mt-4 inline-block border border-violet/50 bg-violet-soft/40 px-4 py-2 font-display text-xs tracking-widest text-violet"
           >
             choose your next shore →
           </Link>

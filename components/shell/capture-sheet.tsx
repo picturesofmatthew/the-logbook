@@ -214,8 +214,8 @@ export function CaptureSheet() {
   }
 
   const seg =
-    "flex-1 font-pixel text-xs tracking-wide uppercase py-2.5 cursor-pointer border-2 flex items-center justify-center gap-1.5";
-  const label = "font-pixel text-[10px] tracking-wide text-ink-soft";
+    "flex-1 font-display text-xs tracking-wide uppercase py-2.5 cursor-pointer border-2 flex items-center justify-center gap-1.5";
+  const label = "font-display text-[10px] tracking-wide text-ink-soft";
 
   return (
     <>
@@ -295,7 +295,7 @@ export function CaptureSheet() {
                 type="button"
                 onClick={runEstimate}
                 disabled={estimating}
-                className="wobbly-sm cursor-pointer border-2 border-terracotta bg-terracotta px-4 font-pixel text-xs text-cream disabled:opacity-60"
+                className="wobbly-sm cursor-pointer border-2 border-terracotta bg-terracotta px-4 font-display text-xs text-cream disabled:opacity-60"
               >
                 {estimating ? "…" : "est."}
               </button>
@@ -308,7 +308,7 @@ export function CaptureSheet() {
               <div className="rise-in wobbly-sm flex flex-col gap-2 border-2 border-dashed border-gold/70 bg-gold-soft/30 p-3">
                 <div className="flex items-center gap-2">
                   <span
-                    className="font-pixel text-base text-terracotta"
+                    className="font-display text-base text-terracotta"
                     title="an estimate"
                   >
                     ~
@@ -329,7 +329,7 @@ export function CaptureSheet() {
                     ] as const
                   ).map(([lbl, key]) => (
                     <label key={key} className="flex flex-col gap-0.5">
-                      <span className="font-pixel text-[9px] tracking-wide text-ink-soft">
+                      <span className="font-display text-[9px] tracking-wide text-ink-soft">
                         {lbl}
                       </span>
                       <input
@@ -415,7 +415,7 @@ export function CaptureSheet() {
               <button
                 type="button"
                 onClick={readWorkout}
-                className="wobbly-sm cursor-pointer border-2 border-terracotta bg-terracotta px-4 font-pixel text-xs text-cream"
+                className="wobbly-sm cursor-pointer border-2 border-terracotta bg-terracotta px-4 font-display text-xs text-cream"
               >
                 read
               </button>
@@ -428,7 +428,7 @@ export function CaptureSheet() {
                   onChange={(e) =>
                     setPreview((p) => (p ? { ...p, title: e.target.value } : p))
                   }
-                  className="wobbly-sm border-2 border-ink/25 bg-cream px-2 py-1 font-pixel text-xs outline-none focus:border-gold"
+                  className="wobbly-sm border-2 border-ink/25 bg-cream px-2 py-1 font-display text-xs outline-none focus:border-gold"
                 />
                 {foldSets(preview.sets).map((line) => (
                   <p key={line.ex} className="text-xs text-ink-soft">
@@ -467,7 +467,7 @@ export function CaptureSheet() {
                           className="wobbly-sm flex cursor-pointer items-center justify-between gap-2 border-2 border-ink/20 bg-cream px-3 py-2 text-left hover:border-gold"
                         >
                           <span className="min-w-0">
-                            <span className="block truncate font-pixel text-[11px]">
+                            <span className="block truncate font-display text-[11px]">
                               {w.title}
                             </span>
                             <span className="block truncate text-[11px] text-ink-soft">
@@ -476,7 +476,7 @@ export function CaptureSheet() {
                                 .join(" · ")}
                             </span>
                           </span>
-                          <span className="font-pixel text-[10px] uppercase text-terracotta">
+                          <span className="font-display text-[10px] uppercase text-terracotta">
                             repeat →
                           </span>
                         </button>
@@ -519,7 +519,7 @@ export function CaptureSheet() {
         )}
 
         {toast ? (
-          <p className="mt-3 text-center font-pixel text-xs text-moss-deep">{toast}</p>
+          <p className="mt-3 text-center font-display text-xs text-moss-deep">{toast}</p>
         ) : null}
 
         <button

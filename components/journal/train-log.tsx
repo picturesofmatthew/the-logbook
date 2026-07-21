@@ -41,7 +41,7 @@ const emptyLift: Row = {
   minutes: "",
 };
 
-const labelCls = "font-pixel text-[10px] tracking-wide text-ink-soft";
+const labelCls = "font-display text-[10px] tracking-wide text-ink-soft";
 const inputCls =
   "wobbly-sm border-2 border-ink/30 bg-cream px-2 py-1 outline-none focus:border-gold";
 
@@ -155,10 +155,10 @@ export function TrainLog({
           <div className="absolute inset-0 bg-ink/40" />
           <div className="ceremony-card relative w-full max-w-xs">
             <div className="wobbly lantern-pool border-2 border-gold bg-cream p-5 text-center shadow-card">
-              <p className="flex items-center justify-center gap-2 font-pixel text-sm tracking-widest text-gold">
+              <p className="flex items-center justify-center gap-2 font-display text-sm tracking-widest text-gold">
                 <StarMark size={13} /> A NEW MARK <StarMark size={13} />
               </p>
-              <p className="mt-2 font-pixel text-sm">{markMoment.join(" · ")}</p>
+              <p className="mt-2 font-display text-sm">{markMoment.join(" · ")}</p>
               <p className="mt-2 text-xs italic text-ink-soft">
                 your best yet — the iron remembers
               </p>
@@ -173,7 +173,7 @@ export function TrainLog({
           className="wobbly-sm border-2 border-ink/15 bg-cream px-3 py-2"
         >
           <div className="flex items-baseline justify-between gap-2">
-            <p className="font-pixel text-xs tracking-wide">{w.title}</p>
+            <p className="font-display text-xs tracking-wide">{w.title}</p>
             <div className="flex items-center gap-2">
               {totalVolumeLb(w.sets) > 0 ? (
                 <span className="text-[11px] text-ink-soft">

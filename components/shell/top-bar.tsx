@@ -42,7 +42,7 @@ export function TopBar({
         className={`${chip} rounded-[16px_8px_14px_8px/8px_14px_8px_16px] cursor-pointer`}
       >
         <GladeRune size={20} />
-        <span className="font-pixel text-[9.5px] uppercase tracking-widest">
+        <span className="font-display text-[9.5px] uppercase tracking-widest">
           glade
         </span>
       </Link>
@@ -58,14 +58,14 @@ export function TopBar({
           className={`${chip} rounded-[8px_16px_8px_14px/14px_8px_16px_8px] cursor-pointer`}
         >
           <span className="text-right leading-none">
-            <span className="block font-pixel text-[10.5px] uppercase tracking-wide">
+            <span className="block font-display text-[10.5px] uppercase tracking-wide">
               {name}
             </span>
             <span className="mt-0.5 block text-[9.5px] text-ink-soft">
               {dateLabel}
             </span>
           </span>
-          <span className="grid h-[30px] w-[30px] place-items-center rounded-full border-2 border-ink/40 bg-[radial-gradient(circle_at_40%_35%,var(--color-terracotta-soft),var(--color-terracotta))] font-pixel text-sm text-cream">
+          <span className="grid h-[30px] w-[30px] place-items-center rounded-full border-2 border-ink/40 bg-[radial-gradient(circle_at_40%_35%,var(--color-terracotta-soft),var(--color-terracotta))] font-display text-sm text-cream">
             {name.slice(0, 1)}
           </span>
         </button>

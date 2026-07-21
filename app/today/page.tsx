@@ -57,7 +57,7 @@ export default async function TodayPage({
     <main className="mx-auto flex w-full max-w-md flex-col gap-4 p-4">
       <div className="flex items-center gap-2 text-gold">
         <TodayRune size={16} />
-        <h1 className="font-pixel text-sm uppercase tracking-[0.16em] text-ink">
+        <h1 className="font-display text-sm uppercase tracking-[0.16em] text-ink">
           Today
         </h1>
         <span className="h-0 flex-1 border-t-[1.5px] border-ink/20" />
@@ -71,7 +71,7 @@ export default async function TodayPage({
           ◀
         </Link>
         <div className="text-center">
-          <p className="font-pixel text-sm tracking-wide">
+          <p className="font-display text-sm tracking-wide">
             {isToday ? "today" : friendlyDate(day, tz)}
           </p>
           {!isToday ? (

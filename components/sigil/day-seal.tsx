@@ -1,5 +1,6 @@
-// The day's seal, with its caption: tier, chords struck, or the legendary's
-// name in union's color. Never a scold — an open ring just waits.
+// The day's seal — the hero of the home. Big and centered in its dark
+// cartouche; the caption sits beneath it (tier, chords struck, or the
+// legendary's name in union's color). Never a scold — an open ring just waits.
 
 import { CHORDS, LEGENDARIES, type SigilSpec } from "@/lib/engine/sigil";
 import { StarMark } from "@/components/glyphs";
@@ -17,30 +18,32 @@ export function DaySeal({
   spec,
   missingName,
   isToday,
+  size = 248,
 }: {
   spec: SigilSpec;
   missingName: string | null;
   isToday: boolean;
+  size?: number;
 }) {
   const legendary = spec.legendary ? LEGENDARIES[spec.legendary] : null;
 
   return (
-    <section className="flex items-center gap-3">
+    <section className="flex flex-col items-center gap-3 text-center">
       <div className={spec.tier === "legendary" ? "lantern-pool rounded-full" : undefined}>
-        <SigilGlyph spec={spec} size={96} bloom={spec.completed && isToday} />
+        <SigilGlyph spec={spec} size={size} bloom={spec.completed && isToday} />
       </div>
-      <div className="min-w-0 flex-1">
+      <div className="min-w-0 max-w-[280px]">
         {legendary ? (
           <>
-            <p className="flex items-center gap-1.5 font-pixel text-sm tracking-wide text-violet">
-              <StarMark size={13} /> {legendary.name}
+            <p className="flex items-center justify-center gap-1.5 font-display text-base tracking-wide text-violet">
+              <StarMark size={14} /> {legendary.name}
             </p>
             <p className="mt-0.5 text-xs italic text-ink-soft">
               {legendary.epigraph}
             </p>
           </>
         ) : (
-          <p className="font-pixel text-xs tracking-wide text-ink-soft">
+          <p className="font-display text-sm tracking-wide text-ink-soft">
             {TIER_LABELS[spec.tier]}
             {!spec.completed && missingName
               ? ` — waiting on ${missingName}`
