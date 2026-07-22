@@ -108,6 +108,7 @@ export async function logWorkout(input: {
       });
 
     revalidatePath("/");
+    revalidatePath("/today");
     return {};
   });
 }
@@ -123,6 +124,7 @@ export async function deleteWorkout(input: {
       .delete(workouts)
       .where(and(eq(workouts.id, id), eq(workouts.profileId, profileId)));
     revalidatePath("/");
+    revalidatePath("/today");
     return {};
   });
 }

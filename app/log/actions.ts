@@ -58,6 +58,7 @@ export async function logEntry(input: {
       servings: input.servings,
     });
     revalidatePath("/");
+    revalidatePath("/today");
     return {};
   });
 }
@@ -69,6 +70,7 @@ export async function removeEntry(entryId: number): Promise<void> {
       .delete(entries)
       .where(and(eq(entries.id, entryId), eq(entries.profileId, profileId)));
     revalidatePath("/");
+    revalidatePath("/today");
     return {};
   });
 }
@@ -147,6 +149,7 @@ export async function donateSpecimen(
     }
 
     revalidatePath("/");
+    revalidatePath("/today");
     return { foodId, alreadyKnown };
   });
 }
@@ -236,6 +239,7 @@ export async function createRecipe(input: {
     }
 
     revalidatePath("/");
+    revalidatePath("/today");
     return { foodId: created.id };
   });
 }

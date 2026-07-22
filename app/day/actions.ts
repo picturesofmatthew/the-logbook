@@ -55,6 +55,7 @@ export async function saveWeighIn(input: {
         set: { weightLb: input.weightLb },
       });
     revalidatePath("/");
+    revalidatePath("/today");
     revalidatePath("/trends");
     return {};
   });
@@ -76,6 +77,7 @@ export async function setTraining(input: {
   return safely(async () => {
     await upsertMeta(profileId, day, { training: input.training });
     revalidatePath("/");
+    revalidatePath("/today");
     return {};
   });
 }
@@ -92,6 +94,7 @@ export async function setWater(input: {
   return safely(async () => {
     await upsertMeta(profileId, day, { waterCups: cups });
     revalidatePath("/");
+    revalidatePath("/today");
     return {};
   });
 }
@@ -107,6 +110,7 @@ export async function setMood(input: {
   return safely(async () => {
     await upsertMeta(profileId, day, { mood });
     revalidatePath("/");
+    revalidatePath("/today");
     return {};
   });
 }
@@ -122,6 +126,7 @@ export async function saveNote(input: {
   return safely(async () => {
     await upsertMeta(profileId, day, { note });
     revalidatePath("/");
+    revalidatePath("/today");
     return {};
   });
 }

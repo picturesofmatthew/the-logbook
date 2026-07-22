@@ -155,13 +155,22 @@ A second adversarial audit (`AUDIT.md`) read the current build. It **confirmed a
   whatever page happens to scan a day; a legendary on an un-revisited day is never recorded, and the
   stored day is first-*observed*, not first-*earned*.
 - **[High] `food-estimate`** — up to ~12 sequential USDA fetches, no cache/rate-limit/in-handler auth
-  (`app/api/food-estimate/route.ts:111`); risks Vercel duration + DEMO_KEY quota.
+  (`app/api/food-estimate/route.ts:111`); risks Vercel duration + DEMO_KEY quota. **→ Addressed
+  (2026-07-21):** item lookups now run in parallel (`Promise.all`), a per-instance cache
+  (`lib/usda.ts`) spares repeat queries, and the handler re-verifies the session (401). *(Residual: no
+  hard per-session rate limit yet.)*
 - **[Med→High at scale] Full-history recompute uncached** on every home + library load
   (`lib/ledger.ts:124,223`, `lib/data.ts:105`); latency cliff as history/couples grow.
 - **[Med] Duplicate-specimen race** — no `UNIQUE(lower(name))` on `foods` (`app/log/actions.ts:109`).
-- **[Med] Seal needs FOOD from both** — workouts alone never close it (`keeper-day.ts:26`); decide
-  on purpose.
+- **[Med] Seal needs FOOD from both** — workouts alone never close it (`keeper-day.ts:26`). **→
+  Resolved by design (2026-07-21):** the seal stays the *food* ritual on purpose; the glade **fire**
+  now warms any day someone shows up (a solo/either log kindles it), so a workout-only day reads as
+  warm-but-unsealed, not empty.
 - **[Med] Incomplete revalidation** — log actions only `revalidatePath("/")`; `/today`/`/library`/
-  `/book` can serve stale client-cached copies.
+  `/book` can serve stale client-cached copies. **→ Addressed (2026-07-21):** food/workout/meta log
+  actions now also revalidate `/today` (the ledger). *(Residual: `/book`/`/library` still browse-fresh
+  only — low impact.)*
+- **[Med, deferred] `UNIQUE(lower(name))` on foods** — the dupe-race guard needs a prod migration +
+  a dupe pre-check; near-impossible at two users, so deferred to a deliberate DB pass.
 - **[Test gap] The impure data + ledger layer is untested** — the exact layer holding the tz bucketing,
   both-logged rule, and discovery recording.

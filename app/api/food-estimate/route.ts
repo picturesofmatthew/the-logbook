@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { SESSION_COOKIE, verifySession } from "@/lib/auth";
 import {
   gramsFor,
   parseFoodLine,
@@ -91,6 +92,13 @@ function capitalize(s: string): string {
 }
 
 export async function GET(request: NextRequest) {
+  // Defense in depth — the proxy already gates this, but the handler shouldn't
+  // trust that alone (and it keeps the USDA quota behind the passcode).
+  const token = request.cookies.get(SESSION_COOKIE)?.value;
+  if (!(await verifySession(token))) {
+    return NextResponse.json({ error: "Not signed in." }, { status: 401 });
+  }
+
   const q = request.nextUrl.searchParams.get("q")?.trim();
   if (!q || q.length < 2) {
     return NextResponse.json({ error: "Write in a meal to estimate." }, { status: 400 });
@@ -108,16 +116,26 @@ export async function GET(request: NextRequest) {
   let usdaDown = false;
   let firstMatchName: string | null = null;
 
-  for (const item of items) {
-    // Whole foods first (a written meal is home cooking); branded only if the
-    // whole-food guides have nothing — keeps "eggs" off the candy shelf.
-    let results: FoodSearchResult[] = [];
-    try {
-      results = await searchFoods(item.name, "Foundation,SR Legacy");
-      if (results.length === 0) results = await searchFoods(item.name, "Branded");
-    } catch {
-      usdaDown = true;
-    }
+  // Look every item up in parallel (was sequential — up to 6×2 blocking round
+  // trips). Whole foods first (a written meal is home cooking); branded only if
+  // the whole-food guides are empty — keeps "eggs" off the candy shelf. Then
+  // aggregate in written order so the total is deterministic.
+  const lookups = await Promise.all(
+    items.map(async (item) => {
+      try {
+        let results = await searchFoods(item.name, "Foundation,SR Legacy");
+        if (results.length === 0) {
+          results = await searchFoods(item.name, "Branded");
+        }
+        return { item, results, down: false };
+      } catch {
+        return { item, results: [] as FoodSearchResult[], down: true };
+      }
+    }),
+  );
+
+  for (const { item, results, down } of lookups) {
+    if (down) usdaDown = true;
     const match = bestMatch(results, item.name);
     if (!match || match.per100.calories === 0) {
       breakdown.push({ label: item.raw, matched: null, calories: 0 });

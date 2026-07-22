@@ -109,10 +109,21 @@ export function scaleToServing(food: FdcFood): FoodSearchResult {
   };
 }
 
+// A small per-instance cache — USDA rows are effectively static, so identical
+// searches (a re-submitted estimate, the same food twice) shouldn't re-hit the
+// API and burn the quota. Bounded; oldest-out when full.
+const searchCache = new Map<string, { at: number; results: FoodSearchResult[] }>();
+const SEARCH_TTL_MS = 1000 * 60 * 60; // 1h
+const SEARCH_CACHE_MAX = 300;
+
 export async function searchFoods(
   query: string,
   dataType = "Foundation,SR Legacy,Branded",
 ): Promise<FoodSearchResult[]> {
+  const cacheKey = `${dataType}|${query.trim().toLowerCase()}`;
+  const hit = searchCache.get(cacheKey);
+  if (hit && Date.now() - hit.at < SEARCH_TTL_MS) return hit.results;
+
   const key = process.env.FDC_API_KEY || "DEMO_KEY";
   const url = new URL(FDC_URL);
   url.searchParams.set("api_key", key);
@@ -125,5 +136,12 @@ export async function searchFoods(
     throw new Error(`USDA search failed: ${res.status}`);
   }
   const data = (await res.json()) as { foods?: FdcFood[] };
-  return (data.foods ?? []).map(scaleToServing);
+  const results = (data.foods ?? []).map(scaleToServing);
+
+  if (searchCache.size >= SEARCH_CACHE_MAX) {
+    const oldest = searchCache.keys().next().value;
+    if (oldest !== undefined) searchCache.delete(oldest);
+  }
+  searchCache.set(cacheKey, { at: Date.now(), results });
+  return results;
 }
