@@ -12,6 +12,7 @@ import { DISPLAY_NAMES, PROFILES, type Profile } from "@/lib/auth";
 import {
   getArrivals,
   getDayExtras,
+  getDiscoveries,
   getExerciseHistories,
   getFirstLogTimes,
   getJournalDay,
@@ -104,7 +105,12 @@ export default async function GladeHome() {
   // Persist the earned facts (claim-once, idempotent). Which page-load wins the
   // claim no longer decides who SEES the ceremony — that's the fact + per-device
   // gate below, so BOTH keepers witness each moment on their own screen.
-  if (sigil.legendary) await recordLegendary(sigil.legendary, day);
+  const discoveries = await getDiscoveries();
+  if (sigil.legendary && !discoveries.has(sigil.legendary)) {
+    if (await recordLegendary(sigil.legendary, day)) {
+      discoveries.set(sigil.legendary, day);
+    }
+  }
 
   const arrivals = await getArrivals();
   for (const b of glade.beings.filter((b) => b.arrived && !arrivals.has(b.id))) {
@@ -131,7 +137,13 @@ export default async function GladeHome() {
   // recorded arrival days, the boat), not the claim booleans. The grandest wins
   // the night (shore > legendary > being > seal); each ceremony then gates
   // itself once-per-device (lib/ceremony-seen) so neither keeper is skipped. ──
-  const legendaryToday = isToday ? sigil.legendary : null;
+  // Only the FIRST-discovery day fires the ceremony (like beings/shore) — many
+  // legendaries recur (feast-seal, ember-vigil…), and the grand "inked forever"
+  // overlay must not re-fire every time the couple earns that condition again.
+  const legendaryToday =
+    sigil.legendary && discoveries.get(sigil.legendary) === today
+      ? sigil.legendary
+      : null;
   const beingArrivedToday =
     glade.beings.find((b) => b.arrived && arrivals.get(b.id) === today)?.id ??
     null;

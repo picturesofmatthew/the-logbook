@@ -30,9 +30,11 @@ function PlateCaption({ numeral, title }: { numeral: string; title: string }) {
 }
 
 // Fixed series colors, validated for CVD + contrast on the cream surface.
+// Kennedy sits a shade deeper than the plate-frame gold (#d9a441) so her line
+// and dots don't blend into the gilt border now that the Almanac is plated.
 const SERIES_COLORS: Record<Profile, string> = {
   matthew: "#a45438",
-  kennedy: "#d9a441",
+  kennedy: "#b8751a",
 };
 
 function rollingAverage(points: WeighInPoint[]): WeighInPoint[] {
