@@ -167,7 +167,15 @@ export default async function GladeHome() {
     >
       {/* THE SIGIL — the day's seal, the hero of the home */}
       <div className="flex flex-col items-center gap-4 px-6 pt-14 pb-3 text-center">
-        <DaySeal spec={sigil} missingName={missingName} isToday={isToday} />
+        {/* tap the seal to open today's ledger — the numbers behind the mark */}
+        <Link
+          href="/today"
+          transitionTypes={["nav-forward"]}
+          aria-label="Open today's ledger"
+          className="block cursor-pointer transition-transform active:scale-[0.98]"
+        >
+          <DaySeal spec={sigil} missingName={missingName} isToday={isToday} />
+        </Link>
 
         {stamps.length > 0 ? (
           <div className="flex flex-wrap items-center justify-center gap-1.5">

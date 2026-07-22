@@ -17,7 +17,7 @@ import { addDays, currentTz, diffDays, todayIso } from "@/lib/dates";
 import { currentProfile } from "@/lib/session";
 
 export const metadata: Metadata = {
-  title: "The chart plates - signed × sealed",
+  title: "The Almanac - signed × sealed",
 };
 
 // An engraved plate caption, field-guide style — the book's shared rule.
@@ -122,10 +122,10 @@ export default async function TrendsPage() {
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-5 p-4 pb-16">
       <header className="text-center">
         <h1 className="flex items-center justify-center gap-2 font-display text-2xl tracking-wide">
-          <TrendsRune size={24} /> THE CHART PLATES
+          <TrendsRune size={24} /> THE ALMANAC
         </h1>
         <p className="mt-1 text-sm text-ink-soft">
-          trends, drawn into the book
+          the quiet data book — your numbers, drawn as plates
         </p>
       </header>
 

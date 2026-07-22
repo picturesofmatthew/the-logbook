@@ -4,26 +4,26 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   BookRune,
-  PantryRune,
+  GladeRune,
+  LibraryRune,
   QuillRune,
-  TodayRune,
   TrendsRune,
 } from "./rune-icons";
 import { useShell } from "./shell-provider";
 
 const LEFT = [
-  { href: "/today", label: "today", Rune: TodayRune },
-  { href: "/museum", label: "pantry", Rune: PantryRune },
+  { href: "/", label: "glade", Rune: GladeRune },
+  { href: "/library", label: "library", Rune: LibraryRune },
 ] as const;
 
 const RIGHT = [
-  { href: "/book", label: "book", Rune: BookRune },
-  { href: "/trends", label: "trends", Rune: TrendsRune },
+  { href: "/book", label: "spellbook", Rune: BookRune },
+  { href: "/trends", label: "almanac", Rune: TrendsRune },
 ] as const;
 
 // The book's page order — used to turn forward (deeper) or back (toward the
 // front) depending on where you are. The glade is index 0 (it's home).
-const ORDER = ["/", "/today", "/museum", "/book", "/trends"];
+const ORDER = ["/", "/library", "/book", "/trends"];
 
 function directionType(pathname: string, href: string): string {
   const from = ORDER.indexOf(pathname);

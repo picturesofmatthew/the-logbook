@@ -393,7 +393,7 @@ export function CaptureSheet() {
             )}
 
             <Link
-              href="/museum"
+              href="/library#pantry"
               onClick={closeCapture}
               className="wobbly-sm flex items-center justify-center gap-1.5 cursor-pointer border-2 border-dashed border-ink/30 px-3 py-2 text-center text-sm text-ink-soft hover:border-gold"
             >

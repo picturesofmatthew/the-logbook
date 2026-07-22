@@ -1,41 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { BeingPortrait } from "@/components/glade/being-portrait";
 import { SigilGlyph } from "@/components/sigil/sigil-glyph";
-import { BestiaryRune, BookRune } from "@/components/shell/rune-icons";
-import { StarMark } from "@/components/glyphs";
-import { getArrivals, getDiscoveries, recordLegendary } from "@/lib/data";
+import { BookRune } from "@/components/shell/rune-icons";
+import { getDiscoveries, recordLegendary } from "@/lib/data";
 import { currentTz, friendlyDate, todayIso } from "@/lib/dates";
-import { BEINGS } from "@/lib/engine/beings";
-import { LEGENDARIES, type LegendaryId, type SigilSpec } from "@/lib/engine/sigil";
-import { Plate, GiltHeading } from "@/components/shell/plate";
-import { buildMonthLedger, getGladeState } from "@/lib/ledger";
+import { Plate } from "@/components/shell/plate";
+import { buildMonthLedger } from "@/lib/ledger";
 import { currentProfile } from "@/lib/session";
 
 export const metadata: Metadata = {
   title: "The Spellbook - signed × sealed",
 };
-
-// A display-only spec for a discovered legendary's plate in the Legendarium.
-function legendarySpec(id: LegendaryId): SigilSpec {
-  let seed = 0;
-  for (const ch of id) seed = (seed * 31 + ch.charCodeAt(0)) >>> 0;
-  return {
-    completed: true,
-    moss: { inked: true, weight: "even" },
-    ember: { inked: true, weight: "even" },
-    radicals: [],
-    ornaments: [],
-    newMark: false,
-    chords: [],
-    legendary: id,
-    tier: "legendary",
-    seed,
-    moon: false,
-    water: false,
-    lowMood: false,
-  };
-}
 
 function monthShift(monthPrefix: string, delta: number): string {
   const d = new Date(`${monthPrefix}-01T12:00:00Z`);
@@ -59,26 +34,16 @@ export default async function BookPage({
 
   const ledger = await buildMonthLedger(month, today);
 
-  const [initialDiscoveries, glade, arrivals] = await Promise.all([
-    getDiscoveries(),
-    getGladeState(today),
-    getArrivals(),
-  ]);
-
-  // Lazy discovery: any legendary this page just computed and hasn't recorded
-  // yet gets its row — earliest day first, so history claims titles in order.
-  // Skipping already-known ids avoids a no-op INSERT per legendary per view.
-  const undiscovered = ledger.filter(
-    (e) => e.spec.legendary && !initialDiscoveries.has(e.spec.legendary),
-  );
-  for (const { day, spec } of undiscovered) {
-    if (spec.legendary) await recordLegendary(spec.legendary, day);
+  // Lazy discovery: any legendary this month's ledger reveals that history hasn't
+  // claimed yet gets recorded here (earliest day first). The Legendarium itself
+  // now lives in the Field Book (/library) and reads these back — recording stays
+  // with the calendar so titles keep accruing as you flip through the months.
+  const known = await getDiscoveries();
+  for (const { day, spec } of ledger) {
+    if (spec.legendary && !known.has(spec.legendary)) {
+      await recordLegendary(spec.legendary, day);
+    }
   }
-  const discoveries =
-    undiscovered.length > 0 ? await getDiscoveries() : initialDiscoveries;
-  const beingById = new Map(glade.beings.map((b) => [b.id, b]));
-  const arrivedCount = glade.beings.filter((b) => b.arrived).length;
-  const elkGlimpsedOn = arrivals.get("pale-elk");
 
   const monthLabel = new Intl.DateTimeFormat("en-US", {
     timeZone: "UTC",
@@ -157,128 +122,6 @@ export default async function BookPage({
           ))}
         </div>
       </Plate>
-
-      <section>
-        <GiltHeading className="mb-3 text-sm tracking-wide">
-          <StarMark size={15} /> THE LEGENDARIUM
-        </GiltHeading>
-        <p className="-mt-2 mb-2 text-center text-[10px] text-ink-soft">
-          {discoveries.size}/{Object.keys(LEGENDARIES).length} discovered
-        </p>
-        <div className="grid grid-cols-2 gap-2">
-          {(Object.keys(LEGENDARIES) as LegendaryId[]).map((id) => {
-            const foundOn = discoveries.get(id);
-            return foundOn ? (
-              <Link
-                key={id}
-                href={`/book/${foundOn}`}
-                className="plate lantern-pool flex flex-col items-center p-2.5 text-center"
-              >
-                <span className="plate-corner tl" aria-hidden />
-                <span className="plate-corner tr" aria-hidden />
-                <span className="plate-corner bl" aria-hidden />
-                <span className="plate-corner br" aria-hidden />
-                <SigilGlyph spec={legendarySpec(id)} size={56} />
-                <p className="font-display text-[10px] leading-tight text-violet">
-                  {LEGENDARIES[id].name}
-                </p>
-                <p className="mt-0.5 text-[10px] italic leading-tight text-ink-soft">
-                  {LEGENDARIES[id].epigraph}
-                </p>
-                <p className="mt-0.5 text-[9px] text-ink-soft/70">
-                  {friendlyDate(foundOn, tz)}
-                </p>
-              </Link>
-            ) : (
-              <div
-                key={id}
-                className="wobbly-sm hatch flex flex-col items-center justify-center border-2 border-dashed border-ink/25 p-2 py-4 text-center"
-              >
-                <span className="text-2xl opacity-40">?</span>
-                <p className="mt-1 font-display text-[10px] text-ink-soft/70">
-                  undiscovered
-                </p>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      <section>
-        <GiltHeading className="mb-3 text-sm tracking-wide">
-          <BestiaryRune size={16} /> THE BESTIARY
-        </GiltHeading>
-        <p className="-mt-2 mb-2 text-center text-[10px] text-ink-soft">
-          {arrivedCount}/{BEINGS.length} arrived
-        </p>
-        <div className="grid grid-cols-2 gap-2">
-          {BEINGS.map((def) => {
-            const state = beingById.get(def.id);
-            const stage = state?.stage ?? 0;
-            const arrivedOn = arrivals.get(def.id);
-            return stage >= 1 ? (
-              <div
-                key={def.id}
-                className="plate flex flex-col items-center p-2.5 text-center"
-              >
-                <span className="plate-corner tl" aria-hidden />
-                <span className="plate-corner tr" aria-hidden />
-                <span className="plate-corner bl" aria-hidden />
-                <span className="plate-corner br" aria-hidden />
-                <div className="flex h-24 items-center justify-center">
-                  <BeingPortrait being={def.id} stage={stage} />
-                </div>
-                <p className="font-display text-[10px] capitalize leading-tight">
-                  {def.name}
-                </p>
-                <p className="mt-0.5 text-[10px] italic leading-tight text-ink-soft">
-                  {def.line}
-                </p>
-                <p className="mt-0.5 text-[9px] text-ink-soft/70">
-                  keeps {def.zone}
-                  {arrivedOn ? ` · since ${friendlyDate(arrivedOn, tz)}` : ""}
-                </p>
-                {state && state.stage < 3 && state.nextAt != null ? (
-                  <p className="mt-0.5 font-display text-[9px] tracking-wide text-gold">
-                    deeper trust — {state.nextAt - state.count} more
-                  </p>
-                ) : null}
-              </div>
-            ) : (
-              <div
-                key={def.id}
-                className="wobbly-sm hatch flex flex-col items-center justify-center border-2 border-dashed border-ink/25 p-2 py-4 text-center"
-              >
-                <span className="text-2xl opacity-40">?</span>
-                <p className="mt-1 font-display text-[10px] text-ink-soft/70">
-                  still in the wood
-                </p>
-                <p className="mt-0.5 text-[10px] italic leading-tight text-ink-soft/70">
-                  {def.line}
-                </p>
-                {state && state.count > 0 && state.nextAt != null ? (
-                  <p className="mt-1 font-display text-[9px] tracking-wide text-moss-deep">
-                    the wood stirs — {state.nextAt - state.count} more
-                  </p>
-                ) : null}
-              </div>
-            );
-          })}
-          {elkGlimpsedOn ? (
-            <div className="wobbly-sm lantern-pool col-span-2 flex flex-col items-center border-2 border-violet/50 bg-cream/70 p-3 text-center shadow-card">
-              <BeingPortrait being="pale-elk" />
-              <p className="mt-1 font-display text-[10px] capitalize leading-tight text-violet">
-                the Pale Elk
-              </p>
-              <p className="mt-0.5 text-[10px] italic leading-tight text-ink-soft">
-                Glimpsed {friendlyDate(elkGlimpsedOn, tz)}. It did not stay.
-                They never do.
-              </p>
-            </div>
-          ) : null}
-        </div>
-      </section>
-
     </main>
   );
 }

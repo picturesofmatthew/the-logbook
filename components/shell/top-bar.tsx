@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { isMuted, setMuted, subscribeMuted } from "@/lib/sounds";
-import { GladeRune } from "./rune-icons";
 
 const chip =
   "flex items-center gap-2 border-[1.5px] border-ink/25 bg-cream/70 px-2.5 py-1.5 text-ink shadow-[0_1px_0_rgba(74,59,42,0.15)] transition-all hover:border-ink/40 active:scale-[0.97]";
@@ -33,21 +32,8 @@ export function TopBar({
   }, [menuOpen]);
 
   return (
-    <header className="fixed inset-x-0 top-0 z-30 mx-auto flex max-w-md items-center justify-between p-3 [view-transition-name:top-bar]">
-      {/* return to the glade, from anywhere */}
-      <Link
-        href="/"
-        transitionTypes={["nav-home"]}
-        aria-label="Return to the glade"
-        className={`${chip} rounded-[16px_8px_14px_8px/8px_14px_8px_16px] cursor-pointer`}
-      >
-        <GladeRune size={20} />
-        <span className="font-display text-[9.5px] uppercase tracking-widest">
-          glade
-        </span>
-      </Link>
-
-      {/* profile — tap for settings */}
+    <header className="fixed inset-x-0 top-0 z-30 mx-auto flex max-w-md items-center justify-end p-3 [view-transition-name:top-bar]">
+      {/* profile — tap for settings (glade lives on the ribbon now) */}
       <div ref={ref} className="relative">
         <button
           type="button"

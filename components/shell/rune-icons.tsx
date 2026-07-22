@@ -99,6 +99,20 @@ export function QuillRune(props: RuneProps) {
   );
 }
 
+// A shelf of gathered books — spines of varied height on a shelf-line, a
+// title-tick on the tallest. The field book / compendium that holds the rest.
+export function LibraryRune(props: RuneProps) {
+  return (
+    <Svg {...props}>
+      <path d="M4 19 H20" />
+      <path d="M6 19 V7.4 h2.5 V19" />
+      <path d="M9.9 19 V4.8 h2.5 V19" />
+      <path d="M13.8 19 V8.4 h2.5 V19" />
+      <path d="M10.5 8 h1.3" opacity="0.75" />
+    </Svg>
+  );
+}
+
 // A stag's crown — antlers branching over a still head. Marks the bestiary.
 export function BestiaryRune(props: RuneProps) {
   return (
