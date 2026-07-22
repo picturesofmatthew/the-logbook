@@ -5,6 +5,10 @@ Deduped and ranked by severity. Each item: the risk, the fix, and which phase it
 The striking result: four independent lenses (product, technical, business, scope) converged on one
 root — see below.*
 
+> **Code-verified refresh (2026-07-21):** a second 3-lens audit (`AUDIT.md`) read the *current build*
+> and confirmed Tiers 1, 5, and 6 are still live (with file:line evidence), and found new technical
+> items — see **`## Audit refresh`** at the foot of this doc.
+
 ## The convergent finding
 
 **The mechanic that makes the app magical — the seal only closes when both show up — is the same
@@ -118,3 +122,39 @@ breakup as a first-class state** solves the top finding of three agents at once.
 - **No money-wager mechanic in v1** (DietBet-style staking pulls in gambling regulation).
 - **App Store review:** ship **two pre-paired demo accounts** + notes (a two-player flow a reviewer
   can't exercise = a 2.1 rejection loop). Keep the love-tap affection non-sexual (age rating).
+
+---
+
+## Audit refresh (2026-07-21 — code-verified)
+
+A second adversarial audit (`AUDIT.md`) read the current build. It **confirmed against live code**:
+
+- **Tier 1 (core-loop fragility) — still live.** Solo value / async close / survive-a-leave are all
+  unbuilt: `sigil.ts:159` (chords `[]` unless both), `boat.ts` (planks only on joint days),
+  `seal-ceremony.tsx` (fires only on `completed && isToday`).
+- **Tier 5 (colorblind seal) — still live, unmitigated.** Halves differ only by hue at near-equal
+  luminance (`glyphs.ts:261`); no shape/texture/CVD toggle.
+- **Tier 6 (canonical couple-day) — still live, and it applies to the CURRENT engine, not just the
+  native build.** `todayIso()` buckets on the per-device tz cookie (`lib/dates.ts:8`,
+  `tz-sync.tsx`); it auto-activates on the Oct-2026 move. Elevated to **Track A** in `ROADMAP.md`.
+
+**New findings** (not previously in this register):
+
+- **[High] Ceremonies fire from DB writes during GET render and are silently consumable.** Opening
+  `/book` (which scans the month, incl. today) before home consumes today's legendary claim →
+  the ceremony never shows for anyone. `app/page.tsx:91`, `book/page.tsx:42`, `book/[day]/page.tsx:98`.
+  Fix: move claim-once into the log action; page *reads* + shows the ceremony from server-truth "seen".
+- **[High] Legendarium under-reports + wrong "found-on" date** — discoveries are recorded lazily by
+  whatever page happens to scan a day; a legendary on an un-revisited day is never recorded, and the
+  stored day is first-*observed*, not first-*earned*.
+- **[High] `food-estimate`** — up to ~12 sequential USDA fetches, no cache/rate-limit/in-handler auth
+  (`app/api/food-estimate/route.ts:111`); risks Vercel duration + DEMO_KEY quota.
+- **[Med→High at scale] Full-history recompute uncached** on every home + library load
+  (`lib/ledger.ts:124,223`, `lib/data.ts:105`); latency cliff as history/couples grow.
+- **[Med] Duplicate-specimen race** — no `UNIQUE(lower(name))` on `foods` (`app/log/actions.ts:109`).
+- **[Med] Seal needs FOOD from both** — workouts alone never close it (`keeper-day.ts:26`); decide
+  on purpose.
+- **[Med] Incomplete revalidation** — log actions only `revalidatePath("/")`; `/today`/`/library`/
+  `/book` can serve stale client-cached copies.
+- **[Test gap] The impure data + ledger layer is untested** — the exact layer holding the tz bucketing,
+  both-logged rule, and discovery recording.

@@ -3,6 +3,12 @@
 *The phased build plan: "what we're building, in what order." Read `PROJECT-BRAIN.md` first for
 state + decision log; this is the sequencing doc. Last updated 2026-07-21.*
 
+> **⚠ Re-sequenced 2026-07-21 by the quality audit (`AUDIT.md`).** Phase 0 + most of Phase 1 have
+> shipped (the sigil hero, the ceremony, the Field Book / Library, the plate language). The audit
+> re-sequences the *remaining* work into three tracks — see **`## Post-audit re-sequence`** below.
+> The headline: the long-distance "loop reliability" work (canonical couple-day, async close, solo
+> half-seal, love-tap) is **no longer deferrable to Phase 3** — the Oct-2026 dogfood forces it first.
+
 ## Where we are
 - **Act One is LIVE** (Next.js 16 + Neon PWA): the two-keeper seal composing from both users' data,
   the full sigil engine (chords/tiers/legendaries), the glade + familiar + beings, the spellbook,
@@ -27,7 +33,35 @@ wordlessly.
 
 ---
 
-## Phase 0 — Foundation & Organization  ← WE ARE HERE
+## Post-audit re-sequence (2026-07-21) ← WE ARE HERE
+
+The 3-lens audit (`AUDIT.md`) verified the build against real code and re-ordered the remaining work.
+The old Phase 2/3 still stand as *content*; this is the near-term execution order.
+
+**Track A — Make the loop real** *(the retention spine; forced by the dogfood; no new infra)*
+- Canonical couple-day + async ~36–48h close window (engine invariant + golden cross-tz test). [RISK T6/T1]
+- Solo half-seal + personal plank — logging your half is a complete artifact; the joint close *fuses*. [RISK T1]
+- Move claim-once ceremonies out of GET-render into the log action; "seen" = server-truth; fire on async close.
+- One web-push "your half is waiting" primitive — invite + love-tap + re-engagement in one mechanic. [RISK T7]
+
+**Track B — Finish the book** *(cohesion pass; cheap; do while dogfooding the current build)*
+- Thread `detail:"thumb"` through `SigilGlyph` for grid/calendar seals.
+- Make the seal visibly tappable / restore a `/today` entry point (undo the buried-`/today` nav regression).
+- Type-floor sweep (≥12 body, ≥10 struck labels; Fraunces out of sub-11px).
+- Finish the plate rollout to `/today` + capture sheet + trends + settings; delete the second card recipe.
+- Keeper identity system: one color pair + texture, reused in seal *and* charts — also closes the CVD gap. [RISK T5]
+
+**Track C — Harden before external couples** *(later)*: test the data/ledger layer; `food-estimate`
+hardening + confirm `FDC_API_KEY` in prod; `UNIQUE(lower(name))` on foods; decide the food-vs-workout
+seal rule; revalidate affected paths on log. The **growth gate** (accounts + pairing → couple #3) is
+the old **Phase 3**, still deferred until the loop survives a lapse.
+
+**Recommended order:** Track B cheap wins now → Track A spine before Asia → Track C as the external-couple
+gate approaches. Single first move if forced: canonical couple-day + solo half-seal, together.
+
+---
+
+## Phase 0 — Foundation & Organization  *(shipped)*
 **Goal:** a clean, on-model substrate so adding content, sigils, art, and UI later is frictionless.
 
 **Done this session (2026-07-21):**
