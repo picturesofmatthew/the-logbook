@@ -14,7 +14,7 @@
 //   the dark middle field (carved runes + lift ornaments float here) →
 //   the bright star-cartouche (the compass core + chord-studs) → the crown gem.
 
-import type { SigilSpec } from "@/lib/engine/sigil";
+import type { SigilSpec, ChordId } from "@/lib/engine/sigil";
 import type { Hall } from "@/lib/halls";
 import type { SplitFamily } from "@/lib/engine/training";
 
@@ -35,8 +35,8 @@ const R_FRAME_OUT = 112, R_FRAME_IN = 104, R_FRAME_NODE = 108;
 const R_BAND_OUT = 92; // the fat braided band's outer edge
 const BAND_W: Record<string, number> = { open: 9, lean: 18, even: 24, feast: 28 };
 const R_CART = 38;     // the bright star-cartouche
-const R_RUNE = 55;     // hall-runes float here, in the dark field
-const R_LIFT = 45;     // lift ornaments, seated closer to the core
+const R_RUNE = 57;     // outer field ring — food halls + training lifts (what you did)
+const R_CHORD = 47;    // inner field ring — chord-runes (how you're in sync)
 
 const f = (n: number) => n.toFixed(2);
 const polar = (r: number, d: number): [number, number] => [
@@ -97,6 +97,36 @@ export const LIFT_GLYPHS: Record<SplitFamily, Glyph> = {
   cardio: (x, y, s) => `<path d="M ${x - s} ${y} a ${s} ${s} 0 1 1 ${s} ${s * 0.9} a ${s * 0.5} ${s * 0.5} 0 1 1 ${-s * 0.5} ${-s * 0.5}"/>`,
   mobility: (x, y, s) => `<path d="M ${x - s} ${y + s * 0.5} q ${s} ${-s * 1.4} ${s * 2} 0"/>`,
   rest: (x, y, s) => `<path d="M ${x - s} ${y} L ${x + s} ${y}"/>`,
+};
+
+// ── SWAPPABLE: chord-runes — cohesion made legible. Each chord the two of you
+//    strike together inscribes its OWN mark on the seal (canon: THE-SIGIL-TURN).
+//    Reading the seal becomes reading how you were in sync. ──
+export const CHORD_GLYPHS: Record<ChordId, Glyph> = {
+  // both under target — a downward chevron (leanness)
+  lean: (x, y, s) => `<path d="M ${x - s} ${y - s * 0.4} L ${x} ${y + s * 0.6} L ${x + s} ${y - s * 0.4}"/>`,
+  // both hit protein — a dumbbell (iron)
+  iron: (x, y, s) => `<path d="M ${x - s} ${y} L ${x + s} ${y} M ${x - s} ${y - s * 0.55} L ${x - s} ${y + s * 0.55} M ${x + s} ${y - s * 0.55} L ${x + s} ${y + s * 0.55}"/>`,
+  // same split, same day — twin bars
+  "twin-split": (x, y, s) => `<path d="M ${x - s * 0.42} ${y - s} L ${x - s * 0.42} ${y + s} M ${x + s * 0.42} ${y - s} L ${x + s * 0.42} ${y + s}"/>`,
+  // both lifted — an anvil (a bar over a block)
+  anvil: (x, y, s) => `<path d="M ${x - s} ${y - s * 0.25} L ${x + s} ${y - s * 0.25} M ${x - s * 0.4} ${y - s * 0.25} L ${x - s * 0.4} ${y + s * 0.7} L ${x + s * 0.4} ${y + s * 0.7} L ${x + s * 0.4} ${y - s * 0.25}"/>`,
+  // both did cardio — a winding road
+  "long-road": (x, y, s) => `<path d="M ${x - s} ${y + s * 0.3} q ${s * 0.5} ${-s} ${s} 0 q ${s * 0.5} ${s} ${s} 0"/>`,
+  // both watered — a water drop
+  spring: (x, y, s) => `<path d="M ${x} ${y - s} q ${s * 0.72} ${s * 0.9} 0 ${s * 1.7} q ${-s * 0.72} ${-s * 0.8} 0 ${-s * 1.7} Z"/>`,
+  // both ate from the earth — a sprouting leaf
+  green: (x, y, s) => `<path d="M ${x} ${y + s} L ${x} ${y - s * 0.25} M ${x} ${y - s * 0.05} q ${-s * 0.78} ${-s * 0.3} ${-s * 0.58} ${-s} q ${s * 0.72} ${s * 0.08} ${s * 0.58} ${s}"/>`,
+  // both cooked — a hearth flame
+  hearth: (x, y, s) => `<path d="M ${x} ${y + s} q ${-s * 0.78} ${-s * 0.35} ${-s * 0.42} ${-s} q ${-s * 0.04} ${s * 0.42} ${s * 0.26} ${s * 0.36} q ${s * 0.26} ${-s * 0.46} ${-s * 0.06} ${-s} q ${s * 0.86} ${s * 0.46} ${s * 0.5} ${s * 1.34} q ${-s * 0.16} ${s * 0.4} ${-s * 0.3} ${s * 0.3}"/>`,
+  // the same mood, twice — two facing arcs
+  mirror: (x, y, s) => `<path d="M ${x - s * 0.15} ${y - s} q ${-s * 0.68} ${s} 0 ${s * 2} M ${x + s * 0.15} ${y - s} q ${s * 0.68} ${s} 0 ${s * 2}"/>`,
+  // both wrote it down — a quill nib
+  scribe: (x, y, s) => `<path d="M ${x - s * 0.7} ${y + s} L ${x + s * 0.6} ${y - s * 0.8} M ${x + s * 0.18} ${y - s * 0.34} L ${x + s * 0.9} ${y - s * 0.5}"/>`,
+  // a record fell — a spark star
+  "new-mark": (x, y, s) => `<path d="${starPath(x, y, s, s * 0.38, 4)}"/>`,
+  // two records, one day — twin peaks
+  "twin-peaks": (x, y, s) => `<path d="M ${x - s} ${y + s * 0.6} L ${x - s * 0.45} ${y - s * 0.5} L ${x + s * 0.1} ${y + s * 0.25} M ${x - s * 0.1} ${y + s * 0.25} L ${x + s * 0.45} ${y - s * 0.5} L ${x + s} ${y + s * 0.6}"/>`,
 };
 
 // ── SWAPPABLE: nature cores — the day's character, at the cartouche center ──
@@ -206,24 +236,22 @@ function spellCore(spec: SigilSpec, gold: string, lit: boolean, legendary: boole
   const structC = lit ? gold : P.goldSoft;
   const wrap = (cls: string, inner: string) => (reveal ? `<g class="rv ${cls}">${inner}</g>` : inner);
 
-  // FIELD — faint structural rings + carved hall-runes + lift ornaments
-  let field = `<circle cx="${CX}" cy="${CY}" r="${R_RUNE + 8}" fill="none" stroke="${structC}" stroke-width="0.6" opacity="${lit ? 0.45 : 0.28}"/>`;
-  if (nat.water) field += `<circle cx="${CX}" cy="${CY}" r="${R_RUNE + 11}" fill="none" stroke="${structC}" stroke-width="0.5" opacity="0.3" stroke-dasharray="1.5 4"/>`;
+  // FIELD — the outer ring: what each of you did (food halls + training lifts),
+  // carved into the dark field, with a faint structural ring behind.
+  let field = `<circle cx="${CX}" cy="${CY}" r="${R_RUNE + 7}" fill="none" stroke="${structC}" stroke-width="0.6" opacity="${lit ? 0.45 : 0.28}"/>`;
+  if (nat.water) field += `<circle cx="${CX}" cy="${CY}" r="${R_RUNE + 10}" fill="none" stroke="${structC}" stroke-width="0.5" opacity="0.3" stroke-dasharray="1.5 4"/>`;
   const halls: Hall[] = spec.radicals.length ? spec.radicals.slice(0, 6) : ["dishes"];
-  const n = halls.length;
-  let runes = "";
-  halls.forEach((h, i) => {
-    const [x, y] = polar(R_RUNE, rot + (i / n) * 360);
-    runes += HALL_GLYPHS[h](x, y, 7);
+  const lifts = spec.ornaments.filter((o) => o !== "rest").slice(0, 3);
+  const outer: Array<(x: number, y: number) => string> = [
+    ...halls.map((h) => (x: number, y: number) => HALL_GLYPHS[h](x, y, 5.6)),
+    ...lifts.map((l) => (x: number, y: number) => LIFT_GLYPHS[l](x, y, 4.6)),
+  ];
+  let om = "";
+  outer.forEach((g, i) => {
+    const [x, y] = polar(R_RUNE, rot + (i / outer.length) * 360);
+    om += g(x, y);
   });
-  field += `<g opacity="${spec.completed ? 1 : 0.4}">${etch(runes, runeMain, runeLip)}</g>`;
-  const lifts = spec.ornaments.filter((o) => o !== "rest").slice(0, 4);
-  if (lifts.length) {
-    const seats = [0, 90, 270, 180];
-    let lm = "";
-    lifts.forEach((lf, i) => { const [x, y] = polar(R_LIFT, seats[i] + 30); lm += LIFT_GLYPHS[lf](x, y, 4.4); });
-    field += `<g opacity="${spec.completed ? 0.95 : 0.4}">${etch(lm, runeMain, runeLip)}</g>`;
-  }
+  field += `<g opacity="${spec.completed ? 1 : 0.4}">${etch(om, runeMain, runeLip)}</g>`;
 
   // CORE — the bright star-cartouche disc + the nature core, igniting at center
   let core = "";
@@ -238,14 +266,17 @@ function spellCore(spec: SigilSpec, gold: string, lit: boolean, legendary: boole
   const pts = legendary ? 8 : spec.tier === "resonant" ? 6 : spec.tier === "fine" ? 5 : 4;
   core += NATURE_CORES[nat.nature](CX, CY, coreLine, coreFill, pts, 2.0);
 
-  // STUDS — a gold cabochon per chord, popping in sequence on the cartouche ring
-  const chordN = Math.min(spec.chords.length, 8);
+  // CHORD-RUNES — the inner ring: each struck chord inscribes its OWN mark,
+  // popping in sequence during the ceremony. Carved gold, lit brighter. A tiny
+  // gold seat plants each on the ring so it reads as set into the seal.
+  const chords = spec.chords.slice(0, 8);
   let studs = "";
-  for (let i = 0; i < chordN; i++) {
-    const [x, y] = polar(R_CART, (i / chordN) * 360 + 18);
-    const stud = `<circle cx="${f(x)}" cy="${f(y)}" r="2.7" fill="${P.groundEdge}" stroke="${gold}" stroke-width="0.9"/><circle cx="${f(x)}" cy="${f(y)}" r="1.4" fill="${legendary ? P.violetBright : gold}"/>`;
-    studs += reveal ? `<g class="rv-stud" style="--i:${i}">${stud}</g>` : stud;
-  }
+  chords.forEach((c, i) => {
+    const [x, y] = polar(R_CHORD, (i / chords.length) * 360 + 18);
+    const seat = `<circle cx="${f(x)}" cy="${f(y)}" r="1.1" fill="${legendary ? P.violetBright : gold}" opacity="0.5"/>`;
+    const mark = seat + etch(CHORD_GLYPHS[c](x, y, 4.6), runeMain, runeLip);
+    studs += reveal ? `<g class="rv-stud" style="--i:${i}">${mark}</g>` : mark;
+  });
 
   return wrap("rv-field", field) + wrap("rv-core", core) + (studs ? wrap("rv-studs", studs) : "");
 }
