@@ -129,9 +129,12 @@ breakup as a first-class state** solves the top finding of three agents at once.
 
 A second adversarial audit (`AUDIT.md`) read the current build. It **confirmed against live code**:
 
-- **Tier 1 (core-loop fragility) — still live.** Solo value / async close / survive-a-leave are all
-  unbuilt: `sigil.ts:159` (chords `[]` unless both), `boat.ts` (planks only on joint days),
-  `seal-ceremony.tsx` (fires only on `completed && isToday`).
+- **Tier 1 (core-loop fragility) — partly addressed.** **Solo standalone value: DECIDED + shipped
+  (2026-07-21)** — a solo log kindles the glade firepit + lights that keeper's lantern and the seal
+  caption reframes to "your half is kept" (a warm artifact, not a scold). **Deliberately NOT a boat
+  plank** — the boat stays strictly two-player (`boat.ts` unchanged: planks only on joint days). Still
+  open: the **async ~36–48h close window** and **survive-a-leave** (`seal-ceremony.tsx` still fires
+  only on `completed && isToday`).
 - **Tier 5 (colorblind seal) — still live, unmitigated.** Halves differ only by hue at near-equal
   luminance (`glyphs.ts:261`); no shape/texture/CVD toggle.
 - **Tier 6 (canonical couple-day) — still live, and it applies to the CURRENT engine, not just the

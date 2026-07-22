@@ -80,7 +80,7 @@ Beyond the convergent seven, the code read surfaced fresh technical items:
 | Do | Effort | Kills |
 |---|---|---|
 | Canonical couple-day + async ~36–48h close window (engine invariant + golden cross-tz test) | M | #1 |
-| Solo half-seal + personal plank — logging your half is a complete artifact; the joint close *fuses* | S | #2 |
+| Solo half-seal — a kept half is a warm artifact, not a scold: it kindles the glade fire + lights your lantern, and the caption reframes to "your half is kept" | S | #2 |
 | Move claim-once ceremonies out of GET-render into the log action; "seen" = server-truth; fire on async close | M | #3 |
 | One web-push primitive: "your half is waiting" — invite + love-tap + re-engagement in one mechanic | S–M | #2, #3, beachhead |
 
@@ -98,6 +98,15 @@ Beyond the convergent seven, the code read surfaced fresh technical items:
 `food-estimate` hardening + confirm `FDC_API_KEY` in prod; `UNIQUE(lower(name))` on foods; decide the
 food-vs-workout seal rule; revalidate affected paths on log. **The growth gate** (real accounts +
 pairing so a *third* couple can exist) stays deferred — correctly — until the loop survives a lapse.
+
+## Decisions since the audit
+
+- **Solo value = the glade fire, NOT a boat plank (2026-07-21).** A plank stays
+  strictly two-player — the boat is the thing you can only build together. A solo
+  log instead *kindles the firepit + lights that keeper's lantern* (a warm,
+  ambient, personal reward) and the seal's caption reframes from "waiting on X" to
+  "your half is kept — [partner] closes the ring." The joint close still fires the
+  ceremony + plank. *(Shipped — see the glade `firepit`/`DaySeal` change.)*
 
 ## Recommendation / sequence
 

@@ -97,13 +97,17 @@ export default async function DayPage({
   });
   if (spec.legendary) await recordLegendary(spec.legendary, day);
 
-  const notLogged = PROFILES.filter((p) => journal[p].entries.length === 0);
-  const missingName =
-    notLogged.length === 2
-      ? "you both"
-      : notLogged.length === 1
-        ? DISPLAY_NAMES[notLogged[0]]
-        : null;
+  // Where a past day stands when the ring didn't close — warm, past-tense,
+  // never a scold. A solo log was still a kept half.
+  const soloKept = spec.moss.inked !== spec.ember.inked;
+  const keptName = spec.moss.inked
+    ? DISPLAY_NAMES["matthew"]
+    : DISPLAY_NAMES["kennedy"];
+  const standingLine = spec.completed
+    ? null
+    : soloKept
+      ? `${keptName} kept their half that day`
+      : "an open page, unkept";
 
   const mealsFor = (entriesList: JournalEntry[]) =>
     MEALS.map((meal) => ({
@@ -126,7 +130,7 @@ export default async function DayPage({
       </header>
 
       <div className="wobbly hatch border-2 border-ink/20 bg-cream/70 p-3 shadow-card">
-        <DaySeal spec={spec} missingName={missingName} isToday={false} />
+        <DaySeal spec={spec} standingLine={standingLine} isToday={false} />
       </div>
 
       <div className="wobbly grid grid-cols-2 gap-4 border-2 border-ink/20 bg-cream/70 p-4 shadow-card">

@@ -490,6 +490,11 @@ export function GladeScene({
 }) {
   const counts = TIER_COUNTS[tier];
   const poolExists = beings.heron >= 1;
+  // A kept half — solo or joint — kindles the firepit: showing up warms the
+  // glade that day, even alone. Fuller when both keep it. (The boat still needs
+  // both; the fire is the personal, ambient reward for one.)
+  const anyLit = !!mossLit || !!emberLit;
+  const bothLit = !!mossLit && !!emberLit;
 
   return (
     <svg
@@ -573,13 +578,36 @@ export function GladeScene({
         </g>
       ))}
 
-      {/* the firepit — a ring of stones, embered after dark */}
+      {/* the firepit — a ring of stones. Dormant it only embers after dark;
+          the moment a keeper keeps their half it kindles into a living fire
+          (day and night), rising fuller when both keep it. */}
       <g>
         <ellipse cx="218" cy="133" rx="7.5" ry="3" fill="none" stroke="var(--glade-fauna)" strokeWidth="1" opacity="0.45" />
         <circle cx="212" cy="133" r="1.4" fill="var(--glade-fauna)" opacity="0.85" />
         <circle cx="218" cy="134.4" r="1.5" fill="var(--glade-fauna)" opacity="0.85" />
         <circle cx="224" cy="133" r="1.4" fill="var(--glade-fauna)" opacity="0.85" />
-        <circle className="glade-dark-only lantern-breathe" cx="218" cy="131.5" r="2.2" fill="var(--color-gold)" />
+        {anyLit ? (
+          <g aria-hidden>
+            <defs>
+              <radialGradient id="firelight-pool">
+                <stop offset="0%" stopColor="var(--color-gold)" stopOpacity={bothLit ? "0.8" : "0.5"} />
+                <stop offset="50%" stopColor="var(--color-terracotta)" stopOpacity="0.22" />
+                <stop offset="100%" stopColor="var(--color-terracotta)" stopOpacity="0" />
+              </radialGradient>
+            </defs>
+            {/* warm light pooling from the pit — visible in daylight too, so a
+                solo log warms the world, not only after dark */}
+            <circle className="lantern-breathe" cx="218" cy="129" r={bothLit ? "28" : "20"} fill="url(#firelight-pool)" />
+            {/* the flames rising from the coals */}
+            <path className="lantern-breathe" d="M 218 133 Q 211 125 218 117 Q 225 125 218 133 Z" fill="var(--color-terracotta)" opacity="0.92" />
+            <path className="lantern-breathe" d="M 218 133 Q 214.5 127 218 121 Q 221.5 127 218 133 Z" fill="var(--color-gold)" />
+            {bothLit ? (
+              <path className="lantern-breathe" d="M 224 133 Q 221 128 224 123 Q 227 128 224 133 Z" fill="var(--color-terracotta)" opacity="0.85" />
+            ) : null}
+          </g>
+        ) : (
+          <circle className="glade-dark-only lantern-breathe" cx="218" cy="131.5" r="2.2" fill="var(--color-gold)" />
+        )}
       </g>
 
       {/* the crook'd lantern post */}

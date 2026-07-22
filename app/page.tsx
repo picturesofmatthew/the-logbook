@@ -82,6 +82,22 @@ export default async function GladeHome() {
       : notLogged.length === 1
         ? DISPLAY_NAMES[notLogged[0]]
         : null;
+
+  // Where the day stands before the ring closes — warm and viewer-aware, never
+  // a scold. A solo log is a kept half (your lantern's lit, the fire's up), not
+  // a failure to close; and it seeds the "your hand closes it" love-tap.
+  const viewerKept = journal[viewer].entries.length > 0;
+  const soloKept = sigil.moss.inked !== sigil.ember.inked;
+  const keptName = sigil.moss.inked
+    ? DISPLAY_NAMES["matthew"]
+    : DISPLAY_NAMES["kennedy"];
+  const standingLine = sigil.completed
+    ? null
+    : soloKept
+      ? viewerKept
+        ? `your half is kept — ${missingName} closes the ring`
+        : `${keptName} kept their half — your hand closes it`
+      : "an open page, still to keep together";
   const hearthDay =
     sigil.chords.includes("hearth") || sigil.legendary === "feast-seal";
 
@@ -175,7 +191,7 @@ export default async function GladeHome() {
           aria-label="Open today's page — food, water, mood, the ledger"
           className="group block cursor-pointer transition-transform active:scale-[0.98]"
         >
-          <DaySeal spec={sigil} missingName={missingName} isToday={isToday} />
+          <DaySeal spec={sigil} standingLine={standingLine} isToday={isToday} />
           <span className="mt-2.5 inline-flex items-center gap-1.5 font-sans text-[11px] uppercase tracking-[0.14em] text-terracotta/75 transition-colors group-hover:text-terracotta">
             today&apos;s page
             <span aria-hidden className="transition-transform group-hover:translate-x-0.5">

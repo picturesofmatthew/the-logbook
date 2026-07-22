@@ -16,12 +16,14 @@ const TIER_LABELS: Record<SigilSpec["tier"], string> = {
 
 export function DaySeal({
   spec,
-  missingName,
+  standingLine,
   isToday,
   size = 248,
 }: {
   spec: SigilSpec;
-  missingName: string | null;
+  // Where the day stands before the ring closes — a warm, viewer-aware line
+  // ("your half is kept — …"), never a scold. Computed on the home.
+  standingLine: string | null;
   isToday: boolean;
   size?: number;
 }) {
@@ -44,10 +46,7 @@ export function DaySeal({
           </>
         ) : (
           <p className="font-display text-sm tracking-wide text-ink-soft">
-            {TIER_LABELS[spec.tier]}
-            {!spec.completed && missingName
-              ? ` — waiting on ${missingName}`
-              : ""}
+            {spec.completed ? TIER_LABELS[spec.tier] : standingLine}
           </p>
         )}
         {spec.chords.length > 0 ? (

@@ -40,7 +40,7 @@ The old Phase 2/3 still stand as *content*; this is the near-term execution orde
 
 **Track A — Make the loop real** *(the retention spine; forced by the dogfood; no new infra)*
 - Canonical couple-day + async ~36–48h close window (engine invariant + golden cross-tz test). [RISK T6/T1]
-- Solo half-seal + personal plank — logging your half is a complete artifact; the joint close *fuses*. [RISK T1]
+- Solo half-seal — a kept half kindles the glade fire + lights your lantern (no plank; the boat stays two-player) and the caption reframes to "your half is kept". [RISK T1]
 - Move claim-once ceremonies out of GET-render into the log action; "seen" = server-truth; fire on async close.
 - One web-push "your half is waiting" primitive — invite + love-tap + re-engagement in one mechanic. [RISK T7]
 
