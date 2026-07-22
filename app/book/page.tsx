@@ -172,8 +172,12 @@ export default async function BookPage({
               <Link
                 key={id}
                 href={`/book/${foundOn}`}
-                className="wobbly-sm flex flex-col items-center border-2 border-violet/50 bg-cream/70 p-2 text-center shadow-card"
+                className="plate lantern-pool flex flex-col items-center p-2.5 text-center"
               >
+                <span className="plate-corner tl" aria-hidden />
+                <span className="plate-corner tr" aria-hidden />
+                <span className="plate-corner bl" aria-hidden />
+                <span className="plate-corner br" aria-hidden />
                 <SigilGlyph spec={legendarySpec(id)} size={56} />
                 <p className="font-display text-[10px] leading-tight text-violet">
                   {LEGENDARIES[id].name}
@@ -201,12 +205,12 @@ export default async function BookPage({
       </section>
 
       <section>
-        <h2 className="mb-2 flex items-center gap-2 font-display text-sm tracking-wide">
+        <GiltHeading className="mb-3 text-sm tracking-wide">
           <BestiaryRune size={16} /> THE BESTIARY
-          <span className="text-[10px] text-ink-soft">
-            {arrivedCount}/{BEINGS.length} arrived
-          </span>
-        </h2>
+        </GiltHeading>
+        <p className="-mt-2 mb-2 text-center text-[10px] text-ink-soft">
+          {arrivedCount}/{BEINGS.length} arrived
+        </p>
         <div className="grid grid-cols-2 gap-2">
           {BEINGS.map((def) => {
             const state = beingById.get(def.id);
@@ -215,8 +219,12 @@ export default async function BookPage({
             return stage >= 1 ? (
               <div
                 key={def.id}
-                className="wobbly-sm flex flex-col items-center border-2 border-gold bg-cream/70 p-2 text-center shadow-card"
+                className="plate flex flex-col items-center p-2.5 text-center"
               >
+                <span className="plate-corner tl" aria-hidden />
+                <span className="plate-corner tr" aria-hidden />
+                <span className="plate-corner bl" aria-hidden />
+                <span className="plate-corner br" aria-hidden />
                 <div className="flex h-24 items-center justify-center">
                   <BeingPortrait being={def.id} stage={stage} />
                 </div>
