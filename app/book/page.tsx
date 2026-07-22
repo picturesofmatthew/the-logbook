@@ -30,6 +30,9 @@ function legendarySpec(id: LegendaryId): SigilSpec {
     legendary: id,
     tier: "legendary",
     seed,
+    moon: false,
+    water: false,
+    lowMood: false,
   };
 }
 

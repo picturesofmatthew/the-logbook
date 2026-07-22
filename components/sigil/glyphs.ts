@@ -67,14 +67,6 @@ function halfBand(side: "left" | "right", innerR: number, outerR: number) {
   const oS = side === "left" ? 0 : 1, iS = side === "left" ? 1 : 0;
   return `M ${f(otx)} ${f(oty)} A ${outerR} ${outerR} 0 0 ${oS} ${f(obx)} ${f(oby)} L ${f(ibx)} ${f(iby)} A ${innerR} ${innerR} 0 0 ${iS} ${f(itx)} ${f(ity)} Z`;
 }
-// a partial arc band between two angles (for the braid crossover at the seam)
-function arcBand(a0: number, a1: number, innerR: number, outerR: number) {
-  const [ox0, oy0] = polar(outerR, a0), [ox1, oy1] = polar(outerR, a1);
-  const [ix1, iy1] = polar(innerR, a1), [ix0, iy0] = polar(innerR, a0);
-  const large = Math.abs(a1 - a0) > 180 ? 1 : 0, sweep = a1 > a0 ? 1 : 0;
-  return `M ${f(ox0)} ${f(oy0)} A ${outerR} ${outerR} 0 ${large} ${sweep} ${f(ox1)} ${f(oy1)} L ${f(ix1)} ${f(iy1)} A ${innerR} ${innerR} 0 ${large} ${1 - sweep} ${f(ix0)} ${f(iy0)} Z`;
-}
-
 type Glyph = (x: number, y: number, s: number) => string;
 
 // ── SWAPPABLE: hall runes — "what fed you" ──
@@ -216,13 +208,13 @@ const LEG_NATURE: Record<string, Nature> = {
   "long-road-home": "effort", "twin-peaks": "effort",
 };
 function natureFor(spec: SigilSpec): NatureInfo {
-  const chords = spec.chords as readonly string[];
   const leg = spec.legendary as string | null;
   let nature: Nature = "star";
   if (leg) nature = LEG_NATURE[leg] ?? "star";
   else if (spec.ornaments.length) nature = "effort";
   else if (spec.radicals.includes("produce")) nature = "nourish";
-  return { nature, moon: leg === "quiet-moon", water: chords.includes("spring"), lowMood: leg === "ember-vigil" || leg === "quiet-moon" };
+  // real signals now, not guesses (see SigilSpec.moon/water/lowMood)
+  return { nature, moon: spec.moon, water: spec.water, lowMood: spec.lowMood };
 }
 
 // ── SWAPPABLE PART: the dark cartouche — the medallion the seal floats in ──
@@ -278,10 +270,12 @@ function braidedBand(spec: SigilSpec, gold: string, lit: boolean, legendary: boo
     if (legendary) s += litRim("right", eI, P.terraLit);
     s += `<path d="${halfBand("right", R_BAND_OUT - 2.5, R_BAND_OUT)}" fill="${P.cream}" opacity="0.14" stroke="none"/>`;
   } else s += `<path d="${halfBand("right", R_BAND_OUT - 10, R_BAND_OUT)}" fill="none" stroke="${P.goldSoft}" stroke-width="1" stroke-dasharray="3 6" opacity="0.45"/>`;
-  // the braid: ember crosses OVER moss at the base seam (the bound-together mark)
+  // The two halves meet cleanly at the top (under the crown) and the base — a
+  // small gold clasp-bead marks the base join as intentional and symmetric
+  // (mirroring the crown), so neither colour overflows the other.
   if (spec.moss.inked && spec.ember.inked) {
-    s += `<path d="${arcBand(180, 201, eI, R_BAND_OUT)}" fill="${P.terra}" stroke="${P.ink}" stroke-width="1"/>`;
-    s += `<path d="${arcBand(180, 201, eI, eI + 3)}" fill="${P.terraDeep}" opacity="0.45" stroke="none"/>`;
+    const [bx, by] = polar((R_BAND_OUT + Math.min(mI, eI)) / 2, 180);
+    s += `<path d="M ${f(bx)} ${f(by - 3.2)} L ${f(bx + 2.6)} ${f(by)} L ${f(bx)} ${f(by + 3.2)} L ${f(bx - 2.6)} ${f(by)} Z" fill="${gold}" stroke="${P.ink}" stroke-width="0.6"/>`;
   }
   return s;
 }
@@ -320,7 +314,7 @@ function spellCore(spec: SigilSpec, gold: string, lit: boolean, legendary: boole
   if (legendary) core += `<circle cx="${CX}" cy="${CY}" r="${R_CART + 8}" fill="${LEG?.glow ?? P.violetBright}" opacity="0.24" filter="url(#soft-${SEED})"/>`;
   core += `<circle cx="${CX}" cy="${CY}" r="${R_CART}" fill="${legendary ? P.cream : P.paper}"/>`;
   if (legendary) core += `<circle cx="${CX}" cy="${CY}" r="${R_CART}" fill="${LEG?.cast ?? P.violetDeep}" opacity="0.15"/>`;
-  else if (nat.nature === "vigil" || nat.moon) core += `<circle cx="${CX}" cy="${CY}" r="${R_CART}" fill="${P.violetDeep}" opacity="0.16"/>`;
+  else if (nat.moon || nat.lowMood) core += `<circle cx="${CX}" cy="${CY}" r="${R_CART}" fill="${P.violetDeep}" opacity="${nat.moon ? 0.16 : 0.1}"/>`;
   core += `<circle cx="${CX}" cy="${CY}" r="${R_CART}" fill="none" stroke="${gold}" stroke-width="1.6"/>`;
   core += `<circle cx="${CX}" cy="${CY}" r="${R_CART - 4}" fill="none" stroke="${gold}" stroke-width="0.8" opacity="0.7"/>`;
   if (lit) core += `<circle cx="${CX}" cy="${CY}" r="${R_CART - 4}" fill="none" stroke="${P.violet}" stroke-width="0.8" opacity="0.6"/>`;
@@ -350,7 +344,9 @@ function spellCore(spec: SigilSpec, gold: string, lit: boolean, legendary: boole
 function crown(spec: SigilSpec, gold: string, lit: boolean, legendary: boolean, nat: NatureInfo, bloom: boolean) {
   if (!spec.completed) return "";
   const cy = 30;
-  if (nat.moon)
+  // a full-moon night crowns the seal with the moon — but a non-moon legendary
+  // keeps its own union gem even under a full moon.
+  if (nat.moon && (!legendary || spec.legendary === "quiet-moon"))
     return `<circle cx="${CX}" cy="${cy}" r="9" fill="${P.goldSoft}" stroke="${gold}" stroke-width="1.2"/><path d="M ${CX + 3.5} ${cy - 6} a 7 7 0 1 0 0 12 a 5.4 5.4 0 1 1 0 -12 Z" fill="${P.violetDeep}" opacity="0.6"/>`;
   if (lit) {
     const glow = bloom || legendary ? `<circle cx="${CX}" cy="${cy}" r="15" fill="${P.violetBright}" opacity="0.45" filter="url(#soft-${SEED})"/>` : "";

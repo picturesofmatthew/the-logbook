@@ -386,6 +386,11 @@ export type SigilSpec = {
   legendary: LegendaryId | null;
   tier: SigilTier;
   seed: number;
+  // Latent signals from the real day — the seal reflects the world, not just
+  // the logs. The renderer reads these directly instead of guessing them.
+  moon: boolean; // a full moon that night
+  water: boolean; // both keepers well-watered
+  lowMood: boolean; // a hard day for at least one of you — honored, never scolded
 };
 
 function halfFor(k: KeeperDay): SigilHalf {
@@ -440,5 +445,8 @@ export function composeSigil(input: {
     legendary,
     tier: tierFor({ completed, chordCount: chords.length, legendary }),
     seed: seedFor(day),
+    moon: moonIsFull(day),
+    water: moss.waterCups >= 8 && ember.waterCups >= 8,
+    lowMood: isLowMood(moss.mood) || isLowMood(ember.mood),
   };
 }
