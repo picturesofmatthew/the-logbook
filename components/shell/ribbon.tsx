@@ -58,7 +58,7 @@ function Tab({
         <Rune size={22} />
       </span>
       <span
-        className={`font-display text-[8.5px] uppercase tracking-wide ${
+        className={`font-display text-[10px] uppercase tracking-wide ${
           active ? "text-terracotta" : "text-ink-soft"
         }`}
       >
@@ -92,7 +92,7 @@ export function Ribbon() {
         <span className="grid h-14 w-14 place-items-center rounded-full border-[3px] border-cream bg-[radial-gradient(circle_at_42%_34%,var(--color-gold),var(--color-terracotta))] text-cream shadow-card">
           <QuillRune size={26} />
         </span>
-        <span className="font-display text-[8.5px] uppercase tracking-wide text-terracotta">
+        <span className="font-display text-[10px] uppercase tracking-wide text-terracotta">
           log
         </span>
       </button>

@@ -124,10 +124,10 @@ export default async function LibraryPage() {
               href={`#${s.id}`}
               className="wobbly-sm flex flex-1 flex-col items-center border-2 border-ink/20 bg-cream px-1 py-1 text-center shadow-card active:scale-95"
             >
-              <span className="font-display text-[9px] uppercase tracking-wide">
+              <span className="font-display text-[10px] uppercase tracking-wide">
                 {s.label}
               </span>
-              <span className="text-[9px] text-ink-soft">{s.count}</span>
+              <span className="text-[10px] text-ink-soft">{s.count}</span>
             </a>
           ))}
         </div>

@@ -12,13 +12,19 @@ export function SigilGlyph({
   size = 96,
   bloom = false,
   reveal = false,
+  detail,
 }: {
   spec: SigilSpec;
   size?: number;
   bloom?: boolean;
   // reveal: play the completion-ceremony draw-on (see composeSeal + globals.css)
   reveal?: boolean;
+  // detail: "thumb" drops the fine field detail so small grid/calendar seals
+  // read instead of crushing to mud. Defaults to auto-by-size (<72px → thumb);
+  // a reveal is always a full ceremony, never thumbed.
+  detail?: "full" | "thumb";
 }) {
+  const resolved = detail ?? (size < 72 && !reveal ? "thumb" : "full");
   return (
     <svg
       viewBox="0 0 240 240"
@@ -30,7 +36,9 @@ export function SigilGlyph({
           ? `The day's seal, ${spec.tier}`
           : "The day's seal, still open"
       }
-      dangerouslySetInnerHTML={{ __html: composeSeal(spec, { bloom, reveal }) }}
+      dangerouslySetInnerHTML={{
+        __html: composeSeal(spec, { bloom, reveal, detail: resolved }),
+      }}
     />
   );
 }

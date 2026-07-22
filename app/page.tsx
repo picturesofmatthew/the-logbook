@@ -167,14 +167,21 @@ export default async function GladeHome() {
     >
       {/* THE SIGIL — the day's seal, the hero of the home */}
       <div className="flex flex-col items-center gap-4 px-6 pt-14 pb-3 text-center">
-        {/* tap the seal to open today's ledger — the numbers behind the mark */}
+        {/* tap the seal to open today's ledger — the numbers behind the mark.
+            the hint gives the art object a visible "this is a door" affordance. */}
         <Link
           href="/today"
           transitionTypes={["nav-forward"]}
-          aria-label="Open today's ledger"
-          className="block cursor-pointer transition-transform active:scale-[0.98]"
+          aria-label="Open today's page — food, water, mood, the ledger"
+          className="group block cursor-pointer transition-transform active:scale-[0.98]"
         >
           <DaySeal spec={sigil} missingName={missingName} isToday={isToday} />
+          <span className="mt-2.5 inline-flex items-center gap-1.5 font-sans text-[11px] uppercase tracking-[0.14em] text-terracotta/75 transition-colors group-hover:text-terracotta">
+            today&apos;s page
+            <span aria-hidden className="transition-transform group-hover:translate-x-0.5">
+              ❯
+            </span>
+          </span>
         </Link>
 
         {stamps.length > 0 ? (

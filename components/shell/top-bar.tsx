@@ -47,7 +47,7 @@ export function TopBar({
             <span className="block font-display text-[10.5px] uppercase tracking-wide">
               {name}
             </span>
-            <span className="mt-0.5 block text-[9.5px] text-ink-soft">
+            <span className="mt-0.5 block text-[11px] text-ink-soft">
               {dateLabel}
             </span>
           </span>
