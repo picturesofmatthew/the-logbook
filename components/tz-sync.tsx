@@ -2,8 +2,9 @@
 
 import { useEffect } from "react";
 
-// Keeps a timezone cookie current so server-rendered "today" matches the
-// phone's clock — including after the move to Chiang Mai.
+// Keeps the *device* timezone cookie current as the couple travels. This drives
+// display + descriptive long-distance chords only — the shared day key is the
+// couple tz (see coupleTz in lib/dates), so two devices never split the seal.
 export function TzSync() {
   useEffect(() => {
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
