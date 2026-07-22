@@ -2,9 +2,11 @@
 
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { eq } from "drizzle-orm";
+import { db } from "@/db";
+import { profiles } from "@/db/schema";
 import {
   hmacDigest,
-  isProfile,
   SESSION_COOKIE,
   signSession,
   timingSafeEqual,
@@ -37,7 +39,7 @@ export async function enter(
   const profile = formData.get("profile");
   const passcode = formData.get("passcode");
 
-  if (!isProfile(profile)) {
+  if (typeof profile !== "string" || !profile) {
     return { error: "Pick who you are first." };
   }
 
@@ -59,7 +61,17 @@ export async function enter(
   }
   attempts.delete(ip);
 
-  const token = await signSession(profile);
+  // Passcode is right — confirm this keeper exists and belongs to a bond. (Real
+  // per-user credentials replace the shared passcode in a later phase.)
+  const [keeper] = await db
+    .select({ id: profiles.id })
+    .from(profiles)
+    .where(eq(profiles.id, profile));
+  if (!keeper) {
+    return { error: "Pick who you are first." };
+  }
+
+  const token = await signSession(keeper.id);
   (await cookies()).set(SESSION_COOKIE, token, {
     httpOnly: true,
     sameSite: "lax",

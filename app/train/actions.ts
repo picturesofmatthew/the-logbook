@@ -7,7 +7,7 @@ import { dayMeta, workouts, workoutSets } from "@/db/schema";
 import { LEDGER_TAG } from "@/lib/cache-tags";
 import { todayIso } from "@/lib/dates";
 import { safely } from "@/lib/safe";
-import { currentProfile } from "@/lib/session";
+import { currentUser } from "@/lib/session";
 
 function validDay(day: unknown): day is string {
   return typeof day === "string" && /^\d{4}-\d{2}-\d{2}$/.test(day);
@@ -52,7 +52,7 @@ export async function logWorkout(input: {
   note?: string;
   sets: SetInput[];
 }): Promise<{ error?: string }> {
-  const profileId = await currentProfile();
+  const { userId: profileId, bondId } = await currentUser();
   const day = await guardedDay(input.day);
   if (!day) return { error: "Unknown day." };
 
@@ -72,6 +72,7 @@ export async function logWorkout(input: {
     const [workout] = await db
       .insert(workouts)
       .values({
+        bondId,
         profileId,
         day,
         title,
@@ -102,7 +103,7 @@ export async function logWorkout(input: {
           : ("cardio" as const);
     await db
       .insert(dayMeta)
-      .values({ profileId, day, training })
+      .values({ bondId, profileId, day, training })
       .onConflictDoUpdate({
         target: [dayMeta.profileId, dayMeta.day],
         set: { training },
@@ -118,13 +119,19 @@ export async function logWorkout(input: {
 export async function deleteWorkout(input: {
   id: number;
 }): Promise<{ error?: string }> {
-  const profileId = await currentProfile();
+  const { userId: profileId, bondId } = await currentUser();
   const id = Math.round(Number(input.id));
   if (!Number.isFinite(id)) return { error: "Unknown workout." };
   return safely(async () => {
     await db
       .delete(workouts)
-      .where(and(eq(workouts.id, id), eq(workouts.profileId, profileId)));
+      .where(
+        and(
+          eq(workouts.id, id),
+          eq(workouts.profileId, profileId),
+          eq(workouts.bondId, bondId),
+        ),
+      );
     revalidatePath("/");
     revalidatePath("/today");
     revalidateTag(LEDGER_TAG, { expire: 0 });

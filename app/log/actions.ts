@@ -7,7 +7,7 @@ import { entries, foods, recipeItems } from "@/db/schema";
 import { LEDGER_TAG } from "@/lib/cache-tags";
 import { todayIso } from "@/lib/dates";
 import { safely } from "@/lib/safe";
-import { currentProfile } from "@/lib/session";
+import { currentUser } from "@/lib/session";
 import type { Hall } from "@/lib/halls";
 
 const MEALS = ["breakfast", "lunch", "dinner", "snacks"] as const;
@@ -37,7 +37,7 @@ export async function logEntry(input: {
   servings: number;
   day: string;
 }): Promise<{ error?: string }> {
-  const profileId = await currentProfile();
+  const { userId: profileId, bondId } = await currentUser();
   if (!MEALS.includes(input.meal)) return { error: "Unknown meal." };
   if (!validDay(input.day)) return { error: "Unknown day." };
   if (!validServings(input.servings)) return { error: "Servings look off." };
@@ -52,6 +52,7 @@ export async function logEntry(input: {
     if (!food) return { error: "That specimen is missing from the pantry." };
 
     await db.insert(entries).values({
+      bondId,
       profileId,
       day: input.day,
       meal: input.meal,
@@ -66,11 +67,17 @@ export async function logEntry(input: {
 }
 
 export async function removeEntry(entryId: number): Promise<void> {
-  const profileId = await currentProfile();
+  const { userId: profileId, bondId } = await currentUser();
   await safely(async () => {
     await db
       .delete(entries)
-      .where(and(eq(entries.id, entryId), eq(entries.profileId, profileId)));
+      .where(
+        and(
+          eq(entries.id, entryId),
+          eq(entries.profileId, profileId),
+          eq(entries.bondId, bondId),
+        ),
+      );
     revalidatePath("/");
     revalidatePath("/today");
     revalidateTag(LEDGER_TAG, { expire: 0 });
@@ -97,7 +104,7 @@ export type DonateInput = {
 export async function donateSpecimen(
   input: DonateInput,
 ): Promise<{ error?: string; foodId?: number; alreadyKnown?: boolean }> {
-  const profileId = await currentProfile();
+  const { userId: profileId } = await currentUser();
 
   const name = input.name.trim().slice(0, 80);
   if (name.length < 2) return { error: "Give the specimen a name." };
@@ -164,7 +171,7 @@ export async function createRecipe(input: {
   items: { foodId: number; servings: number }[];
   logAs: { meal: Meal; servings: number; day: string } | null;
 }): Promise<{ error?: string; foodId?: number }> {
-  const profileId = await currentProfile();
+  const { userId: profileId } = await currentUser();
 
   const name = input.name.trim().slice(0, 80);
   if (name.length < 2) return { error: "Give the dish a name." };

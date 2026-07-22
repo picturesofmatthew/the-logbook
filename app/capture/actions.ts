@@ -7,7 +7,7 @@ import {
 } from "@/lib/data";
 import { todayIso } from "@/lib/dates";
 import type { Specimen } from "@/lib/meals";
-import { currentProfile } from "@/lib/session";
+import { currentUser } from "@/lib/session";
 
 // Everything the capture sheet needs when it opens: today (tz-aware, for
 // logging), this keeper's recent specimens (the one-tap eat grid), and their
@@ -17,11 +17,11 @@ export async function loadCaptureData(): Promise<{
   recents: Specimen[];
   recentWorkouts: RecentWorkout[];
 }> {
-  const profile = await currentProfile();
+  const { userId, bondId } = await currentUser();
   const [day, recents, recentWorkouts] = await Promise.all([
     todayIso(),
-    getRecentSpecimens(profile, 12),
-    getRecentWorkouts(profile, 12),
+    getRecentSpecimens(bondId, userId, 12),
+    getRecentWorkouts(bondId, userId, 12),
   ]);
   return { day, recents, recentWorkouts };
 }

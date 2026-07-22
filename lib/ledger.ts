@@ -14,7 +14,7 @@ import {
   workouts,
   workoutSets,
 } from "@/db/schema";
-import { PROFILES, type Profile } from "@/lib/auth";
+import { getBondMembers, SLOTS, type Slot } from "@/lib/bond";
 import { LEDGER_TAG } from "@/lib/cache-tags";
 import { bothLoggedDays, getActiveDream, type DreamRow } from "@/lib/data";
 import { beingStates, type BeingState, type LedgerDay } from "@/lib/engine/beings";
@@ -65,46 +65,68 @@ const emptyFacts = (): DayFacts => ({
   firstLoggedAtMs: null,
 });
 
-// The earliest day both keepers logged — the First Page.
-export async function getFirstBothDay(): Promise<string | null> {
-  const both = [...(await bothLoggedDays())].sort();
+// The earliest day both keepers of a bond logged — the First Page.
+export async function getFirstBothDay(bondId: string): Promise<string | null> {
+  const both = [...(await bothLoggedDays(bondId))].sort();
   return both[0] ?? null;
 }
 
-async function getFirstEntryDay(): Promise<string | null> {
+async function getFirstEntryDay(bondId: string): Promise<string | null> {
   const rows = await db
     .select({ day: entries.day })
     .from(entries)
+    .where(eq(entries.bondId, bondId))
     .orderBy(asc(entries.day))
     .limit(1);
   return rows[0]?.day ?? null;
 }
 
 export async function buildLedgerRange(
+  bondId: string,
   start: string,
   end: string,
   today: string,
 ): Promise<LedgerEntry[]> {
+  const members = await getBondMembers(bondId);
   const [entryRows, metaRows, workoutRows, targetRows, firstBothDay] =
     await Promise.all([
       db
         .select({ entry: entries, food: foods })
         .from(entries)
         .innerJoin(foods, eq(entries.foodId, foods.id))
-        .where(and(gte(entries.day, start), lte(entries.day, end))),
+        .where(
+          and(
+            eq(entries.bondId, bondId),
+            gte(entries.day, start),
+            lte(entries.day, end),
+          ),
+        ),
       db
         .select()
         .from(dayMeta)
-        .where(and(gte(dayMeta.day, start), lte(dayMeta.day, end))),
+        .where(
+          and(
+            eq(dayMeta.bondId, bondId),
+            gte(dayMeta.day, start),
+            lte(dayMeta.day, end),
+          ),
+        ),
       db
         .select()
         .from(workouts)
-        .where(and(gte(workouts.day, start), lte(workouts.day, end))),
+        .where(
+          and(
+            eq(workouts.bondId, bondId),
+            gte(workouts.day, start),
+            lte(workouts.day, end),
+          ),
+        ),
       db
         .select()
         .from(targets)
+        .where(eq(targets.bondId, bondId))
         .orderBy(asc(targets.effectiveDate), asc(targets.id)),
-      getFirstBothDay(),
+      getFirstBothDay(bondId),
     ]);
 
   const setRows =
@@ -133,7 +155,13 @@ export async function buildLedgerRange(
     })
     .from(workoutSets)
     .innerJoin(workouts, eq(workoutSets.workoutId, workouts.id))
-    .where(and(eq(workoutSets.kind, "lift"), lte(workouts.day, end)))
+    .where(
+      and(
+        eq(workouts.bondId, bondId),
+        eq(workoutSets.kind, "lift"),
+        lte(workouts.day, end),
+      ),
+    )
     .orderBy(asc(workouts.day), asc(workoutSets.id));
 
   // Food facts per profile per day.
@@ -169,12 +197,13 @@ export async function buildLedgerRange(
     workoutsByKey.set(key, list);
   }
 
-  // Rolling per-exercise bests per profile, snapshotted before each day.
-  // (Days with no lift sets have no snapshot; the empty-map fallback is
-  // harmless there — a day without lifts can't strike a New Mark.)
-  const historyBefore = new Map<Profile, Map<string, Map<string, number>>>();
-  for (const profile of PROFILES) {
-    const mine = allSetRows.filter((r) => r.profileId === profile);
+  // Rolling per-exercise bests per SLOT, snapshotted before each day. (Days with
+  // no lift sets have no snapshot; the empty-map fallback is harmless there — a
+  // day without lifts can't strike a New Mark.)
+  const historyBefore = new Map<Slot, Map<string, Map<string, number>>>();
+  for (const slot of SLOTS) {
+    const pid = members[slot]?.id;
+    const mine = pid ? allSetRows.filter((r) => r.profileId === pid) : [];
     const byDay = new Map<string, typeof mine>();
     for (const r of mine) {
       const list = byDay.get(r.day) ?? [];
@@ -192,39 +221,43 @@ export async function buildLedgerRange(
         if (rm > (rolling.get(k) ?? 0)) rolling.set(k, rm);
       }
     }
-    historyBefore.set(profile, snapshots);
+    historyBefore.set(slot, snapshots);
   }
 
-  const targetFor = (profile: Profile, day: string) => {
+  const targetFor = (pid: string | undefined, day: string) => {
+    if (!pid) return null;
     let match: (typeof targetRows)[number] | null = null;
     for (const t of targetRows) {
-      if (t.profileId === profile && t.effectiveDate <= day) match = t;
+      if (t.profileId === pid && t.effectiveDate <= day) match = t;
     }
     return match;
   };
 
-  const keeperDayFor = (profile: Profile, day: string): KeeperDay => {
-    const f = facts.get(`${profile}:${day}`) ?? emptyFacts();
-    const meta = metaRows.find(
-      (m) => m.profileId === profile && m.day === day,
-    );
+  const keeperDayFor = (slot: Slot, day: string): KeeperDay => {
+    const pid = members[slot]?.id;
+    const f = (pid && facts.get(`${pid}:${day}`)) || emptyFacts();
+    const meta = pid
+      ? metaRows.find((m) => m.profileId === pid && m.day === day)
+      : undefined;
     return buildKeeperDay({
       calories: f.calories,
       proteinG: f.proteinG,
       halls: [...f.halls],
-      target: targetFor(profile, day),
+      target: targetFor(pid, day),
       meta: meta ?? null,
-      workouts: workoutsByKey.get(`${profile}:${day}`) ?? [],
+      workouts: (pid && workoutsByKey.get(`${pid}:${day}`)) || [],
       historyBest:
-        historyBefore.get(profile)?.get(day) ?? new Map<string, number>(),
+        historyBefore.get(slot)?.get(day) ?? new Map<string, number>(),
       firstLoggedAtMs: f.firstLoggedAtMs,
     });
   };
 
+  const mossId = members.moss?.id;
+  const emberId = members.ember?.id;
   const days: LedgerEntry[] = [];
   for (let d = start; d <= end && d <= today; d = nextDay(d)) {
-    const moss = keeperDayFor("matthew", d);
-    const ember = keeperDayFor("kennedy", d);
+    const moss = keeperDayFor("moss", d);
+    const ember = keeperDayFor("ember", d);
     const spec = composeSigil({
       day: d,
       moss,
@@ -238,8 +271,8 @@ export async function buildLedgerRange(
       bothLowLogged:
         spec.completed && isLowMood(moss.mood) && isLowMood(ember.mood),
       workoutCount:
-        (workoutsByKey.get(`matthew:${d}`)?.length ?? 0) +
-        (workoutsByKey.get(`kennedy:${d}`)?.length ?? 0),
+        (mossId ? (workoutsByKey.get(`${mossId}:${d}`)?.length ?? 0) : 0) +
+        (emberId ? (workoutsByKey.get(`${emberId}:${d}`)?.length ?? 0) : 0),
       bothWatered: moss.waterCups >= 8 && ember.waterCups >= 8,
     });
   }
@@ -248,25 +281,25 @@ export async function buildLedgerRange(
 
 // The full-history ledger is the app's most expensive read — a sigil composed
 // for every day since the first entry, on every home/library/shore load (and a
-// month's worth on the Spellbook). It's derived purely from the date range +
-// today (no cookies/headers), so it caches cleanly across requests. Tagged
-// LEDGER_TAG; every write that changes a ledger input calls
-// revalidateTag(LEDGER_TAG) to recompute (see lib/cache-tags.ts). Single-tenant
-// today, so the couple safely shares one entry — the key grows a couple_id when
-// the household boundary lands.
+// month's worth on the Spellbook). It's derived purely from bondId + the date
+// range + today (no cookies/headers), so it caches cleanly across requests.
+// bondId leads the cache key, so one bond can never be served another's ledger.
+// Tagged LEDGER_TAG; every write that changes a ledger input calls
+// revalidateTag(LEDGER_TAG, {expire:0}) to recompute (see lib/cache-tags.ts).
 const cachedLedgerRange = unstable_cache(
-  (start: string, end: string, today: string) =>
-    buildLedgerRange(start, end, today),
+  (bondId: string, start: string, end: string, today: string) =>
+    buildLedgerRange(bondId, start, end, today),
   ["ledger-range"],
   { tags: [LEDGER_TAG] },
 );
 
 export async function buildMonthLedger(
+  bondId: string,
   monthPrefix: string, // "YYYY-MM"
   today: string,
 ): Promise<LedgerEntry[]> {
   const end = lastDayOfMonth(monthPrefix);
-  return cachedLedgerRange(`${monthPrefix}-01`, end, today);
+  return cachedLedgerRange(bondId, `${monthPrefix}-01`, end, today);
 }
 
 // The Glade's whole memory: beings called by the full history, vitality from
@@ -286,10 +319,13 @@ export type GladeState = {
   firstBothDay: string | null;
 };
 
-export async function getGladeState(today: string): Promise<GladeState> {
+export async function getGladeState(
+  bondId: string,
+  today: string,
+): Promise<GladeState> {
   const [firstDay, dream] = await Promise.all([
-    getFirstEntryDay(),
-    getActiveDream(),
+    getFirstEntryDay(bondId),
+    getActiveDream(bondId),
   ]);
 
   // Planks ride the same ledger the beings do — a completed day since this
@@ -319,7 +355,7 @@ export async function getGladeState(today: string): Promise<GladeState> {
     };
   }
 
-  const ledger = await cachedLedgerRange(firstDay, today, today);
+  const ledger = await cachedLedgerRange(bondId, firstDay, today, today);
 
   const history: LedgerDay[] = ledger.map((e) => ({
     day: e.day,

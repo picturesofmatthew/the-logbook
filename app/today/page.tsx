@@ -4,7 +4,7 @@ import { OwnColumn } from "@/components/journal/own-column";
 import { PartnerGlance } from "@/components/journal/partner-glance";
 import { TrainLog } from "@/components/journal/train-log";
 import { TodayRune } from "@/components/shell/rune-icons";
-import { DISPLAY_NAMES, partnerOf } from "@/lib/auth";
+import { partnerSlot, requireBond } from "@/lib/bond";
 import {
   getAllSpecimens,
   getDayExtras,
@@ -16,7 +16,6 @@ import {
 } from "@/lib/data";
 import { addDays, currentTz, friendlyDate, todayIso } from "@/lib/dates";
 import { newMarks } from "@/lib/engine/training";
-import { currentProfile } from "@/lib/session";
 
 // The ledger — the day's numbers, reached from the Today rune. The seal, the
 // world, and the ceremonies live on the glade; this page is where the marks
@@ -26,8 +25,8 @@ export default async function TodayPage({
 }: {
   searchParams: Promise<{ d?: string }>;
 }) {
-  const profile = await currentProfile();
-  const partner = partnerOf(profile);
+  const { userId, bondId, viewerSlot, members } = await requireBond();
+  const partner = partnerSlot(viewerSlot);
   const today = await todayIso();
   const tz = await currentTz();
 
@@ -37,20 +36,20 @@ export default async function TodayPage({
   const isToday = day === today;
 
   const [journal, specimens, recents, extras, weighInLb] = await Promise.all([
-    getJournalDay(day),
+    getJournalDay(bondId, day),
     getAllSpecimens(),
-    getRecentSpecimens(profile),
-    getDayExtras(day),
-    getWeighIn(profile, day),
+    getRecentSpecimens(bondId, userId),
+    getDayExtras(bondId, day),
+    getWeighIn(bondId, viewerSlot, day),
   ]);
   const [dayWorkouts, histories] = await Promise.all([
-    getWorkoutsForDay(day),
-    getExerciseHistories(day),
+    getWorkoutsForDay(bondId, day),
+    getExerciseHistories(bondId, day),
   ]);
 
   const ownMarks = newMarks(
-    dayWorkouts[profile].flatMap((w) => w.sets),
-    histories[profile].best,
+    dayWorkouts[viewerSlot].flatMap((w) => w.sets),
+    histories[viewerSlot].best,
   );
 
   return (
@@ -101,34 +100,38 @@ export default async function TodayPage({
 
       <div className="wobbly border-2 border-ink/20 bg-cream/70 p-4 shadow-card">
         <OwnColumn
-          displayName={DISPLAY_NAMES[profile]}
+          displayName={members[viewerSlot]?.displayName ?? "You"}
           day={day}
-          entries={journal[profile].entries}
-          target={journal[profile].target}
+          entries={journal[viewerSlot].entries}
+          target={journal[viewerSlot].target}
           specimens={specimens}
           recents={recents}
         />
       </div>
       <PartnerGlance
-        displayName={DISPLAY_NAMES[partner]}
+        displayName={members[partner]?.displayName ?? "Your partner"}
         entries={journal[partner].entries}
         target={journal[partner].target}
         mood={extras.meta[partner].mood}
         note={extras.meta[partner].note}
       />
 
-      <DailyRituals day={day} meta={extras.meta[profile]} weighInLb={weighInLb} />
+      <DailyRituals
+        day={day}
+        meta={extras.meta[viewerSlot]}
+        weighInLb={weighInLb}
+      />
 
       <TrainLog
         day={day}
-        workouts={dayWorkouts[profile]}
-        exerciseNames={histories[profile].names}
+        workouts={dayWorkouts[viewerSlot]}
+        exerciseNames={histories[viewerSlot].names}
         newMarkExercises={ownMarks}
-        bestEntries={[...histories[profile].best]}
-        training={extras.meta[profile].training}
+        bestEntries={[...histories[viewerSlot].best]}
+        training={extras.meta[viewerSlot].training}
       />
 
-      {journal[profile].target === null ? (
+      {journal[viewerSlot].target === null ? (
         <Link
           href="/settings"
           className="wobbly-sm border-2 border-dashed border-ink/30 bg-transparent px-4 py-2 text-center text-sm text-ink-soft hover:border-gold"

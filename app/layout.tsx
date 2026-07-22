@@ -8,7 +8,10 @@ import { ShellProvider } from "@/components/shell/shell-provider";
 import { TopBar } from "@/components/shell/top-bar";
 import { SwRegister } from "@/components/sw-register";
 import { TzSync } from "@/components/tz-sync";
-import { DISPLAY_NAMES, SESSION_COOKIE, verifySession } from "@/lib/auth";
+import { eq } from "drizzle-orm";
+import { db } from "@/db";
+import { profiles } from "@/db/schema";
+import { SESSION_COOKIE, verifySession } from "@/lib/auth";
 import { currentTz, todayIso } from "@/lib/dates";
 import { hourInTz, lightStateForHour } from "@/lib/light";
 import "./globals.css";
@@ -28,7 +31,7 @@ const display = Fraunces({
 
 export const metadata: Metadata = {
   title: "signed × sealed",
-  description: "A shared logbook for Matthew & Kennedy",
+  description: "A shared logbook for two.",
   appleWebApp: {
     capable: true,
     title: "signed × sealed",
@@ -52,17 +55,21 @@ export default async function RootLayout({
   // route but /enter, so a null profile here means we're on the door, which
   // must render bare (no chrome, no profile).
   const token = (await cookies()).get(SESSION_COOKIE)?.value;
-  const profile = await verifySession(token);
+  const userId = await verifySession(token);
 
   let chrome: { name: string; dateLabel: string } | null = null;
-  if (profile) {
+  if (userId) {
+    const [row] = await db
+      .select({ displayName: profiles.displayName })
+      .from(profiles)
+      .where(eq(profiles.id, userId));
     const today = await todayIso();
     const dateLabel = new Intl.DateTimeFormat("en-US", {
       timeZone: tz,
       month: "short",
       day: "numeric",
     }).format(new Date(today + "T12:00:00"));
-    chrome = { name: DISPLAY_NAMES[profile], dateLabel };
+    chrome = { name: row?.displayName ?? "", dateLabel };
   }
 
   return (

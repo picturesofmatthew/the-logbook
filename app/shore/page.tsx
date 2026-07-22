@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { DreamForm } from "@/components/shore/dream-form";
 import { ShoreScene } from "@/components/shore/shore-scene";
+import { requireBond } from "@/lib/bond";
 import { getReachedShores } from "@/lib/data";
 import { currentTz, friendlyDate, todayIso } from "@/lib/dates";
 import { getGladeState } from "@/lib/ledger";
-import { currentProfile } from "@/lib/session";
 import { renameDream, setNextShore } from "./actions";
 
 // THE FAR SHORE — the Dream in focus. Reached by tapping the distance on the
@@ -15,11 +15,11 @@ export default async function ShorePage({
 }: {
   searchParams: Promise<{ planks?: string }>;
 }) {
-  await currentProfile();
+  const { bondId } = await requireBond();
   const today = await todayIso();
   const [glade, reached, tz] = await Promise.all([
-    getGladeState(today),
-    getReachedShores(),
+    getGladeState(bondId, today),
+    getReachedShores(bondId),
     currentTz(),
   ]);
   const dream = glade.dream;

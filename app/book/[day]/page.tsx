@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { DaySeal } from "@/components/sigil/day-seal";
 import { MealGlyph, MoodFace, WaterDrop, WorkoutGlyph } from "@/components/glyphs";
-import { DISPLAY_NAMES, PROFILES, type Profile } from "@/lib/auth";
+import { requireBond, SLOTS, type Slot } from "@/lib/bond";
 import {
   getDayExtras,
   getExerciseHistories,
@@ -20,7 +20,6 @@ import { composeSigil } from "@/lib/engine/sigil";
 import { totalOf } from "@/lib/engine/totals";
 import { MEALS, type JournalEntry } from "@/lib/meals";
 import { getFirstBothDay } from "@/lib/ledger";
-import { currentProfile } from "@/lib/session";
 
 export const metadata: Metadata = {
   title: "A day's page - signed × sealed",
@@ -52,7 +51,7 @@ export default async function DayPage({
 }: {
   params: Promise<{ day: string }>;
 }) {
-  await currentProfile();
+  const { bondId, members } = await requireBond();
   const { day } = await params;
   const today = await todayIso();
   if (!/^\d{4}-\d{2}-\d{2}$/.test(day) || day > today) notFound();
@@ -60,27 +59,30 @@ export default async function DayPage({
 
   const [journal, extras, dayWorkouts, firstLogs, firstBothDay] =
     await Promise.all([
-      getJournalDay(day),
-      getDayExtras(day),
-      getWorkoutsForDay(day),
-      getFirstLogTimes(day),
-      getFirstBothDay(),
+      getJournalDay(bondId, day),
+      getDayExtras(bondId, day),
+      getWorkoutsForDay(bondId, day),
+      getFirstLogTimes(bondId, day),
+      getFirstBothDay(bondId),
     ]);
-  const [histories, matthewWeighIn, kennedyWeighIn] = await Promise.all([
-    getExerciseHistories(day),
-    getWeighIn("matthew", day),
-    getWeighIn("kennedy", day),
+  const [histories, mossWeighIn, emberWeighIn] = await Promise.all([
+    getExerciseHistories(bondId, day),
+    getWeighIn(bondId, "moss", day),
+    getWeighIn(bondId, "ember", day),
   ]);
-  const weighIns = { matthew: matthewWeighIn, kennedy: kennedyWeighIn };
+  const weighIns = { moss: mossWeighIn, ember: emberWeighIn };
 
   const totals = Object.fromEntries(
-    PROFILES.map((p) => [
-      p,
+    SLOTS.map((slot) => [
+      slot,
       totalOf(
-        journal[p].entries.map((e) => ({ ...e.food, servings: e.servings })),
+        journal[slot].entries.map((e) => ({
+          ...e.food,
+          servings: e.servings,
+        })),
       ),
     ]),
-  ) as Record<Profile, ReturnType<typeof totalOf>>;
+  ) as Record<Slot, ReturnType<typeof totalOf>>;
 
   const dayData = {
     journal,
@@ -91,18 +93,18 @@ export default async function DayPage({
   };
   const spec = composeSigil({
     day,
-    moss: keeperDayFromDay("matthew", dayData),
-    ember: keeperDayFromDay("kennedy", dayData),
+    moss: keeperDayFromDay("moss", dayData),
+    ember: keeperDayFromDay("ember", dayData),
     firstPage: firstBothDay === day,
   });
-  if (spec.legendary) await recordLegendary(spec.legendary, day);
+  if (spec.legendary) await recordLegendary(bondId, spec.legendary, day);
 
   // Where a past day stands when the ring didn't close — warm, past-tense,
   // never a scold. A solo log was still a kept half.
   const soloKept = spec.moss.inked !== spec.ember.inked;
   const keptName = spec.moss.inked
-    ? DISPLAY_NAMES["matthew"]
-    : DISPLAY_NAMES["kennedy"];
+    ? (members.moss?.displayName ?? "")
+    : (members.ember?.displayName ?? "");
   const standingLine = spec.completed
     ? null
     : soloKept
@@ -134,32 +136,32 @@ export default async function DayPage({
       </div>
 
       <div className="wobbly grid grid-cols-2 gap-4 border-2 border-ink/20 bg-cream/70 p-4 shadow-card">
-        {PROFILES.map((p, i) => {
-          const target = journal[p].target;
+        {SLOTS.map((slot, i) => {
+          const target = journal[slot].target;
           const over =
-            target != null && totals[p].calories > target.calories;
+            target != null && totals[slot].calories > target.calories;
           return (
             <div
-              key={p}
+              key={slot}
               className={
                 i === 1 ? "border-l-2 border-dashed border-ink/15 pl-4" : ""
               }
             >
               <p
                 className={`font-display text-xs tracking-wide ${
-                  p === "matthew" ? "text-moss-deep" : "text-terracotta"
+                  slot === "moss" ? "text-moss-deep" : "text-terracotta"
                 }`}
               >
-                {DISPLAY_NAMES[p].toUpperCase()}
+                {(members[slot]?.displayName ?? "").toUpperCase()}
               </p>
 
-              {journal[p].entries.length === 0 ? (
+              {journal[slot].entries.length === 0 ? (
                 <p className="mt-2 text-xs text-ink-soft/70">
                   this page stayed quiet
                 </p>
               ) : (
                 <>
-                  {mealsFor(journal[p].entries).map(({ meal, items }) => (
+                  {mealsFor(journal[slot].entries).map(({ meal, items }) => (
                     <div key={meal.id} className="mt-2">
                       <p className="flex items-center gap-1 text-[10px] text-ink-soft">
                         <MealGlyph meal={meal.id} size={11} /> {meal.label}
@@ -177,15 +179,15 @@ export default async function DayPage({
                       over ? "text-terracotta-soft" : "text-ink-soft"
                     }`}
                   >
-                    {Math.round(totals[p].calories)} kcal
+                    {Math.round(totals[slot].calories)} kcal
                     {target ? ` / ${target.calories}` : ""} ·{" "}
-                    {Math.round(totals[p].proteinG)}g protein
+                    {Math.round(totals[slot].proteinG)}g protein
                     {over ? " · a feast" : ""}
                   </p>
                 </>
               )}
 
-              {dayWorkouts[p].map((w) => (
+              {dayWorkouts[slot].map((w) => (
                 <div key={w.id} className="mt-2">
                   <p className="flex items-center gap-1 text-[10px] text-ink-soft">
                     <WorkoutGlyph kind="lift" size={11} /> {w.title}
@@ -199,19 +201,19 @@ export default async function DayPage({
               ))}
 
               <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-ink-soft">
-                {extras.meta[p].waterCups > 0 ? (
+                {extras.meta[slot].waterCups > 0 ? (
                   <span className="flex items-center gap-1">
-                    <WaterDrop filled size={12} /> {extras.meta[p].waterCups} cups
+                    <WaterDrop filled size={12} /> {extras.meta[slot].waterCups} cups
                   </span>
                 ) : null}
-                {extras.meta[p].mood ? (
-                  <MoodFace mood={extras.meta[p].mood} size={15} />
+                {extras.meta[slot].mood ? (
+                  <MoodFace mood={extras.meta[slot].mood} size={15} />
                 ) : null}
-                {weighIns[p] != null ? <span>{weighIns[p]} lb</span> : null}
+                {weighIns[slot] != null ? <span>{weighIns[slot]} lb</span> : null}
               </p>
-              {extras.meta[p].note ? (
+              {extras.meta[slot].note ? (
                 <p className="mt-1 text-xs italic text-ink-soft">
-                  “{extras.meta[p].note}”
+                  “{extras.meta[slot].note}”
                 </p>
               ) : null}
             </div>

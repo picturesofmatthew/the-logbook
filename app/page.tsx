@@ -8,7 +8,7 @@ import { DaySeal } from "@/components/sigil/day-seal";
 import { LegendaryCeremony } from "@/components/sigil/legendary-ceremony";
 import { SealCeremony } from "@/components/sigil/seal-ceremony";
 import { ShoreArrivalCeremony } from "@/components/sigil/shore-arrival-ceremony";
-import { DISPLAY_NAMES, PROFILES, type Profile } from "@/lib/auth";
+import { requireBond, SLOTS, type Slot } from "@/lib/bond";
 import {
   getArrivals,
   getDayExtras,
@@ -30,7 +30,6 @@ import { stageForDays } from "@/lib/engine/familiar";
 import { composeSigil } from "@/lib/engine/sigil";
 import { totalOf } from "@/lib/engine/totals";
 import { stampsForDay } from "@/lib/engine/stamps";
-import { currentProfile } from "@/lib/session";
 
 // The glade — home, and one continuous living world (not stacked cards). The
 // sky fills the screen behind the chrome; the ring narrates the day in it; two
@@ -47,21 +46,21 @@ const MOTES = [
 ];
 
 export default async function GladeHome() {
-  const viewer = await currentProfile(); // route guard (redirects to /enter if unauthenticated)
+  const { bondId, viewerSlot, members } = await requireBond(); // guard (→ /enter if unauthed)
   const today = await todayIso();
   const day = today;
   const isToday = true;
 
   const [journal, familiarState, extras] = await Promise.all([
-    getJournalDay(day),
-    getFamiliarState(today),
-    getDayExtras(day),
+    getJournalDay(bondId, day),
+    getFamiliarState(bondId, today),
+    getDayExtras(bondId, day),
   ]);
   const [dayWorkouts, firstLogs, histories, glade] = await Promise.all([
-    getWorkoutsForDay(day),
-    getFirstLogTimes(day),
-    getExerciseHistories(day),
-    getGladeState(today),
+    getWorkoutsForDay(bondId, day),
+    getFirstLogTimes(bondId, day),
+    getExerciseHistories(bondId, day),
+    getGladeState(bondId, today),
   ]);
 
   const dayData = {
@@ -73,8 +72,8 @@ export default async function GladeHome() {
   };
   const sigil = composeSigil({
     day,
-    moss: keeperDayFromDay("matthew", dayData),
-    ember: keeperDayFromDay("kennedy", dayData),
+    moss: keeperDayFromDay("moss", dayData),
+    ember: keeperDayFromDay("ember", dayData),
     // First Page fires on the couple's first both-logged day. The home seal
     // must pass the same flag the ledger does — omitting it (the old default of
     // false) left the hero seal reading "common" on the one day the boat below
@@ -82,22 +81,22 @@ export default async function GladeHome() {
     // getGladeState already ran, so this costs no extra query.
     firstPage: glade.firstBothDay === today,
   });
-  const notLogged = PROFILES.filter((p) => journal[p].entries.length === 0);
+  const notLogged = SLOTS.filter((slot) => journal[slot].entries.length === 0);
   const missingName =
     notLogged.length === 2
       ? "you both"
       : notLogged.length === 1
-        ? DISPLAY_NAMES[notLogged[0]]
+        ? (members[notLogged[0]]?.displayName ?? "your partner")
         : null;
 
   // Where the day stands before the ring closes — warm and viewer-aware, never
   // a scold. A solo log is a kept half (your lantern's lit, the fire's up), not
   // a failure to close; and it seeds the "your hand closes it" love-tap.
-  const viewerKept = journal[viewer].entries.length > 0;
+  const viewerKept = journal[viewerSlot].entries.length > 0;
   const soloKept = sigil.moss.inked !== sigil.ember.inked;
   const keptName = sigil.moss.inked
-    ? DISPLAY_NAMES["matthew"]
-    : DISPLAY_NAMES["kennedy"];
+    ? (members.moss?.displayName ?? "")
+    : (members.ember?.displayName ?? "");
   const standingLine = sigil.completed
     ? null
     : soloKept
@@ -111,22 +110,22 @@ export default async function GladeHome() {
   // Persist the earned facts (claim-once, idempotent). Which page-load wins the
   // claim no longer decides who SEES the ceremony — that's the fact + per-device
   // gate below, so BOTH keepers witness each moment on their own screen.
-  const discoveries = await getDiscoveries();
+  const discoveries = await getDiscoveries(bondId);
   if (sigil.legendary && !discoveries.has(sigil.legendary)) {
     // recordLegendary is idempotent (onConflictDoNothing). Whether this load
     // wins the insert or a partner's concurrent load already did, the discovery
     // is now stamped for `day` — so stamp it locally regardless of the return.
     // Gating on the insert win meant the keeper who LOST the race read a stale
     // map and never saw the ceremony, defeating the "both witness it" refactor.
-    await recordLegendary(sigil.legendary, day);
+    await recordLegendary(bondId, sigil.legendary, day);
     discoveries.set(sigil.legendary, day);
   }
 
-  const arrivals = await getArrivals();
+  const arrivals = await getArrivals(bondId);
   for (const b of glade.beings.filter((b) => b.arrived && !arrivals.has(b.id))) {
     // Same as legendaries: stamp locally regardless of who won the write, so
     // the arrival ceremony fires for both keepers on the day it arrives.
-    await recordArrival(b.id, today);
+    await recordArrival(bondId, b.id, today);
     arrivals.set(b.id, today);
   }
 
@@ -137,7 +136,7 @@ export default async function GladeHome() {
       ? diffDays(today, glade.lastLegendaryDay)
       : null,
   });
-  if (paleElk) await recordArrival("pale-elk", today);
+  if (paleElk) await recordArrival(bondId, "pale-elk", today);
 
   // The boat is whole and the far shore is reached — claimed once (stamps
   // `reachedDay`); the Dream stays active until the couple chooses the next one.
@@ -149,7 +148,7 @@ export default async function GladeHome() {
     glade.boat?.complete === true &&
     glade.dream != null &&
     glade.dream.reachedDay == null;
-  if (reachingNow) await reachShore(glade.dream!.id, today);
+  if (reachingNow) await reachShore(bondId, glade.dream!.id, today);
 
   // ── What to celebrate today — computed from FACTS (the composed sigil, the
   // recorded arrival days, the boat), not the claim booleans. The grandest wins
@@ -171,15 +170,18 @@ export default async function GladeHome() {
     (reachingNow || glade.dream.reachedDay === today);
 
   const stamps = stampsForDay({
-    people: PROFILES.map((p) => ({
-      name: DISPLAY_NAMES[p],
+    people: SLOTS.map((slot) => ({
+      name: members[slot]?.displayName ?? "",
       total: totalOf(
-        journal[p].entries.map((e) => ({ ...e.food, servings: e.servings })),
+        journal[slot].entries.map((e) => ({
+          ...e.food,
+          servings: e.servings,
+        })),
       ),
-      target: journal[p].target,
-      loggedAny: journal[p].entries.length > 0,
-      training: extras.meta[p].training,
-      waterCups: extras.meta[p].waterCups,
+      target: journal[slot].target,
+      loggedAny: journal[slot].entries.length > 0,
+      training: extras.meta[slot].training,
+      waterCups: extras.meta[slot].waterCups,
     })),
     newSpecimens: extras.newSpecimens,
   });
@@ -191,19 +193,19 @@ export default async function GladeHome() {
 
   // Who set down the second lantern — the keeper whose log closed the ring
   // today (the later first-log wins). Named only when both times are known.
-  const bothTimed = firstLogs.matthew != null && firstLogs.kennedy != null;
-  const closer: Profile | null =
+  const bothTimed = firstLogs.moss != null && firstLogs.ember != null;
+  const closer: Slot | null =
     sigil.completed && bothTimed
-      ? firstLogs.matthew! >= firstLogs.kennedy!
-        ? "matthew"
-        : "kennedy"
+      ? firstLogs.moss! >= firstLogs.ember!
+        ? "moss"
+        : "ember"
       : null;
   const closerLine =
     closer == null
       ? null
-      : closer === viewer
+      : closer === viewerSlot
         ? "you closed the ring"
-        : `${DISPLAY_NAMES[closer]} closed the ring`;
+        : `${members[closer]?.displayName ?? ""} closed the ring`;
 
   return (
     <main
@@ -323,12 +325,12 @@ export default async function GladeHome() {
               inklings={familiarState.loggedToday.length}
               hearthDay={isToday && hearthDay}
               mossLit={
-                familiarState.loggedToday.includes("matthew") ||
-                dayWorkouts.matthew.length > 0
+                familiarState.loggedToday.includes("moss") ||
+                dayWorkouts.moss.length > 0
               }
               emberLit={
-                familiarState.loggedToday.includes("kennedy") ||
-                dayWorkouts.kennedy.length > 0
+                familiarState.loggedToday.includes("ember") ||
+                dayWorkouts.ember.length > 0
               }
             />
             <div className="absolute bottom-[7%] left-1/2 -translate-x-1/2">

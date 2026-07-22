@@ -9,7 +9,7 @@ import {
 import { LibraryRune, PantryRune, BestiaryRune } from "@/components/shell/rune-icons";
 import { StarMark } from "@/components/glyphs";
 import { GiltHeading } from "@/components/shell/plate";
-import { DISPLAY_NAMES, PROFILES, type Profile } from "@/lib/auth";
+import { requireBond, SLOTS, type Slot } from "@/lib/bond";
 import {
   getAllSpecimens,
   getArrivals,
@@ -21,7 +21,6 @@ import { HALLS } from "@/lib/halls";
 import { BEINGS } from "@/lib/engine/beings";
 import { LEGENDARIES, type LegendaryId, type SigilSpec } from "@/lib/engine/sigil";
 import { getGladeState } from "@/lib/ledger";
-import { currentProfile } from "@/lib/session";
 
 export const metadata: Metadata = {
   title: "The Field Book - signed × sealed",
@@ -49,25 +48,34 @@ function legendarySpec(id: LegendaryId): SigilSpec {
 }
 
 export default async function LibraryPage() {
-  await currentProfile();
+  const { bondId, members } = await requireBond();
   const today = await todayIso();
   const tz = await currentTz();
 
   const [specimens, glade, arrivals, discoveries, shores] = await Promise.all([
     getAllSpecimens(),
-    getGladeState(today),
-    getArrivals(),
-    getDiscoveries(),
-    getReachedShores(),
+    getGladeState(bondId, today),
+    getArrivals(bondId),
+    getDiscoveries(bondId),
+    getReachedShores(bondId),
   ]);
+
+  // Resolve donor names from THIS bond's members. The museum is shared across
+  // bonds, so a specimen donated by another bond shows a generic label rather
+  // than a stranger's name.
+  const nameById = new Map(
+    SLOTS.map((slot) => members[slot])
+      .filter((m): m is NonNullable<typeof m> => m != null)
+      .map((m) => [m.id, m.displayName]),
+  );
 
   // ── Pantry ──
   const donationCounts = Object.fromEntries(
-    PROFILES.map((p) => [
-      p,
-      specimens.filter((s) => s.discoveredBy === p).length,
+    SLOTS.map((slot) => [
+      slot,
+      specimens.filter((s) => s.discoveredBy === members[slot]?.id).length,
     ]),
-  ) as Record<Profile, number>;
+  ) as Record<Slot, number>;
 
   const fmt = new Intl.DateTimeFormat("en-US", {
     timeZone: tz,
@@ -86,7 +94,7 @@ export default async function LibraryPage() {
       carbsG: s.carbsG,
       fatG: s.fatG,
       estimated: s.estimated,
-      donorName: DISPLAY_NAMES[s.discoveredBy as Profile] ?? s.discoveredBy,
+      donorName: nameById.get(s.discoveredBy) ?? "a keeper",
       discoveredLabel: fmt.format(new Date(s.discoveredAt)),
     };
   }
@@ -141,9 +149,10 @@ export default async function LibraryPage() {
         <p className="-mt-2 text-center text-[10px] text-ink-soft">
           {specimens.length}{" "}
           {specimens.length === 1 ? "specimen" : "specimens"} ·{" "}
-          {PROFILES.map((p) => `${DISPLAY_NAMES[p]} ${donationCounts[p]}`).join(
-            " · ",
-          )}
+          {SLOTS.map(
+            (slot) =>
+              `${members[slot]?.displayName ?? ""} ${donationCounts[slot]}`,
+          ).join(" · ")}
         </p>
 
         {specimens.length === 0 ? (

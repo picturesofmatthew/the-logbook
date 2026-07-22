@@ -1,15 +1,16 @@
 "use client";
 
 import { useActionState } from "react";
-import { PROFILES, type Profile } from "@/lib/auth";
 import { enter, type EnterState } from "./actions";
 
-const NICE_NAMES: Record<Profile, string> = {
-  matthew: "Matthew",
-  kennedy: "Kennedy",
-};
-
-export function EnterForm() {
+// The keepers are read from the DB by the page (app/enter/page.tsx) and passed
+// in — no hardcoded names. For now the door still lists a bond's members;
+// real per-user login (email/password) replaces this in a later phase.
+export function EnterForm({
+  keepers,
+}: {
+  keepers: { id: string; displayName: string }[];
+}) {
   const [state, formAction, pending] = useActionState<EnterState, FormData>(
     enter,
     null,
@@ -22,17 +23,17 @@ export function EnterForm() {
           WHO GOES THERE?
         </legend>
         <div className="grid grid-cols-2 gap-3">
-          {PROFILES.map((p) => (
-            <label key={p} className="cursor-pointer">
+          {keepers.map((k) => (
+            <label key={k.id} className="cursor-pointer">
               <input
                 type="radio"
                 name="profile"
-                value={p}
+                value={k.id}
                 required
                 className="peer sr-only"
               />
               <span className="wobbly-sm block border-2 border-ink/30 bg-cream px-4 py-3 text-center text-lg shadow-card transition-all peer-checked:border-moss-deep peer-checked:bg-moss peer-checked:text-cream peer-checked:shadow-pressed">
-                {NICE_NAMES[p]}
+                {k.displayName}
               </span>
             </label>
           ))}

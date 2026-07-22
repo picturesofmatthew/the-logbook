@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SigilGlyph } from "@/components/sigil/sigil-glyph";
 import { BookRune } from "@/components/shell/rune-icons";
+import { requireBond } from "@/lib/bond";
 import { getDiscoveries, recordLegendary } from "@/lib/data";
 import { currentTz, friendlyDate, todayIso } from "@/lib/dates";
 import { Plate } from "@/components/shell/plate";
 import { buildMonthLedger } from "@/lib/ledger";
-import { currentProfile } from "@/lib/session";
 
 export const metadata: Metadata = {
   title: "The Spellbook - signed × sealed",
@@ -23,7 +23,7 @@ export default async function BookPage({
 }: {
   searchParams: Promise<{ m?: string }>;
 }) {
-  await currentProfile();
+  const { bondId } = await requireBond();
   const today = await todayIso();
   const tz = await currentTz();
   const thisMonth = today.slice(0, 7);
@@ -32,16 +32,16 @@ export default async function BookPage({
   const requested = m && /^\d{4}-\d{2}$/.test(m) ? m : thisMonth;
   const month = requested > thisMonth ? thisMonth : requested;
 
-  const ledger = await buildMonthLedger(month, today);
+  const ledger = await buildMonthLedger(bondId, month, today);
 
   // Lazy discovery: any legendary this month's ledger reveals that history hasn't
   // claimed yet gets recorded here (earliest day first). The Legendarium itself
   // now lives in the Field Book (/library) and reads these back — recording stays
   // with the calendar so titles keep accruing as you flip through the months.
-  const known = await getDiscoveries();
+  const known = await getDiscoveries(bondId);
   for (const { day, spec } of ledger) {
     if (spec.legendary && !known.has(spec.legendary)) {
-      await recordLegendary(spec.legendary, day);
+      await recordLegendary(bondId, spec.legendary, day);
     }
   }
 

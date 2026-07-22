@@ -8,7 +8,7 @@ import { profiles, targets, weighIns } from "@/db/schema";
 import { LEDGER_TAG } from "@/lib/cache-tags";
 import { todayIso } from "@/lib/dates";
 import { safely } from "@/lib/safe";
-import { currentProfile } from "@/lib/session";
+import { currentUser } from "@/lib/session";
 import type { ActivityLevel, Sex } from "@/lib/engine/tdee";
 
 export type SetupState = { error: string } | null;
@@ -31,7 +31,7 @@ export async function saveSetup(
   _prev: SetupState,
   formData: FormData,
 ): Promise<SetupState> {
-  const profileId = await currentProfile();
+  const { userId: profileId, bondId } = await currentUser();
 
   const sex = formData.get("sex");
   const birthdate = formData.get("birthdate");
@@ -86,13 +86,14 @@ export async function saveSetup(
 
     await db
       .insert(weighIns)
-      .values({ profileId, day: today, weightLb })
+      .values({ bondId, profileId, day: today, weightLb })
       .onConflictDoUpdate({
         target: [weighIns.profileId, weighIns.day],
         set: { weightLb },
       });
 
     await db.insert(targets).values({
+      bondId,
       profileId,
       effectiveDate: today,
       calories,

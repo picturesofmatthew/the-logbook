@@ -1,22 +1,19 @@
-// Session tokens: `${profile}.${hmac(profile)}`, signed with AUTH_SECRET.
-// Web Crypto only, so the same code runs in the proxy (edge) and server actions.
+// Session tokens: `${userId}.${hmac(userId)}`, signed with AUTH_SECRET. The user
+// id is app-generated + globally unique, so a valid signature is itself
+// sufficient proof of identity — no allowlist. Web Crypto only, so the same code
+// runs in the proxy (edge) and server actions.
 
 export const SESSION_COOKIE = "logbook_session";
 
-export const PROFILES = ["matthew", "kennedy"] as const;
-export type Profile = (typeof PROFILES)[number];
+// The two sides of a bond. Which user holds which slot is runtime data on the
+// bond (see lib/bond.ts), not a fixed identity — this replaces the old
+// two-keeper `Profile` union. The engine already composes the seal from moss +
+// ember, so the data layer keys per-person state by Slot to match.
+export const SLOTS = ["moss", "ember"] as const;
+export type Slot = (typeof SLOTS)[number];
 
-export const DISPLAY_NAMES: Record<Profile, string> = {
-  matthew: "Matthew",
-  kennedy: "Kennedy",
-};
-
-export function partnerOf(profile: Profile): Profile {
-  return profile === "matthew" ? "kennedy" : "matthew";
-}
-
-export function isProfile(value: unknown): value is Profile {
-  return PROFILES.includes(value as Profile);
+export function partnerSlot(slot: Slot): Slot {
+  return slot === "moss" ? "ember" : "moss";
 }
 
 const encoder = new TextEncoder();
@@ -54,15 +51,20 @@ export function timingSafeEqual(a: string, b: string): boolean {
   return diff === 0;
 }
 
-export async function signSession(profile: Profile): Promise<string> {
-  return `${profile}.${await hmac(profile)}`;
+export async function signSession(userId: string): Promise<string> {
+  return `${userId}.${await hmac(userId)}`;
 }
 
+// A valid signature proves we issued this id — sufficient identity, no allowlist
+// (ids are globally unique). Split on the LAST dot so the id stays opaque.
 export async function verifySession(
   token: string | undefined,
-): Promise<Profile | null> {
+): Promise<string | null> {
   if (!token) return null;
-  const [profile, sig] = token.split(".");
-  if (!isProfile(profile) || !sig) return null;
-  return timingSafeEqual(sig, await hmac(profile)) ? profile : null;
+  const dot = token.lastIndexOf(".");
+  if (dot <= 0) return null;
+  const userId = token.slice(0, dot);
+  const sig = token.slice(dot + 1);
+  if (!userId || !sig) return null;
+  return timingSafeEqual(sig, await hmac(userId)) ? userId : null;
 }

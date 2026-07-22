@@ -6,7 +6,7 @@ import {
   WeightChart,
   type ChartSeries,
 } from "@/components/trends/weight-chart";
-import { DISPLAY_NAMES, PROFILES, type Profile } from "@/lib/auth";
+import { SLOTS, requireBond, type Slot } from "@/lib/bond";
 import {
   getAllWeighIns,
   getDailyTotalsSince,
@@ -14,7 +14,6 @@ import {
   type WeighInPoint,
 } from "@/lib/data";
 import { addDays, currentTz, diffDays, todayIso } from "@/lib/dates";
-import { currentProfile } from "@/lib/session";
 
 export const metadata: Metadata = {
   title: "The Almanac - signed × sealed",
@@ -32,9 +31,12 @@ function PlateCaption({ numeral, title }: { numeral: string; title: string }) {
 // Fixed series colors, validated for CVD + contrast on the cream surface.
 // Kennedy sits a shade deeper than the plate-frame gold (#d9a441) so her line
 // and dots don't blend into the gilt border now that the Almanac is plated.
-const SERIES_COLORS: Record<Profile, string> = {
-  matthew: "#a45438",
-  kennedy: "#b8751a",
+// Keyed by slot (moss | ember). NOTE: these differ from the glade's
+// moss/terracotta — unifying keeper colors across surfaces is a deferred design
+// task; here we preserve the current Almanac appearance.
+const SERIES_COLORS: Record<Slot, string> = {
+  moss: "#a45438",
+  ember: "#b8751a",
 };
 
 function rollingAverage(points: WeighInPoint[]): WeighInPoint[] {
@@ -58,21 +60,21 @@ function weekLabel(monday: string): string {
 }
 
 export default async function TrendsPage() {
-  await currentProfile();
+  const { bondId, members } = await requireBond();
   const today = await todayIso();
   const tz = await currentTz();
 
   const [weighIns, dailyTotals, monthMarks] = await Promise.all([
-    getAllWeighIns(),
-    getDailyTotalsSince(addDays(today, -42)),
-    getMonthMarks(today.slice(0, 7)),
+    getAllWeighIns(bondId),
+    getDailyTotalsSince(bondId, addDays(today, -42)),
+    getMonthMarks(bondId, today.slice(0, 7)),
   ]);
 
-  const series: ChartSeries[] = PROFILES.map((p) => ({
-    name: DISPLAY_NAMES[p],
-    color: SERIES_COLORS[p],
-    points: weighIns[p],
-    rolling: rollingAverage(weighIns[p]),
+  const series: ChartSeries[] = SLOTS.map((slot) => ({
+    name: members[slot]?.displayName ?? "",
+    color: SERIES_COLORS[slot],
+    points: weighIns[slot],
+    rolling: rollingAverage(weighIns[slot]),
   }));
 
   // Weekly averages over logged days, most recent weeks first.
@@ -82,8 +84,8 @@ export default async function TrendsPage() {
   const weeklyRows = weeks
     .map((monday) => {
       const sunday = addDays(monday, 6);
-      const cells = PROFILES.map((p) => {
-        const days = dailyTotals[p].filter(
+      const cells = SLOTS.map((slot) => {
+        const days = dailyTotals[slot].filter(
           (t) => t.day >= monday && t.day <= sunday,
         );
         if (days.length === 0) return null;
@@ -187,9 +189,9 @@ export default async function TrendsPage() {
             <thead>
               <tr className="text-left font-display text-[10px] text-ink-soft">
                 <th className="pb-1 font-normal">WEEK</th>
-                {PROFILES.map((p) => (
-                  <th key={p} className="pb-1 text-right font-normal">
-                    {DISPLAY_NAMES[p].toUpperCase()}
+                {SLOTS.map((slot) => (
+                  <th key={slot} className="pb-1 text-right font-normal">
+                    {(members[slot]?.displayName ?? "").toUpperCase()}
                   </th>
                 ))}
               </tr>
@@ -247,9 +249,9 @@ export default async function TrendsPage() {
                 title={[
                   day,
                   monthMarks.bothDays.has(day) ? "both logged" : null,
-                  ...PROFILES.map((p) =>
-                    monthMarks.training[p][day]
-                      ? `${DISPLAY_NAMES[p]} ${monthMarks.training[p][day]}`
+                  ...SLOTS.map((slot) =>
+                    monthMarks.training[slot][day]
+                      ? `${members[slot]?.displayName ?? ""} ${monthMarks.training[slot][day]}`
                       : null,
                   ),
                 ]
@@ -270,12 +272,12 @@ export default async function TrendsPage() {
                   {monthMarks.bothDays.has(day) && day <= today ? (
                     <HeartMark size={7} className="text-terracotta" />
                   ) : null}
-                  {PROFILES.map((p) =>
-                    monthMarks.training[p][day] ? (
+                  {SLOTS.map((slot) =>
+                    monthMarks.training[slot][day] ? (
                       <span
-                        key={p}
+                        key={slot}
                         className="inline-block h-1.5 w-1.5 rounded-full"
-                        style={{ backgroundColor: SERIES_COLORS[p] }}
+                        style={{ backgroundColor: SERIES_COLORS[slot] }}
                       />
                     ) : null,
                   )}
@@ -286,14 +288,14 @@ export default async function TrendsPage() {
         </div>
         <p className="mt-2 text-center text-[10px] text-ink-soft">
           <HeartMark size={9} className="inline-block align-middle text-terracotta" /> both logged ·{" "}
-          {PROFILES.map((p, i) => (
-            <span key={p}>
+          {SLOTS.map((slot, i) => (
+            <span key={slot}>
               {i > 0 ? " · " : ""}
               <span
                 className="inline-block h-1.5 w-1.5 rounded-full align-middle"
-                style={{ backgroundColor: SERIES_COLORS[p] }}
+                style={{ backgroundColor: SERIES_COLORS[slot] }}
               />{" "}
-              {DISPLAY_NAMES[p]} trained
+              {members[slot]?.displayName ?? ""} trained
             </span>
           ))}
         </p>
