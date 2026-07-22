@@ -135,6 +135,93 @@ body {
   border-radius: 50% 50% 14px 14px / 22% 22% 14px 14px;
 }
 
+/* ── The grimoire plate ──
+   The sigil's ornate gold frame, translated to rectangular panels: a parchment
+   ground, a gold double-border, and cabochon corner-bosses (drawn by the Plate
+   component). Every card speaks this so the whole app reads as pages of one
+   illuminated book — ornate, warm, intentional. */
+.plate {
+  position: relative;
+  background-color: var(--color-paper);
+  /* the coarse ink hatch, carried on the background so absolute children (the
+     glade scene) still work above it */
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent 0 6px,
+    color-mix(in srgb, var(--color-ink) 4%, transparent) 6px 7px
+  );
+  border: 1.6px solid color-mix(in srgb, var(--color-gold) 82%, var(--color-ink));
+  border-radius: 12px;
+  box-shadow:
+    inset 0 0 0 3px var(--color-paper),
+    inset 0 0 0 4px color-mix(in srgb, var(--color-gold) 55%, transparent),
+    var(--shadow-card);
+}
+/* cabochon corner-bosses — gold beads with an ink rim + a soft highlight,
+   echoing the sigil frame's diagonal star-bosses */
+.plate-corner {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 35% 32%,
+    var(--color-gold-soft) 0 25%,
+    var(--color-gold) 40% 70%,
+    color-mix(in srgb, var(--color-gold) 60%, var(--color-ink)) 100%
+  );
+  border: 1.2px solid var(--color-ink);
+  z-index: 2;
+}
+.plate-corner.tl {
+  top: -5px;
+  left: -5px;
+}
+.plate-corner.tr {
+  top: -5px;
+  right: -5px;
+}
+.plate-corner.bl {
+  bottom: -5px;
+  left: -5px;
+}
+.plate-corner.br {
+  bottom: -5px;
+  right: -5px;
+}
+/* frame-only — an ornate window: the gold border + corner-bosses with no
+   parchment fill, so a living scene (the glade) shows through the frame. */
+.plate.frame-only {
+  background-color: transparent;
+  background-image: none;
+  box-shadow: inset 0 0 0 4px color-mix(in srgb, var(--color-gold) 45%, transparent);
+}
+
+/* A gilt section heading — the title flanked by a gold rule that fades out,
+   with a small star pip, so headers feel struck rather than typed. */
+.gilt-heading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  font-family: var(--font-display), Georgia, serif;
+  color: var(--color-ink);
+  letter-spacing: 0.02em;
+}
+.gilt-heading::before,
+.gilt-heading::after {
+  content: "";
+  height: 1.5px;
+  flex: 0 0 1.75rem;
+  border-radius: 1px;
+}
+.gilt-heading::before {
+  background: linear-gradient(90deg, transparent, var(--color-gold));
+}
+.gilt-heading::after {
+  background: linear-gradient(90deg, var(--color-gold), transparent);
+}
+
 /* ── The Glade scene ──
    Scene-specific colors that can't ride the shared tokens (a day sky and a
    night sky differ in structure, not just value). Fauna is the silhouette
