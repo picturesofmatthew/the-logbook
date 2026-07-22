@@ -75,6 +75,12 @@ export default async function GladeHome() {
     day,
     moss: keeperDayFromDay("matthew", dayData),
     ember: keeperDayFromDay("kennedy", dayData),
+    // First Page fires on the couple's first both-logged day. The home seal
+    // must pass the same flag the ledger does — omitting it (the old default of
+    // false) left the hero seal reading "common" on the one day the boat below
+    // it showed a golden plank and the glade counted +5. Derived from the scan
+    // getGladeState already ran, so this costs no extra query.
+    firstPage: glade.firstBothDay === today,
   });
   const notLogged = PROFILES.filter((p) => journal[p].entries.length === 0);
   const missingName =
@@ -107,14 +113,21 @@ export default async function GladeHome() {
   // gate below, so BOTH keepers witness each moment on their own screen.
   const discoveries = await getDiscoveries();
   if (sigil.legendary && !discoveries.has(sigil.legendary)) {
-    if (await recordLegendary(sigil.legendary, day)) {
-      discoveries.set(sigil.legendary, day);
-    }
+    // recordLegendary is idempotent (onConflictDoNothing). Whether this load
+    // wins the insert or a partner's concurrent load already did, the discovery
+    // is now stamped for `day` — so stamp it locally regardless of the return.
+    // Gating on the insert win meant the keeper who LOST the race read a stale
+    // map and never saw the ceremony, defeating the "both witness it" refactor.
+    await recordLegendary(sigil.legendary, day);
+    discoveries.set(sigil.legendary, day);
   }
 
   const arrivals = await getArrivals();
   for (const b of glade.beings.filter((b) => b.arrived && !arrivals.has(b.id))) {
-    if (await recordArrival(b.id, today)) arrivals.set(b.id, today);
+    // Same as legendaries: stamp locally regardless of who won the write, so
+    // the arrival ceremony fires for both keepers on the day it arrives.
+    await recordArrival(b.id, today);
+    arrivals.set(b.id, today);
   }
 
   // The Pale Elk: glimpsed, never resident. First glimpse recorded silently.
@@ -128,10 +141,15 @@ export default async function GladeHome() {
 
   // The boat is whole and the far shore is reached — claimed once (stamps
   // `reachedDay`); the Dream stays active until the couple chooses the next one.
-  const reachedNow =
-    glade.boat?.complete && glade.dream && glade.dream.reachedDay == null
-      ? await reachShore(glade.dream.id, today)
-      : false;
+  // getGladeState fetched the dream fresh this request, so reachedDay == null
+  // here means it wasn't reached before now: if the boat is complete, it is
+  // reached TODAY — independent of who wins the idempotent write — so both
+  // keepers witness the shore, not just the one whose load ran reachShore first.
+  const reachingNow =
+    glade.boat?.complete === true &&
+    glade.dream != null &&
+    glade.dream.reachedDay == null;
+  if (reachingNow) await reachShore(glade.dream!.id, today);
 
   // ── What to celebrate today — computed from FACTS (the composed sigil, the
   // recorded arrival days, the boat), not the claim booleans. The grandest wins
@@ -150,7 +168,7 @@ export default async function GladeHome() {
   const shoreReachedToday =
     !!glade.dream &&
     glade.boat?.complete === true &&
-    (reachedNow || glade.dream.reachedDay === today);
+    (reachingNow || glade.dream.reachedDay === today);
 
   const stamps = stampsForDay({
     people: PROFILES.map((p) => ({

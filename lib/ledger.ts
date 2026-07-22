@@ -4,6 +4,7 @@
 // pass feeds the Glade: chords call beings, effort sets vitality.
 
 import { and, asc, eq, gte, inArray, lte } from "drizzle-orm";
+import { unstable_cache } from "next/cache";
 import { db } from "@/db";
 import {
   dayMeta,
@@ -14,6 +15,7 @@ import {
   workoutSets,
 } from "@/db/schema";
 import { PROFILES, type Profile } from "@/lib/auth";
+import { LEDGER_TAG } from "@/lib/cache-tags";
 import { bothLoggedDays, getActiveDream, type DreamRow } from "@/lib/data";
 import { beingStates, type BeingState, type LedgerDay } from "@/lib/engine/beings";
 import { boatState, type BoatDay, type BoatState } from "@/lib/engine/boat";
@@ -244,17 +246,27 @@ export async function buildLedgerRange(
   return days;
 }
 
-// Ledger results are always derived from source rows, never stored — the
-// whole history grows seals retroactively the moment it is read. Reads run
-// on dynamic (cookie-gated) pages that already recompute per request; the
-// bounded queries below keep that cheap. Per-household caching is a
-// scale-time concern, designed alongside the household boundary.
+// The full-history ledger is the app's most expensive read — a sigil composed
+// for every day since the first entry, on every home/library/shore load (and a
+// month's worth on the Spellbook). It's derived purely from the date range +
+// today (no cookies/headers), so it caches cleanly across requests. Tagged
+// LEDGER_TAG; every write that changes a ledger input calls
+// revalidateTag(LEDGER_TAG) to recompute (see lib/cache-tags.ts). Single-tenant
+// today, so the couple safely shares one entry — the key grows a couple_id when
+// the household boundary lands.
+const cachedLedgerRange = unstable_cache(
+  (start: string, end: string, today: string) =>
+    buildLedgerRange(start, end, today),
+  ["ledger-range"],
+  { tags: [LEDGER_TAG] },
+);
+
 export async function buildMonthLedger(
   monthPrefix: string, // "YYYY-MM"
   today: string,
 ): Promise<LedgerEntry[]> {
   const end = lastDayOfMonth(monthPrefix);
-  return buildLedgerRange(`${monthPrefix}-01`, end, today);
+  return cachedLedgerRange(`${monthPrefix}-01`, end, today);
 }
 
 // The Glade's whole memory: beings called by the full history, vitality from
@@ -268,6 +280,10 @@ export type GladeState = {
   // same ledger scan.
   dream: DreamRow | null;
   boat: BoatState | null;
+  // The earliest both-logged day in the whole history — the First Page.
+  // Surfaced so the home glade composes today's seal with the same `firstPage`
+  // flag the ledger uses, instead of silently defaulting it to false.
+  firstBothDay: string | null;
 };
 
 export async function getGladeState(today: string): Promise<GladeState> {
@@ -299,10 +315,11 @@ export async function getGladeState(today: string): Promise<GladeState> {
       lastLegendaryDay: null,
       dream,
       boat: boatFrom([]),
+      firstBothDay: null,
     };
   }
 
-  const ledger = await buildLedgerRange(firstDay, today, today);
+  const ledger = await cachedLedgerRange(firstDay, today, today);
 
   const history: LedgerDay[] = ledger.map((e) => ({
     day: e.day,
@@ -328,6 +345,12 @@ export async function getGladeState(today: string): Promise<GladeState> {
   const lastLegendaryDay =
     ledger.filter((e) => e.spec.legendary != null).at(-1)?.day ?? null;
 
+  // The full-history ledger is ordered ascending, so the first completed day is
+  // the First Page. This equals the ledger's own getFirstBothDay() over the
+  // whole range (both keepers logging ⇔ two distinct profiles logging), so the
+  // home seal's firstPage flag matches what /book and the ledger already show.
+  const firstBothDay = ledger.find((e) => e.spec.completed)?.day ?? null;
+
   return {
     tier: gladeTier(
       vitalityScore(window),
@@ -337,6 +360,7 @@ export async function getGladeState(today: string): Promise<GladeState> {
     lastLegendaryDay,
     dream,
     boat: boatFrom(ledger),
+    firstBothDay,
   };
 }
 

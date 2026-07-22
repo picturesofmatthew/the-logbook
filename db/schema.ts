@@ -1,6 +1,7 @@
 import {
   boolean,
   date,
+  index,
   integer,
   pgEnum,
   pgTable,
@@ -97,19 +98,30 @@ export const mealEnum = pgEnum("meal", [
   "snacks",
 ]);
 
-export const entries = pgTable("entries", {
-  id: serial("id").primaryKey(),
-  profileId: text("profile_id")
-    .references(() => profiles.id)
-    .notNull(),
-  day: date("day").notNull(),
-  meal: mealEnum("meal").notNull(),
-  foodId: integer("food_id")
-    .references(() => foods.id)
-    .notNull(),
-  servings: real("servings").notNull().default(1),
-  loggedAt: timestamp("logged_at").defaultNow().notNull(),
-});
+export const entries = pgTable(
+  "entries",
+  {
+    id: serial("id").primaryKey(),
+    profileId: text("profile_id")
+      .references(() => profiles.id)
+      .notNull(),
+    day: date("day").notNull(),
+    meal: mealEnum("meal").notNull(),
+    foodId: integer("food_id")
+      .references(() => foods.id)
+      .notNull(),
+    servings: real("servings").notNull().default(1),
+    loggedAt: timestamp("logged_at").defaultNow().notNull(),
+  },
+  // The ledger scans by day-range and buckets per profile; deletes and the
+  // journal read filter by (profile, day); logs join to foods. Without these
+  // every one of those is a sequential scan (flagged: stack M1, DB M2).
+  (t) => [
+    index("entries_day_idx").on(t.day),
+    index("entries_profile_day_idx").on(t.profileId, t.day),
+    index("entries_food_idx").on(t.foodId),
+  ],
+);
 
 export const weighIns = pgTable(
   "weigh_ins",
@@ -137,7 +149,12 @@ export const dayMeta = pgTable(
     note: text("note"),
     mood: text("mood"),
   },
-  (t) => [primaryKey({ columns: [t.profileId, t.day] })],
+  // The composite PK covers (profile, day) lookups, but the ledger reads meta
+  // by day-range across both keepers — a leading-day index the PK can't serve.
+  (t) => [
+    primaryKey({ columns: [t.profileId, t.day] }),
+    index("day_meta_day_idx").on(t.day),
+  ],
 );
 
 // The shared familiar (an arctic fox). Exactly one row. Mood and growth stage
@@ -150,30 +167,43 @@ export const familiar = pgTable("pet", {
 });
 
 // The Training Log: real workouts, not a toggle. A day may hold several.
-export const workouts = pgTable("workouts", {
-  id: serial("id").primaryKey(),
-  profileId: text("profile_id")
-    .references(() => profiles.id)
-    .notNull(),
-  day: date("day").notNull(),
-  title: text("title").notNull(),
-  note: text("note"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+export const workouts = pgTable(
+  "workouts",
+  {
+    id: serial("id").primaryKey(),
+    profileId: text("profile_id")
+      .references(() => profiles.id)
+      .notNull(),
+    day: date("day").notNull(),
+    title: text("title").notNull(),
+    note: text("note"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  // Read by day-range (ledger, rolling PRs) and by (profile, day).
+  (t) => [
+    index("workouts_day_idx").on(t.day),
+    index("workouts_profile_day_idx").on(t.profileId, t.day),
+  ],
+);
 
 // Sets: weight x reps for lifts, minutes for cardio. Bodyweight = null weight.
-export const workoutSets = pgTable("workout_sets", {
-  id: serial("id").primaryKey(),
-  workoutId: integer("workout_id")
-    .references(() => workouts.id, { onDelete: "cascade" })
-    .notNull(),
-  kind: text("kind", { enum: ["lift", "cardio"] }).notNull(),
-  exercise: text("exercise").notNull(),
-  setIndex: integer("set_index").notNull().default(0),
-  weightLb: real("weight_lb"),
-  reps: integer("reps"),
-  minutes: real("minutes"),
-});
+export const workoutSets = pgTable(
+  "workout_sets",
+  {
+    id: serial("id").primaryKey(),
+    workoutId: integer("workout_id")
+      .references(() => workouts.id, { onDelete: "cascade" })
+      .notNull(),
+    kind: text("kind", { enum: ["lift", "cardio"] }).notNull(),
+    exercise: text("exercise").notNull(),
+    setIndex: integer("set_index").notNull().default(0),
+    weightLb: real("weight_lb"),
+    reps: integer("reps"),
+    minutes: real("minutes"),
+  },
+  // The ledger lifts sets by workoutId (inArray join) on every history scan.
+  (t) => [index("workout_sets_workout_idx").on(t.workoutId)],
+);
 
 // First discoveries of legendary sigils — one ceremony each, ever. The sigil
 // itself is always derived from day data; only the discovery moment is stored.

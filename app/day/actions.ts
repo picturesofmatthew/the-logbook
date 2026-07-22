@@ -1,8 +1,9 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { db } from "@/db";
 import { dayMeta, weighIns } from "@/db/schema";
+import { LEDGER_TAG } from "@/lib/cache-tags";
 import { safely } from "@/lib/safe";
 import { todayIso } from "@/lib/dates";
 import { currentProfile } from "@/lib/session";
@@ -78,6 +79,7 @@ export async function setTraining(input: {
     await upsertMeta(profileId, day, { training: input.training });
     revalidatePath("/");
     revalidatePath("/today");
+    revalidateTag(LEDGER_TAG, { expire: 0 });
     return {};
   });
 }
@@ -95,6 +97,7 @@ export async function setWater(input: {
     await upsertMeta(profileId, day, { waterCups: cups });
     revalidatePath("/");
     revalidatePath("/today");
+    revalidateTag(LEDGER_TAG, { expire: 0 });
     return {};
   });
 }
@@ -111,6 +114,7 @@ export async function setMood(input: {
     await upsertMeta(profileId, day, { mood });
     revalidatePath("/");
     revalidatePath("/today");
+    revalidateTag(LEDGER_TAG, { expire: 0 });
     return {};
   });
 }
@@ -127,6 +131,7 @@ export async function saveNote(input: {
     await upsertMeta(profileId, day, { note });
     revalidatePath("/");
     revalidatePath("/today");
+    revalidateTag(LEDGER_TAG, { expire: 0 });
     return {};
   });
 }

@@ -1,9 +1,11 @@
 "use server";
 
 import { eq } from "drizzle-orm";
+import { revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/db";
 import { profiles, targets, weighIns } from "@/db/schema";
+import { LEDGER_TAG } from "@/lib/cache-tags";
 import { todayIso } from "@/lib/dates";
 import { safely } from "@/lib/safe";
 import { currentProfile } from "@/lib/session";
@@ -102,5 +104,9 @@ export async function saveSetup(
   });
   if (saved) return saved;
 
+  // New/changed targets re-weight every day's seal from the effective date on,
+  // so expire the cached ledger before the redirect lands on a fresh "/".
+  // { expire: 0 } = immediate (read-your-writes), not "max"'s stale-while-revalidate.
+  revalidateTag(LEDGER_TAG, { expire: 0 });
   redirect("/");
 }

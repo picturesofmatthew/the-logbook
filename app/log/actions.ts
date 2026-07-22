@@ -1,9 +1,10 @@
 "use server";
 
 import { and, eq, inArray, sql } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { db } from "@/db";
 import { entries, foods, recipeItems } from "@/db/schema";
+import { LEDGER_TAG } from "@/lib/cache-tags";
 import { todayIso } from "@/lib/dates";
 import { safely } from "@/lib/safe";
 import { currentProfile } from "@/lib/session";
@@ -59,6 +60,7 @@ export async function logEntry(input: {
     });
     revalidatePath("/");
     revalidatePath("/today");
+    revalidateTag(LEDGER_TAG, { expire: 0 });
     return {};
   });
 }
@@ -71,6 +73,7 @@ export async function removeEntry(entryId: number): Promise<void> {
       .where(and(eq(entries.id, entryId), eq(entries.profileId, profileId)));
     revalidatePath("/");
     revalidatePath("/today");
+    revalidateTag(LEDGER_TAG, { expire: 0 });
     return {};
   });
 }
