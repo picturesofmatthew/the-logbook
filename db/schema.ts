@@ -12,10 +12,32 @@ import {
   timestamp,
 } from "drizzle-orm/pg-core";
 
-// The two keepers of the logbook. Rows are seeded once; `id` doubles as the
-// session profile value ('matthew' | 'kennedy').
+// A bond: the two-person tenant — a couple, gym partners, or friends. Every
+// per-bond row carries bond_id, and the seal still cannot close alone. `kind`
+// only flavors copy; `tz` is the future per-bond timezone (column added now,
+// wired to todayIso() in a later phase). `id` is app-generated + globally unique.
+export const bondKindEnum = pgEnum("bond_kind", [
+  "couple",
+  "gym_partners",
+  "friends",
+]);
+export const slotEnum = pgEnum("slot", ["moss", "ember"]);
+
+export const bonds = pgTable("bonds", {
+  id: text("id").primaryKey(),
+  kind: bondKindEnum("kind").notNull().default("couple"),
+  tz: text("tz"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// A keeper: one side of a bond. `bondId` + `slot` (moss|ember) place them; the
+// engine composes the seal from the bond's moss and ember. (bond_id/slot are
+// nullable through the tenancy backfill, then made NOT NULL once every row is
+// stamped.)
 export const profiles = pgTable("profiles", {
   id: text("id").primaryKey(),
+  bondId: text("bond_id").references(() => bonds.id),
+  slot: slotEnum("slot"),
   displayName: text("display_name").notNull(),
   // Calculator inputs (Mifflin-St Jeor). All optional until set up in settings.
   sex: text("sex", { enum: ["male", "female"] }),
@@ -31,6 +53,7 @@ export const profiles = pgTable("profiles", {
 // history stays honest as the cut progresses.
 export const targets = pgTable("targets", {
   id: serial("id").primaryKey(),
+  bondId: text("bond_id").references(() => bonds.id),
   profileId: text("profile_id")
     .references(() => profiles.id)
     .notNull(),
@@ -102,6 +125,7 @@ export const entries = pgTable(
   "entries",
   {
     id: serial("id").primaryKey(),
+    bondId: text("bond_id").references(() => bonds.id),
     profileId: text("profile_id")
       .references(() => profiles.id)
       .notNull(),
@@ -126,6 +150,7 @@ export const entries = pgTable(
 export const weighIns = pgTable(
   "weigh_ins",
   {
+    bondId: text("bond_id").references(() => bonds.id),
     profileId: text("profile_id")
       .references(() => profiles.id)
       .notNull(),
@@ -140,6 +165,7 @@ export const weighIns = pgTable(
 export const dayMeta = pgTable(
   "day_meta",
   {
+    bondId: text("bond_id").references(() => bonds.id),
     profileId: text("profile_id")
       .references(() => profiles.id)
       .notNull(),
@@ -162,6 +188,7 @@ export const dayMeta = pgTable(
 // named "pet" until the multi-user pass renames it and adds household_id.)
 export const familiar = pgTable("pet", {
   id: integer("id").primaryKey().default(1),
+  bondId: text("bond_id").references(() => bonds.id),
   name: text("name"),
   adoptedAt: timestamp("adopted_at").defaultNow().notNull(),
 });
@@ -171,6 +198,7 @@ export const workouts = pgTable(
   "workouts",
   {
     id: serial("id").primaryKey(),
+    bondId: text("bond_id").references(() => bonds.id),
     profileId: text("profile_id")
       .references(() => profiles.id)
       .notNull(),
@@ -209,6 +237,7 @@ export const workoutSets = pgTable(
 // itself is always derived from day data; only the discovery moment is stored.
 export const sigilDiscoveries = pgTable("sigil_discoveries", {
   id: serial("id").primaryKey(),
+  bondId: text("bond_id").references(() => bonds.id),
   sigilId: text("sigil_id").notNull().unique(),
   day: date("day").notNull(),
   discoveredAt: timestamp("discovered_at").defaultNow().notNull(),
@@ -218,6 +247,7 @@ export const sigilDiscoveries = pgTable("sigil_discoveries", {
 // Being state itself is always derived from chord history.
 export const beingArrivals = pgTable("being_arrivals", {
   id: serial("id").primaryKey(),
+  bondId: text("bond_id").references(() => bonds.id),
   beingId: text("being_id").notNull().unique(),
   day: date("day").notNull(),
   arrivedAt: timestamp("arrived_at").defaultNow().notNull(),
@@ -231,6 +261,7 @@ export const beingArrivals = pgTable("being_arrivals", {
 // "choose your next shore" arc means more than one row over time.
 export const dreams = pgTable("dreams", {
   id: serial("id").primaryKey(),
+  bondId: text("bond_id").references(() => bonds.id),
   name: text("name").notNull(),
   // Both-logged days (planks) to reach the shore. No deadline; never regresses.
   distanceDays: integer("distance_days").notNull(),
