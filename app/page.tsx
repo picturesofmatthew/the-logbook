@@ -3,7 +3,6 @@ import { ArrivalCeremony } from "@/components/glade/arrival-ceremony";
 import { GladeScene, type BeingStages } from "@/components/glade/glade-scene";
 import { HorizonGlimpse } from "@/components/glade/horizon-glimpse";
 import { FamiliarGlyph } from "@/components/familiar/familiar-glyph";
-import { Plate } from "@/components/shell/plate";
 import { StampMark } from "@/components/glyphs";
 import { DaySeal } from "@/components/sigil/day-seal";
 import { LegendaryCeremony } from "@/components/sigil/legendary-ceremony";
@@ -241,42 +240,38 @@ export default async function GladeHome() {
         </Link>
       ) : null}
 
-      {/* THE GLADE — an ornate window onto the living scene at the foot; the
-          familiar and the creatures live here as ambient life, framed like a
-          lantern-lit window in the grimoire, no longer the focus. */}
-      <div className="px-3 pb-3">
-        <Plate frameOnly className="h-[150px] rounded-[1.25rem]">
-          <div className="absolute inset-[3px] overflow-hidden rounded-[1.1rem]">
-            <div className="absolute inset-x-0 bottom-0 flex justify-center">
-              <div className="relative w-[128%] shrink-0">
-                <GladeScene
-                  skyless
-                  tier={glade.tier}
-                  beings={beingStages}
-                  paleElk={paleElk}
-                  inklings={familiarState.loggedToday.length}
-                  hearthDay={isToday && hearthDay}
-                  mossLit={
-                    familiarState.loggedToday.includes("matthew") ||
-                    dayWorkouts.matthew.length > 0
-                  }
-                  emberLit={
-                    familiarState.loggedToday.includes("kennedy") ||
-                    dayWorkouts.kennedy.length > 0
-                  }
-                />
-                <div className="absolute bottom-[8%] left-1/2 -translate-x-1/2">
-                  <FamiliarGlyph
-                    stage={familiarStage}
-                    size={62}
-                    className="idle-bounce"
-                    title={`${familiarState.name ?? "the fox"}, a ${familiarStage} — the glade is ${glade.tier}`}
-                  />
-                </div>
-              </div>
+      {/* THE GLADE — the living world, full-bleed at the foot of the screen:
+          the immersive foreground where the familiar and creatures roam, no
+          frame, edge to edge, so the home reads as one continuous world. */}
+      <div className="relative w-full overflow-hidden">
+        <div className="flex justify-center">
+          <div className="relative w-[150%] shrink-0">
+            <GladeScene
+              skyless
+              tier={glade.tier}
+              beings={beingStages}
+              paleElk={paleElk}
+              inklings={familiarState.loggedToday.length}
+              hearthDay={isToday && hearthDay}
+              mossLit={
+                familiarState.loggedToday.includes("matthew") ||
+                dayWorkouts.matthew.length > 0
+              }
+              emberLit={
+                familiarState.loggedToday.includes("kennedy") ||
+                dayWorkouts.kennedy.length > 0
+              }
+            />
+            <div className="absolute bottom-[7%] left-1/2 -translate-x-1/2">
+              <FamiliarGlyph
+                stage={familiarStage}
+                size={72}
+                className="idle-bounce"
+                title={`${familiarState.name ?? "the fox"}, a ${familiarStage} — the glade is ${glade.tier}`}
+              />
             </div>
           </div>
-        </Plate>
+        </div>
       </div>
 
       {/* ceremonies — overlays that fire on arrival, grandest first. Reaching
