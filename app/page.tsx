@@ -183,8 +183,9 @@ export default async function GladeHome() {
           "linear-gradient(180deg, var(--glade-sky-top) 0%, var(--glade-sky-bottom) 58%, var(--glade-ground-top) 100%)",
       }}
     >
-      {/* THE SIGIL — the day's seal, the hero of the home */}
-      <div className="flex flex-col items-center gap-4 px-6 pt-14 pb-3 text-center">
+      {/* THE SIGIL — the day's seal, the hero of the home. Sized to leave the
+          glade + the distant shore on-screen without scrolling. */}
+      <div className="flex flex-col items-center gap-3 px-6 pt-12 pb-2 text-center">
         {/* tap the seal to open today's ledger — the numbers behind the mark.
             the hint gives the art object a visible "this is a door" affordance. */}
         <Link
@@ -193,8 +194,13 @@ export default async function GladeHome() {
           aria-label="Open today's page — food, water, mood, the ledger"
           className="group block cursor-pointer transition-transform active:scale-[0.98]"
         >
-          <DaySeal spec={sigil} standingLine={standingLine} isToday={isToday} />
-          <span className="mt-2.5 inline-flex items-center gap-1.5 font-sans text-[11px] uppercase tracking-[0.14em] text-terracotta/75 transition-colors group-hover:text-terracotta">
+          <DaySeal
+            spec={sigil}
+            standingLine={standingLine}
+            isToday={isToday}
+            size={208}
+          />
+          <span className="mt-2 inline-flex items-center gap-1.5 font-sans text-[11px] uppercase tracking-[0.14em] text-terracotta/75 transition-colors group-hover:text-terracotta">
             today&apos;s page
             <span aria-hidden className="transition-transform group-hover:translate-x-0.5">
               ❯

@@ -129,7 +129,11 @@ export default async function TrendsPage() {
         </p>
       </header>
 
-      <section className="wobbly hatch border-2 border-ink/20 bg-cream/70 p-4 shadow-card">
+      <section className="plate p-4">
+        <span className="plate-corner tl" aria-hidden />
+        <span className="plate-corner tr" aria-hidden />
+        <span className="plate-corner bl" aria-hidden />
+        <span className="plate-corner br" aria-hidden />
         <PlateCaption numeral="I" title="THE WEIGHT LINE" />
         <p className="mb-3 text-xs text-ink-soft">
           Dots are mornings; the line is your 7-day average — steer by the
@@ -166,7 +170,11 @@ export default async function TrendsPage() {
         ) : null}
       </section>
 
-      <section className="wobbly hatch border-2 border-ink/20 bg-cream/70 p-4 shadow-card">
+      <section className="plate p-4">
+        <span className="plate-corner tl" aria-hidden />
+        <span className="plate-corner tr" aria-hidden />
+        <span className="plate-corner bl" aria-hidden />
+        <span className="plate-corner br" aria-hidden />
         <PlateCaption numeral="II" title="THE WEEKS, AVERAGED" />
         {weeklyRows.length === 0 ? (
           <p className="text-sm text-ink-soft">
@@ -213,7 +221,11 @@ export default async function TrendsPage() {
         )}
       </section>
 
-      <section className="wobbly hatch border-2 border-ink/20 bg-cream/70 p-4 shadow-card">
+      <section className="plate p-4">
+        <span className="plate-corner tl" aria-hidden />
+        <span className="plate-corner tr" aria-hidden />
+        <span className="plate-corner bl" aria-hidden />
+        <span className="plate-corner br" aria-hidden />
         <PlateCaption numeral="III" title={monthName.toUpperCase()} />
         <div className="grid grid-cols-7 gap-1 text-center">
           {["s", "m", "t", "w", "t", "f", "s"].map((d, i) => (
