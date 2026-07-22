@@ -101,23 +101,14 @@ export default async function GladeHome() {
   const hearthDay =
     sigil.chords.includes("hearth") || sigil.legendary === "feast-seal";
 
-  // The request that claims the discovery row throws the ceremony — once, ever.
-  const newlyDiscovered =
-    sigil.legendary != null
-      ? await recordLegendary(sigil.legendary, day)
-      : false;
+  // Persist the earned facts (claim-once, idempotent). Which page-load wins the
+  // claim no longer decides who SEES the ceremony — that's the fact + per-device
+  // gate below, so BOTH keepers witness each moment on their own screen.
+  if (sigil.legendary) await recordLegendary(sigil.legendary, day);
 
-  // Every being announces its first arrival — one ceremony per load.
-  let newBeing: BeingId | null = null;
-  if (!newlyDiscovered) {
-    const recorded = await getArrivals();
-    const pending = glade.beings.filter((b) => b.arrived && !recorded.has(b.id));
-    for (const b of pending) {
-      if (await recordArrival(b.id, today)) {
-        newBeing = b.id;
-        break;
-      }
-    }
+  const arrivals = await getArrivals();
+  for (const b of glade.beings.filter((b) => b.arrived && !arrivals.has(b.id))) {
+    if (await recordArrival(b.id, today)) arrivals.set(b.id, today);
   }
 
   // The Pale Elk: glimpsed, never resident. First glimpse recorded silently.
@@ -129,14 +120,25 @@ export default async function GladeHome() {
   });
   if (paleElk) await recordArrival("pale-elk", today);
 
-  // The boat is whole and the far shore is reached — the rarest moment, claimed
-  // once. The request that stamps `reachedDay` throws the arrival ceremony; the
-  // Dream stays active (the finished vessel keeps showing) until the couple
-  // chooses the next one.
-  const reachedShore =
+  // The boat is whole and the far shore is reached — claimed once (stamps
+  // `reachedDay`); the Dream stays active until the couple chooses the next one.
+  const reachedNow =
     glade.boat?.complete && glade.dream && glade.dream.reachedDay == null
       ? await reachShore(glade.dream.id, today)
       : false;
+
+  // ── What to celebrate today — computed from FACTS (the composed sigil, the
+  // recorded arrival days, the boat), not the claim booleans. The grandest wins
+  // the night (shore > legendary > being > seal); each ceremony then gates
+  // itself once-per-device (lib/ceremony-seen) so neither keeper is skipped. ──
+  const legendaryToday = isToday ? sigil.legendary : null;
+  const beingArrivedToday =
+    glade.beings.find((b) => b.arrived && arrivals.get(b.id) === today)?.id ??
+    null;
+  const shoreReachedToday =
+    !!glade.dream &&
+    glade.boat?.complete === true &&
+    (reachedNow || glade.dream.reachedDay === today);
 
   const stamps = stampsForDay({
     people: PROFILES.map((p) => ({
@@ -308,26 +310,31 @@ export default async function GladeHome() {
       {/* ceremonies — overlays that fire on arrival, grandest first. Reaching
           the far shore outranks a legendary, a legendary a being, a being the
           plain seal; a grander one suppresses the rest for the night. */}
-      {reachedShore && glade.dream ? (
-        <ShoreArrivalCeremony dreamName={glade.dream.name} />
+      {shoreReachedToday && glade.dream ? (
+        <ShoreArrivalCeremony dreamName={glade.dream.name} day={today} />
       ) : null}
-      {!reachedShore && newlyDiscovered && sigil.legendary ? (
+      {!shoreReachedToday && legendaryToday ? (
         <LegendaryCeremony
-          legendary={sigil.legendary}
+          legendary={legendaryToday}
           spec={sigil}
+          day={today}
           dreamName={glade.dream?.name}
           planksLaid={glade.boat?.planksLaid}
           remaining={glade.boat?.remaining}
         />
       ) : null}
-      {!reachedShore && newBeing ? <ArrivalCeremony being={newBeing} /> : null}
+      {!shoreReachedToday && !legendaryToday && beingArrivedToday ? (
+        <ArrivalCeremony being={beingArrivedToday} day={today} />
+      ) : null}
       {sigil.completed && isToday ? (
         <SealCeremony
           spec={sigil}
           day={day}
           closerLine={closerLine}
           sealedCount={familiarState.lifetimeDays}
-          suppressed={reachedShore || newlyDiscovered || newBeing != null}
+          suppressed={
+            shoreReachedToday || !!legendaryToday || !!beingArrivedToday
+          }
           dreamName={glade.dream?.name}
           planksLaid={glade.boat?.planksLaid}
           remaining={glade.boat?.remaining}

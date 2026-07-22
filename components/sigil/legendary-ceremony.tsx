@@ -1,11 +1,12 @@
 "use client";
 
-// The first-discovery ceremony. The server only renders this on the request
-// that actually claimed the discovery row, so it fires exactly once, ever,
-// per legendary — the moment it is first earned.
+// The first-discovery ceremony. The home decides a legendary was earned today
+// (a fact from the composed sigil); this gates itself once-per-device so BOTH
+// keepers witness it, not just whoever loaded the page first.
 
 import { useEffect, useState } from "react";
 import { LEGENDARIES, type LegendaryId, type SigilSpec } from "@/lib/engine/sigil";
+import { ceremonyUnseen } from "@/lib/ceremony-seen";
 import { legendaryTone, plankTone } from "@/lib/sounds";
 import { StarMark } from "@/components/glyphs";
 import { PlankBeat } from "./plank-beat";
@@ -14,26 +15,30 @@ import { SigilGlyph } from "./sigil-glyph";
 export function LegendaryCeremony({
   legendary,
   spec,
+  day,
   dreamName,
   planksLaid,
   remaining,
 }: {
   legendary: LegendaryId;
   spec: SigilSpec;
+  day: string;
   // A legendary day also sets a plank — a golden one — into the boat.
   dreamName?: string;
   planksLaid?: number | null;
   remaining?: number | null;
 }) {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const laysPlank = planksLaid != null && dreamName != null;
   useEffect(() => {
+    if (!ceremonyUnseen("logbook_legendary_seen_", day)) return;
+    setOpen(true);
     legendaryTone();
     const plank = laysPlank ? window.setTimeout(() => plankTone(), 1900) : undefined;
     return () => {
       if (plank) window.clearTimeout(plank);
     };
-  }, [laysPlank]);
+  }, [day, laysPlank]);
   if (!open) return null;
   const l = LEGENDARIES[legendary];
 

@@ -1,19 +1,24 @@
 "use client";
 
-// A being's first arrival — witnessed once, ever, by whichever keeper loads
-// the Glade first after it is called. Server-gated by being_arrivals.
+// A being's first arrival. The home decides a being arrived today (a fact from
+// the glade state); this gates itself once-per-device so BOTH keepers witness
+// it on their own screen, not just whoever loaded the Glade first.
 
 import { useEffect, useState } from "react";
 import { BEINGS, type BeingId } from "@/lib/engine/beings";
+import { ceremonyUnseen } from "@/lib/ceremony-seen";
 import { arrivalTone } from "@/lib/sounds";
 import { StarMark } from "@/components/glyphs";
 import { BeingPortrait } from "./being-portrait";
 
-export function ArrivalCeremony({ being }: { being: BeingId }) {
-  const [open, setOpen] = useState(true);
+export function ArrivalCeremony({ being, day }: { being: BeingId; day: string }) {
+  const [open, setOpen] = useState(false);
   useEffect(() => {
+    // per-being key: two beings can arrive on the same day and each is witnessed
+    if (!ceremonyUnseen(`logbook_arrival_${being}_seen_`, day)) return;
+    setOpen(true);
     arrivalTone();
-  }, []);
+  }, [being, day]);
   if (!open) return null;
   const def = BEINGS.find((b) => b.id === being);
   if (!def) return null;

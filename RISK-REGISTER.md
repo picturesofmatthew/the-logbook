@@ -146,7 +146,11 @@ A second adversarial audit (`AUDIT.md`) read the current build. It **confirmed a
 - **[High] Ceremonies fire from DB writes during GET render and are silently consumable.** Opening
   `/book` (which scans the month, incl. today) before home consumes today's legendary claim →
   the ceremony never shows for anyone. `app/page.tsx:91`, `book/page.tsx:42`, `book/[day]/page.tsx:98`.
-  Fix: move claim-once into the log action; page *reads* + shows the ceremony from server-truth "seen".
+  **→ Addressed (2026-07-21):** the legendary / arrival / shore ceremonies now trigger on **facts**
+  (the composed sigil, recorded arrival days, boat state) + a **per-device seen-gate**
+  (`lib/ceremony-seen`), mirroring the seal — so **both** keepers witness each moment once, whatever
+  the browse order. The DB writes remain only to persist the collections. *(Residual: the writes still
+  run on the home render — idempotent; moving them fully to the log action is a later purity cleanup.)*
 - **[High] Legendarium under-reports + wrong "found-on" date** — discoveries are recorded lazily by
   whatever page happens to scan a day; a legendary on an un-revisited day is never recorded, and the
   stored day is first-*observed*, not first-*earned*.

@@ -1,20 +1,29 @@
 "use client";
 
-// Reaching the far shore — the rarest, grandest ceremony. The server renders
-// this only on the request that claimed the arrival (reachShore), so it fires
-// exactly once per shore, the moment the last plank lands. From here the couple
-// chooses where to sail next.
+// Reaching the far shore — the rarest, grandest ceremony. The home decides the
+// boat completed today (a fact from the boat state); this gates itself
+// once-per-device so BOTH keepers witness the landfall, then choose where to
+// sail next.
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { ceremonyUnseen } from "@/lib/ceremony-seen";
 import { StarMark } from "@/components/glyphs";
 import { shoreArrivalTone } from "@/lib/sounds";
 
-export function ShoreArrivalCeremony({ dreamName }: { dreamName: string }) {
-  const [open, setOpen] = useState(true);
+export function ShoreArrivalCeremony({
+  dreamName,
+  day,
+}: {
+  dreamName: string;
+  day: string;
+}) {
+  const [open, setOpen] = useState(false);
   useEffect(() => {
+    if (!ceremonyUnseen("logbook_shore_seen_", day)) return;
+    setOpen(true);
     shoreArrivalTone();
-  }, []);
+  }, [day]);
   if (!open) return null;
 
   return (
