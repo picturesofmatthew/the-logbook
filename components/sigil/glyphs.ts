@@ -14,7 +14,7 @@
 //   the dark middle field (carved runes + lift ornaments float here) →
 //   the bright star-cartouche (the compass core + chord-studs) → the crown gem.
 
-import type { SigilSpec, ChordId } from "@/lib/engine/sigil";
+import type { SigilSpec, ChordId, LegendaryId } from "@/lib/engine/sigil";
 import type { Hall } from "@/lib/halls";
 import type { SplitFamily } from "@/lib/engine/training";
 
@@ -24,6 +24,7 @@ const P = {
   moss: "#7c8a4d", mossDeep: "#5b6b3c", mossLit: "#98a664", terra: "#c4704b", terraDeep: "#a85838", terraLit: "#d68a63",
   gold: "#d9a441", goldSoft: "#ecd9a8", goldDeep: "#9c7526", lipGold: "#f6e8bf",
   violet: "#8d7aa8", violetDeep: "#453a54", violetBright: "#c9b3e3",
+  pine: "#4f5c3e", mist: "#9aa88f", // calm earth-greens for the still-water legendary
   // the dark cartouche the seal floats in
   groundMid: "#3b4f52", groundEdge: "#243638", groundCore: "#42585a", flake: "#243638",
 };
@@ -141,6 +142,65 @@ export const NATURE_CORES: Record<Nature, Core> = {
   rest: (cx, cy, line, fill, _pts, z) => `<circle cx="${cx}" cy="${cy}" r="${8 * z}" fill="${fill}" ${strk(line)}/><path d="M ${cx - 5.5 * z} ${cy} q ${2.7 * z} ${-3 * z} ${5.5 * z} 0 t ${5.5 * z} 0" fill="none" ${strk(line)}/>`,
 };
 
+// ── SWAPPABLE: legendary faces — each named legendary gets its OWN emblem at
+//    the cartouche center + its own color cast (the field/glow), instead of
+//    sharing the 5 nature-cores and a uniform violet. `cast` tints the dark
+//    medallion + field; `glow` is the luminous halo; `core` is the emblem. ──
+type LegCore = (cx: number, cy: number, line: string, fill: string, z: number) => string;
+type LegendaryFace = { cast: string; glow: string; core: LegCore };
+export const LEGENDARY_FACES: Record<LegendaryId, LegendaryFace> = {
+  // The First Page — an open book: the day the record began. Gilt.
+  "first-page": {
+    cast: P.goldDeep, glow: P.goldSoft,
+    core: (cx, cy, line, fill, z) => `<g fill="${fill}" ${strk(line)}><path d="M ${cx} ${cy - 5 * z} q ${-7 * z} ${-2.5 * z} ${-9 * z} ${0.5 * z} l 0 ${9 * z} q ${2 * z} ${-3 * z} ${9 * z} ${-0.5 * z} Z"/><path d="M ${cx} ${cy - 5 * z} q ${7 * z} ${-2.5 * z} ${9 * z} ${0.5 * z} l 0 ${9 * z} q ${-2 * z} ${-3 * z} ${-9 * z} ${-0.5 * z} Z"/></g><path d="M ${cx} ${cy - 5 * z} L ${cx} ${cy + 4 * z}" fill="none" ${strk(line)}/>`,
+  },
+  // The Quiet Moon — a full moon with craters. Violet night.
+  "quiet-moon": {
+    cast: P.violetDeep, glow: P.violetBright,
+    core: (cx, cy, line, fill, z) => `<circle cx="${cx}" cy="${cy}" r="${7.5 * z}" fill="${fill}" ${strk(line)}/><circle cx="${cx - 2.5 * z}" cy="${cy - 2 * z}" r="${1.4 * z}" fill="none" ${strk(line)} opacity="0.55"/><circle cx="${cx + 2.8 * z}" cy="${cy + 1.6 * z}" r="${1 * z}" fill="none" ${strk(line)} opacity="0.55"/><circle cx="${cx + 0.4 * z}" cy="${cy + 3.6 * z}" r="${0.8 * z}" fill="none" ${strk(line)} opacity="0.55"/>`,
+  },
+  // The Twin Foxes — a paw print: the grind, honored. Earthy ember.
+  "twin-foxes": {
+    cast: P.terraDeep, glow: P.gold,
+    core: (cx, cy, line, fill, z) => `<g fill="${fill}" ${strk(line)}><path d="M ${cx} ${cy + 5.5 * z} q ${-5 * z} ${-1 * z} ${-4 * z} ${-4.5 * z} q ${1 * z} ${-2 * z} ${4 * z} ${-0.5 * z} q ${3 * z} ${-1.5 * z} ${4 * z} ${0.5 * z} q ${1 * z} ${3.5 * z} ${-4 * z} ${4.5 * z} Z"/><circle cx="${cx - 4.2 * z}" cy="${cy - 2.6 * z}" r="${1.5 * z}"/><circle cx="${cx - 1.4 * z}" cy="${cy - 5 * z}" r="${1.5 * z}"/><circle cx="${cx + 1.4 * z}" cy="${cy - 5 * z}" r="${1.5 * z}"/><circle cx="${cx + 4.2 * z}" cy="${cy - 2.6 * z}" r="${1.5 * z}"/></g>`,
+  },
+  // The Twin Peaks — two summits, two stars: two records, one day. Cool night.
+  "twin-peaks": {
+    cast: P.violetDeep, glow: P.goldSoft,
+    core: (cx, cy, line, fill, z) => `<path d="M ${cx - 7.5 * z} ${cy + 5 * z} L ${cx - 3 * z} ${cy - 4.5 * z} L ${cx + 1.5 * z} ${cy + 5 * z} Z" fill="${fill}" ${strk(line)}/><path d="M ${cx - 1.5 * z} ${cy + 5 * z} L ${cx + 3 * z} ${cy - 4.5 * z} L ${cx + 7.5 * z} ${cy + 5 * z} Z" fill="${fill}" ${strk(line)}/><path d="${starPath(cx - 3 * z, cy - 6.4 * z, 1.9 * z, 0.7 * z, 4)}" fill="${line}"/><path d="${starPath(cx + 3 * z, cy - 6.4 * z, 1.9 * z, 0.7 * z, 4)}" fill="${line}"/>`,
+  },
+  // The Green Cathedral — a tree: the clean day. Verdant.
+  "green-cathedral": {
+    cast: P.mossDeep, glow: P.mossLit,
+    core: (cx, cy, line, fill, z) => `<path d="M ${cx} ${cy + 6 * z} L ${cx} ${cy - 1 * z}" fill="none" ${strk(line)}/><path d="M ${cx} ${cy - 6.5 * z} q ${-6 * z} ${2 * z} ${-5.2 * z} ${6 * z} q ${5.2 * z} ${1.5 * z} ${5.2 * z} ${-1 * z} q 0 ${2.5 * z} ${5.2 * z} ${1 * z} q ${0.8 * z} ${-4 * z} ${-5.2 * z} ${-6 * z} Z" fill="${fill}" ${strk(line)}/>`,
+  },
+  // The Long Road Home — a winding path to a marker: endurance, shared. Dusk.
+  "long-road-home": {
+    cast: P.terraDeep, glow: P.gold,
+    core: (cx, cy, line, fill, z) => `<path d="M ${cx - 5 * z} ${cy + 6 * z} Q ${cx + 4 * z} ${cy + 3 * z} ${cx - 2 * z} ${cy - 1 * z} Q ${cx - 6 * z} ${cy - 4 * z} ${cx + 1.5 * z} ${cy - 5.5 * z}" fill="none" ${strk(line)}/><path d="M ${cx + 0.5 * z} ${cy - 7.6 * z} l ${4.5 * z} ${2.1 * z} l ${-4.5 * z} ${2.1 * z} Z" fill="${fill}" ${strk(line)}/>`,
+  },
+  // The Mirror at Dusk — a reflection axis, two facing arcs: timing as tenderness.
+  "mirror-at-dusk": {
+    cast: P.violetDeep, glow: P.violetBright,
+    core: (cx, cy, line, fill, z) => `<path d="M ${cx} ${cy - 6 * z} L ${cx} ${cy + 6 * z}" fill="none" ${strk(line)} opacity="0.5"/><path d="M ${cx - 1.6 * z} ${cy - 5 * z} q ${-6 * z} ${5 * z} 0 ${10 * z}" fill="none" ${strk(line)}/><path d="M ${cx + 1.6 * z} ${cy - 5 * z} q ${6 * z} ${5 * z} 0 ${10 * z}" fill="none" ${strk(line)}/><circle cx="${cx - 4.2 * z}" cy="${cy}" r="${1.1 * z}" fill="${line}"/><circle cx="${cx + 4.2 * z}" cy="${cy}" r="${1.1 * z}" fill="${line}"/>`,
+  },
+  // The Still Water — three ripples: recovery is a discipline. Calm green.
+  "still-water": {
+    cast: P.pine, glow: P.mist,
+    core: (cx, cy, line, fill, z) => `<g fill="none" ${strk(line)}><path d="M ${cx - 4 * z} ${cy - 3.5 * z} q ${2 * z} ${-2 * z} ${4 * z} 0 q ${2 * z} ${2 * z} ${4 * z} 0"/><path d="M ${cx - 6.5 * z} ${cy + 0.5 * z} q ${3.25 * z} ${-3 * z} ${6.5 * z} 0 q ${3.25 * z} ${3 * z} ${6.5 * z} 0"/><path d="M ${cx - 5.5 * z} ${cy + 4.5 * z} q ${2.75 * z} ${-2.6 * z} ${5.5 * z} 0 q ${2.75 * z} ${2.6 * z} ${5.5 * z} 0"/></g>`,
+  },
+  // The Ember Vigil — a candle kept burning: showing up on a hard day. Ember.
+  "ember-vigil": {
+    cast: P.terraDeep, glow: P.terraLit,
+    core: (cx, cy, line, fill, z) => `<path d="M ${cx} ${cy + 6 * z} L ${cx} ${cy - 1 * z} M ${cx - 2.6 * z} ${cy + 6 * z} L ${cx + 2.6 * z} ${cy + 6 * z}" fill="none" ${strk(line)}/><path d="M ${cx} ${cy - 1 * z} q ${-3.6 * z} ${-2 * z} ${-1.8 * z} ${-5.6 * z} q ${-0.3 * z} ${2.3 * z} ${1.3 * z} ${1.9 * z} q ${1.4 * z} ${-2.6 * z} ${-0.3 * z} ${-5.6 * z} q ${4.6 * z} ${2.6 * z} ${2.7 * z} ${7.2 * z} q ${-0.8 * z} ${2 * z} ${-1.9 * z} ${1.7 * z} Z" fill="${fill}" ${strk(line)}/>`,
+  },
+  // The Feast Seal — a bowl of plenty: a feast together, celebrated. Gold.
+  "feast-seal": {
+    cast: P.goldDeep, glow: P.gold,
+    core: (cx, cy, line, fill, z) => `<circle cx="${cx - 2.6 * z}" cy="${cy - 2.6 * z}" r="${1.9 * z}" fill="${fill}" ${strk(line)}/><circle cx="${cx + 2.6 * z}" cy="${cy - 2 * z}" r="${2.1 * z}" fill="${fill}" ${strk(line)}/><path d="M ${cx} ${cy - 3.6 * z} l 0 ${-3 * z} M ${cx} ${cy - 5.6 * z} l ${1.6 * z} ${1 * z} M ${cx} ${cy - 5.6 * z} l ${-1.6 * z} ${1 * z}" fill="none" ${strk(line)}/><path d="M ${cx - 6.5 * z} ${cy + 0.4 * z} a ${6.5 * z} ${6.5 * z} 0 0 0 ${13 * z} 0 Z" fill="${fill}" ${strk(line)}/><path d="M ${cx - 7.5 * z} ${cy + 0.4 * z} L ${cx + 7.5 * z} ${cy + 0.4 * z}" fill="none" ${strk(line)}/>`,
+  },
+};
+
 // engrave a mark into the field: a dark cut beneath a lit lower lip
 function etch(inner: string, main: string, lip: string) {
   return `<g transform="translate(0.4,0.9)" fill="none" stroke="${lip}" opacity="0.5">${inner}</g><g fill="none" stroke="${main}">${inner}</g>`;
@@ -168,7 +228,7 @@ function natureFor(spec: SigilSpec): NatureInfo {
 // ── SWAPPABLE PART: the dark cartouche — the medallion the seal floats in ──
 function medallion(rand: () => number, lit: boolean, legendary: boolean) {
   let s = `<circle cx="${CX}" cy="${CY}" r="${R_MEDAL}" fill="url(#medal-${SEED})"/>`;
-  if (legendary) s += `<circle cx="${CX}" cy="${CY}" r="${R_MEDAL - 2}" fill="${P.violetDeep}" opacity="0.28"/>`;
+  if (legendary) s += `<circle cx="${CX}" cy="${CY}" r="${R_MEDAL - 2}" fill="${LEG?.cast ?? P.violetDeep}" opacity="0.3"/>`;
   // gold flecks scattered on the ground, as in the reference
   const n = lit ? 26 : 14;
   for (let i = 0; i < n; i++) {
@@ -253,18 +313,23 @@ function spellCore(spec: SigilSpec, gold: string, lit: boolean, legendary: boole
   });
   field += `<g opacity="${spec.completed ? 1 : 0.4}">${etch(om, runeMain, runeLip)}</g>`;
 
-  // CORE — the bright star-cartouche disc + the nature core, igniting at center
+  // CORE — the bright star-cartouche disc + the emblem, igniting at center.
+  // A legendary shows its OWN face (LEGENDARY_FACES); everyone else the nature
+  // core. The disc + halo carry the legendary's color cast.
   let core = "";
-  if (legendary) core += `<circle cx="${CX}" cy="${CY}" r="${R_CART + 8}" fill="${P.violetBright}" opacity="0.22" filter="url(#soft-${SEED})"/>`;
+  if (legendary) core += `<circle cx="${CX}" cy="${CY}" r="${R_CART + 8}" fill="${LEG?.glow ?? P.violetBright}" opacity="0.24" filter="url(#soft-${SEED})"/>`;
   core += `<circle cx="${CX}" cy="${CY}" r="${R_CART}" fill="${legendary ? P.cream : P.paper}"/>`;
-  if (nat.nature === "vigil" || nat.moon) core += `<circle cx="${CX}" cy="${CY}" r="${R_CART}" fill="${P.violetDeep}" opacity="0.16"/>`;
+  if (legendary) core += `<circle cx="${CX}" cy="${CY}" r="${R_CART}" fill="${LEG?.cast ?? P.violetDeep}" opacity="0.15"/>`;
+  else if (nat.nature === "vigil" || nat.moon) core += `<circle cx="${CX}" cy="${CY}" r="${R_CART}" fill="${P.violetDeep}" opacity="0.16"/>`;
   core += `<circle cx="${CX}" cy="${CY}" r="${R_CART}" fill="none" stroke="${gold}" stroke-width="1.6"/>`;
   core += `<circle cx="${CX}" cy="${CY}" r="${R_CART - 4}" fill="none" stroke="${gold}" stroke-width="0.8" opacity="0.7"/>`;
   if (lit) core += `<circle cx="${CX}" cy="${CY}" r="${R_CART - 4}" fill="none" stroke="${P.violet}" stroke-width="0.8" opacity="0.6"/>`;
   const coreLine = lit ? gold : P.ink;
   const coreFill = legendary ? P.goldSoft : lit ? gold : P.cream;
-  const pts = legendary ? 8 : spec.tier === "resonant" ? 6 : spec.tier === "fine" ? 5 : 4;
-  core += NATURE_CORES[nat.nature](CX, CY, coreLine, coreFill, pts, 2.0);
+  const pts = spec.tier === "resonant" ? 6 : spec.tier === "fine" ? 5 : 4;
+  core += legendary && LEG
+    ? LEG.core(CX, CY, coreLine, coreFill, 2.0)
+    : NATURE_CORES[nat.nature](CX, CY, coreLine, coreFill, pts, 2.0);
 
   // CHORD-RUNES — the inner ring: each struck chord inscribes its OWN mark,
   // popping in sequence during the ceremony. Carved gold, lit brighter. A tiny
@@ -296,6 +361,8 @@ function crown(spec: SigilSpec, gold: string, lit: boolean, legendary: boolean, 
 
 // the current seal's seed — set per-compose so filter/gradient ids stay unique
 let SEED = 0;
+// the current legendary's face (cast/glow/core), or null — set per-compose
+let LEG: LegendaryFace | null = null;
 
 // ── SWAPPABLE PART: spark-motes — ink-dots that fly off during the ceremony ──
 function motes(rand: () => number): string {
@@ -322,6 +389,7 @@ export function composeSeal(
 ): string {
   SEED = spec.seed;
   const legendary = spec.tier === "legendary";
+  LEG = legendary && spec.legendary ? LEGENDARY_FACES[spec.legendary] : null;
   const lit = spec.tier === "resonant" || legendary;
   const gold = legendary ? P.goldSoft : P.gold;
   const ground = opts.ground ?? "dark";
@@ -338,7 +406,7 @@ export function composeSeal(
   s += `</defs>`;
 
   if (ground === "dark") s += medallion(rand, lit, legendary);
-  if (legendary) s += `<circle cx="${CX}" cy="${CY}" r="${R_BAND_OUT + 4}" fill="${P.violetBright}" opacity="0.28" filter="url(#soft-${SEED})"/>`;
+  if (legendary) s += `<circle cx="${CX}" cy="${CY}" r="${R_BAND_OUT + 4}" fill="${LEG?.glow ?? P.violetBright}" opacity="0.28" filter="url(#soft-${SEED})"/>`;
 
   // the frame + bands ink themselves on under the radial wipe
   const ring = ornateFrame(gold, spec.tier === "open" ? 0.55 : 1) + braidedBand(spec, gold, lit, legendary);
