@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { FamiliarGlyph } from "@/components/familiar/familiar-glyph";
 import { EnterForm } from "./enter-form";
 
@@ -21,7 +22,13 @@ export default function EnterPage() {
           <EnterForm />
         </div>
         <p className="mt-4 text-center text-sm text-ink-soft">
-          the glade is waiting, and someone small is in it
+          new here?{" "}
+          <Link
+            href="/join"
+            className="text-terracotta underline underline-offset-4"
+          >
+            begin a book
+          </Link>
         </p>
       </div>
     </main>

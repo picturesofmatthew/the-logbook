@@ -37,29 +37,35 @@ export const bonds = pgTable("bonds", {
 // engine composes the seal from the bond's moss and ember. (bond_id/slot are
 // nullable through the tenancy backfill, then made NOT NULL once every row is
 // stamped.)
-export const profiles = pgTable("profiles", {
-  id: text("id").primaryKey(),
-  bondId: text("bond_id")
-    .references(() => bonds.id)
-    .notNull(),
-  slot: slotEnum("slot").notNull(),
-  displayName: text("display_name").notNull(),
-  // Credentials (B2). Nullable through the seed of the two existing keepers;
-  // every real signup sets both. `email` is the login identity, always stored
-  // lowercased so a plain unique guards case-insensitively (NULLs are distinct,
-  // so the pre-account keepers can share "no email" until seeded).
-  // `password_hash` is a scrypt `salt:key`.
-  email: text("email").unique(),
-  passwordHash: text("password_hash"),
-  // Calculator inputs (Mifflin-St Jeor). All optional until set up in settings.
-  sex: text("sex", { enum: ["male", "female"] }),
-  birthdate: date("birthdate"),
-  heightIn: real("height_in"),
-  activityLevel: text("activity_level", {
-    enum: ["sedentary", "light", "moderate", "active", "very_active"],
-  }),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+export const profiles = pgTable(
+  "profiles",
+  {
+    id: text("id").primaryKey(),
+    bondId: text("bond_id")
+      .references(() => bonds.id)
+      .notNull(),
+    slot: slotEnum("slot").notNull(),
+    displayName: text("display_name").notNull(),
+    // Credentials (B2). Nullable through the seed of the two existing keepers;
+    // every real signup sets both. `email` is the login identity, always stored
+    // lowercased so a plain unique guards case-insensitively (NULLs are distinct,
+    // so the pre-account keepers can share "no email" until seeded).
+    // `password_hash` is a scrypt `salt:key`.
+    email: text("email").unique(),
+    passwordHash: text("password_hash"),
+    // Calculator inputs (Mifflin-St Jeor). All optional until set up in settings.
+    sex: text("sex", { enum: ["male", "female"] }),
+    birthdate: date("birthdate"),
+    heightIn: real("height_in"),
+    activityLevel: text("activity_level", {
+      enum: ["sedentary", "light", "moderate", "active", "very_active"],
+    }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  // A bond holds at most one keeper per slot (≤1 moss, ≤1 ember) — the belt to
+  // the invite's single-use suspenders.
+  (t) => [unique("profiles_bond_slot").on(t.bondId, t.slot)],
+);
 
 // Server-side sessions (B2): DB-backed so they can expire and be revoked. The
 // cookie carries a random token + its HMAC (edge-verifiable, no DB hit); only
@@ -73,6 +79,23 @@ export const sessions = pgTable("sessions", {
     .notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   expiresAt: timestamp("expires_at").notNull(),
+});
+
+// Pairing invites (B3): a single-use, expiring token that fills the empty slot
+// of a bond. The raw token lives only in the invite link; sha256(token) is the
+// key here, so a DB leak alone can't redeem an invite. `accepted_at` enforces
+// single-use (set once, atomically). One open invite per bond is an app rule.
+export const invites = pgTable("invites", {
+  tokenHash: text("token_hash").primaryKey(),
+  bondId: text("bond_id")
+    .references(() => bonds.id, { onDelete: "cascade" })
+    .notNull(),
+  createdBy: text("created_by")
+    .references(() => profiles.id, { onDelete: "cascade" })
+    .notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  acceptedAt: timestamp("accepted_at"),
 });
 
 // Daily calorie/macro targets. New rows are appended when targets change so

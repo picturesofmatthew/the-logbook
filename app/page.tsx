@@ -253,6 +253,15 @@ export default async function GladeHome() {
             ))}
           </div>
         ) : null}
+
+        {!members.ember ? (
+          <Link
+            href="/invite"
+            className="wobbly-sm border-2 border-dashed border-terracotta/40 bg-cream/60 px-4 py-1.5 text-sm text-terracotta"
+          >
+            your book waits for its second keeper — invite them ❯
+          </Link>
+        ) : null}
       </div>
 
       {/* ambient motes, drifting up through the sky's empty middle */}

@@ -16,6 +16,6 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Everything except the door, Next internals, and static files (anything with a dot)
-  matcher: ["/((?!enter|_next|.*\\..*).*)"],
+  // Everything except the door + signup, Next internals, and static files.
+  matcher: ["/((?!enter|join|_next|.*\\..*).*)"],
 };
