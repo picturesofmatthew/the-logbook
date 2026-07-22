@@ -197,18 +197,18 @@ function braidedBand(spec: SigilSpec, gold: string, lit: boolean, legendary: boo
 }
 
 // ── SWAPPABLE PART: the bright star-cartouche + chord-studs + field marks ──
-function spellCore(spec: SigilSpec, gold: string, lit: boolean, legendary: boolean, nat: NatureInfo) {
+// Built as three reveal layers (field / core / studs) so the ceremony can draw
+// them on in sequence; `reveal` wraps each in its timed class.
+function spellCore(spec: SigilSpec, gold: string, lit: boolean, legendary: boolean, nat: NatureInfo, reveal = false) {
   const rand = rng(spec.seed * 7 + 3);
   const rot = Math.floor(rand() * 360);
   const runeMain = lit ? P.goldSoft : P.gold, runeLip = P.groundEdge;
   const structC = lit ? gold : P.goldSoft;
-  let s = "";
+  const wrap = (cls: string, inner: string) => (reveal ? `<g class="rv ${cls}">${inner}</g>` : inner);
 
-  // faint structural rings in the dark field
-  s += `<circle cx="${CX}" cy="${CY}" r="${R_RUNE + 8}" fill="none" stroke="${structC}" stroke-width="0.6" opacity="${lit ? 0.45 : 0.28}"/>`;
-  if (nat.water) s += `<circle cx="${CX}" cy="${CY}" r="${R_RUNE + 11}" fill="none" stroke="${structC}" stroke-width="0.5" opacity="0.3" stroke-dasharray="1.5 4"/>`;
-
-  // carved hall-runes, floating in the dark field
+  // FIELD — faint structural rings + carved hall-runes + lift ornaments
+  let field = `<circle cx="${CX}" cy="${CY}" r="${R_RUNE + 8}" fill="none" stroke="${structC}" stroke-width="0.6" opacity="${lit ? 0.45 : 0.28}"/>`;
+  if (nat.water) field += `<circle cx="${CX}" cy="${CY}" r="${R_RUNE + 11}" fill="none" stroke="${structC}" stroke-width="0.5" opacity="0.3" stroke-dasharray="1.5 4"/>`;
   const halls: Hall[] = spec.radicals.length ? spec.radicals.slice(0, 6) : ["dishes"];
   const n = halls.length;
   let runes = "";
@@ -216,38 +216,38 @@ function spellCore(spec: SigilSpec, gold: string, lit: boolean, legendary: boole
     const [x, y] = polar(R_RUNE, rot + (i / n) * 360);
     runes += HALL_GLYPHS[h](x, y, 7);
   });
-  s += `<g opacity="${spec.completed ? 1 : 0.4}">${etch(runes, runeMain, runeLip)}</g>`;
-
-  // carved lift ornaments, seated closer to the core
+  field += `<g opacity="${spec.completed ? 1 : 0.4}">${etch(runes, runeMain, runeLip)}</g>`;
   const lifts = spec.ornaments.filter((o) => o !== "rest").slice(0, 4);
   if (lifts.length) {
     const seats = [0, 90, 270, 180];
     let lm = "";
     lifts.forEach((lf, i) => { const [x, y] = polar(R_LIFT, seats[i] + 30); lm += LIFT_GLYPHS[lf](x, y, 4.4); });
-    s += `<g opacity="${spec.completed ? 0.95 : 0.4}">${etch(lm, runeMain, runeLip)}</g>`;
+    field += `<g opacity="${spec.completed ? 0.95 : 0.4}">${etch(lm, runeMain, runeLip)}</g>`;
   }
 
-  // the bright star-cartouche disc
-  if (legendary) s += `<circle cx="${CX}" cy="${CY}" r="${R_CART + 8}" fill="${P.violetBright}" opacity="0.22" filter="url(#soft-${SEED})"/>`;
-  s += `<circle cx="${CX}" cy="${CY}" r="${R_CART}" fill="${legendary ? P.cream : P.paper}"/>`;
-  if (nat.nature === "vigil" || nat.moon) s += `<circle cx="${CX}" cy="${CY}" r="${R_CART}" fill="${P.violetDeep}" opacity="0.16"/>`;
-  s += `<circle cx="${CX}" cy="${CY}" r="${R_CART}" fill="none" stroke="${gold}" stroke-width="1.6"/>`;
-  s += `<circle cx="${CX}" cy="${CY}" r="${R_CART - 4}" fill="none" stroke="${gold}" stroke-width="0.8" opacity="0.7"/>`;
-  if (lit) s += `<circle cx="${CX}" cy="${CY}" r="${R_CART - 4}" fill="none" stroke="${P.violet}" stroke-width="0.8" opacity="0.6"/>`;
-
-  // chord-studs: a gold cabochon per chord, seated on the cartouche ring
-  const chordN = Math.min(spec.chords.length, 8);
-  for (let i = 0; i < chordN; i++) {
-    const [x, y] = polar(R_CART, (i / chordN) * 360 + 18);
-    s += `<circle cx="${f(x)}" cy="${f(y)}" r="2.7" fill="${P.groundEdge}" stroke="${gold}" stroke-width="0.9"/><circle cx="${f(x)}" cy="${f(y)}" r="1.4" fill="${legendary ? P.violetBright : gold}"/>`;
-  }
-
-  // the nature core, prominent at the very center
+  // CORE — the bright star-cartouche disc + the nature core, igniting at center
+  let core = "";
+  if (legendary) core += `<circle cx="${CX}" cy="${CY}" r="${R_CART + 8}" fill="${P.violetBright}" opacity="0.22" filter="url(#soft-${SEED})"/>`;
+  core += `<circle cx="${CX}" cy="${CY}" r="${R_CART}" fill="${legendary ? P.cream : P.paper}"/>`;
+  if (nat.nature === "vigil" || nat.moon) core += `<circle cx="${CX}" cy="${CY}" r="${R_CART}" fill="${P.violetDeep}" opacity="0.16"/>`;
+  core += `<circle cx="${CX}" cy="${CY}" r="${R_CART}" fill="none" stroke="${gold}" stroke-width="1.6"/>`;
+  core += `<circle cx="${CX}" cy="${CY}" r="${R_CART - 4}" fill="none" stroke="${gold}" stroke-width="0.8" opacity="0.7"/>`;
+  if (lit) core += `<circle cx="${CX}" cy="${CY}" r="${R_CART - 4}" fill="none" stroke="${P.violet}" stroke-width="0.8" opacity="0.6"/>`;
   const coreLine = lit ? gold : P.ink;
   const coreFill = legendary ? P.goldSoft : lit ? gold : P.cream;
   const pts = legendary ? 8 : spec.tier === "resonant" ? 6 : spec.tier === "fine" ? 5 : 4;
-  s += NATURE_CORES[nat.nature](CX, CY, coreLine, coreFill, pts, 2.0);
-  return s;
+  core += NATURE_CORES[nat.nature](CX, CY, coreLine, coreFill, pts, 2.0);
+
+  // STUDS — a gold cabochon per chord, popping in sequence on the cartouche ring
+  const chordN = Math.min(spec.chords.length, 8);
+  let studs = "";
+  for (let i = 0; i < chordN; i++) {
+    const [x, y] = polar(R_CART, (i / chordN) * 360 + 18);
+    const stud = `<circle cx="${f(x)}" cy="${f(y)}" r="2.7" fill="${P.groundEdge}" stroke="${gold}" stroke-width="0.9"/><circle cx="${f(x)}" cy="${f(y)}" r="1.4" fill="${legendary ? P.violetBright : gold}"/>`;
+    studs += reveal ? `<g class="rv-stud" style="--i:${i}">${stud}</g>` : stud;
+  }
+
+  return wrap("rv-field", field) + wrap("rv-core", core) + (studs ? wrap("rv-studs", studs) : "");
 }
 
 // ── SWAPPABLE PART: the crown — the drop of ink that closes the ring ──
@@ -266,10 +266,28 @@ function crown(spec: SigilSpec, gold: string, lit: boolean, legendary: boolean, 
 // the current seal's seed — set per-compose so filter/gradient ids stay unique
 let SEED = 0;
 
+// ── SWAPPABLE PART: spark-motes — ink-dots that fly off during the ceremony ──
+function motes(rand: () => number): string {
+  let s = "";
+  for (let i = 0; i < 8; i++) {
+    const [x, y] = polar(28 + rand() * 74, rand() * 360);
+    s += `<circle class="rv-mote" style="--i:${i}" cx="${f(x)}" cy="${f(y)}" r="${(1 + rand() * 1.4).toFixed(2)}" fill="${P.gold}"/>`;
+  }
+  return s;
+}
+
 // ── the composer: assemble the seal from the parts above ──
+// `reveal` turns on the completion-ceremony draw-on: a radial wipe inks the
+// frame + bands, then the field, core, chord-studs and union gem reveal in a
+// staged CSS timeline (classes in globals.css, gated by reduced-motion).
 export function composeSeal(
   spec: SigilSpec,
-  opts: { bloom?: boolean; ground?: "dark" | "none"; detail?: "full" | "thumb" } = {},
+  opts: {
+    bloom?: boolean;
+    ground?: "dark" | "none";
+    detail?: "full" | "thumb";
+    reveal?: boolean;
+  } = {},
 ): string {
   SEED = spec.seed;
   const legendary = spec.tier === "legendary";
@@ -277,18 +295,23 @@ export function composeSeal(
   const gold = legendary ? P.goldSoft : P.gold;
   const ground = opts.ground ?? "dark";
   const thumb = opts.detail === "thumb";
+  const reveal = !!opts.reveal;
   const nat = natureFor(spec);
   const rand = rng(spec.seed);
 
   let s = `<defs>`;
   s += `<radialGradient id="medal-${SEED}" cx="50%" cy="46%" r="62%"><stop offset="0%" stop-color="${P.groundCore}"/><stop offset="70%" stop-color="${P.groundMid}"/><stop offset="100%" stop-color="${P.groundEdge}"/></radialGradient>`;
   s += `<filter id="soft-${SEED}" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="3"/></filter>`;
+  if (reveal)
+    s += `<mask id="draw-${SEED}" maskUnits="userSpaceOnUse"><circle cx="${CX}" cy="${CY}" r="58" fill="none" stroke="#fff" stroke-width="120" pathLength="1" stroke-dasharray="1" stroke-dashoffset="0" class="rv-wipe" transform="rotate(-90 ${CX} ${CY})"/></mask>`;
   s += `</defs>`;
 
   if (ground === "dark") s += medallion(rand, lit, legendary);
   if (legendary) s += `<circle cx="${CX}" cy="${CY}" r="${R_BAND_OUT + 4}" fill="${P.violetBright}" opacity="0.28" filter="url(#soft-${SEED})"/>`;
-  s += ornateFrame(gold, spec.tier === "open" ? 0.55 : 1);
-  s += braidedBand(spec, gold, lit, legendary);
+
+  // the frame + bands ink themselves on under the radial wipe
+  const ring = ornateFrame(gold, spec.tier === "open" ? 0.55 : 1) + braidedBand(spec, gold, lit, legendary);
+  s += reveal ? `<g mask="url(#draw-${SEED})">${ring}</g>` : ring;
 
   if (thumb) {
     // the 38px book thumbnail: drop the fine field detail, keep the read —
@@ -299,7 +322,9 @@ export function composeSeal(
     return s;
   }
 
-  s += spellCore(spec, gold, lit, legendary, nat);
-  s += crown(spec, gold, lit, legendary, nat, !!opts.bloom);
+  s += spellCore(spec, gold, lit, legendary, nat, reveal);
+  const cr = crown(spec, gold, lit, legendary, nat, !!opts.bloom || reveal);
+  s += reveal ? `<g class="rv rv-crown">${cr}</g>` : cr;
+  if (reveal) s += motes(rand);
   return s;
 }

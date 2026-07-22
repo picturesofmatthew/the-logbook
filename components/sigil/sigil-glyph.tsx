@@ -11,10 +11,13 @@ export function SigilGlyph({
   spec,
   size = 96,
   bloom = false,
+  reveal = false,
 }: {
   spec: SigilSpec;
   size?: number;
   bloom?: boolean;
+  // reveal: play the completion-ceremony draw-on (see composeSeal + globals.css)
+  reveal?: boolean;
 }) {
   return (
     <svg
@@ -27,7 +30,7 @@ export function SigilGlyph({
           ? `The day's seal, ${spec.tier}`
           : "The day's seal, still open"
       }
-      dangerouslySetInnerHTML={{ __html: composeSeal(spec, { bloom }) }}
+      dangerouslySetInnerHTML={{ __html: composeSeal(spec, { bloom, reveal }) }}
     />
   );
 }

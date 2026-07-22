@@ -91,8 +91,10 @@ export function SealCeremony({
     const plank = laysPlank
       ? window.setTimeout(() => plankTone(), 1700)
       : undefined;
-    const fade = window.setTimeout(() => setStage("fading"), laysPlank ? 4600 : 3850);
-    const done = window.setTimeout(() => setStage("hidden"), laysPlank ? 5100 : 4350);
+    // The seal draws itself on over ~3s (composeSeal reveal); hold the moment
+    // long enough to watch the union bloom and the motes spark before fading.
+    const fade = window.setTimeout(() => setStage("fading"), laysPlank ? 5400 : 4700);
+    const done = window.setTimeout(() => setStage("hidden"), laysPlank ? 5900 : 5200);
     return () => {
       window.clearTimeout(show);
       if (plank) window.clearTimeout(plank);
@@ -119,7 +121,7 @@ export function SealCeremony({
         </p>
         <div className="wobbly lantern-pool border-2 border-violet/50 bg-cream p-6 text-center shadow-card">
           <div className="flex justify-center">
-            <SigilGlyph spec={spec} size={110} bloom />
+            <SigilGlyph spec={spec} size={132} bloom reveal />
           </div>
           <p className="mt-3 font-display text-sm text-ink">
             {TIER_LINES[spec.tier]}
