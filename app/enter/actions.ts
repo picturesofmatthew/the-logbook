@@ -1,22 +1,18 @@
 "use server";
 
-import { cookies, headers } from "next/headers";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { profiles } from "@/db/schema";
-import {
-  hmacDigest,
-  SESSION_COOKIE,
-  signSession,
-  timingSafeEqual,
-} from "@/lib/auth";
+import { verifyPassword } from "@/lib/passwords";
+import { createSession } from "@/lib/session";
 
 export type EnterState = { error: string } | null;
 
 // Best-effort brute-force brake. Per-instance memory on serverless — a cold
-// start forgets, so this slows guessing rather than hard-stopping it. Real
-// per-user auth (the v1 track) replaces this wholesale.
+// start forgets, so this slows guessing rather than hard-stopping it. A durable
+// limiter is a later hardening step (B4).
 const WINDOW_MS = 15 * 60 * 1000;
 const MAX_ATTEMPTS = 10;
 const attempts = new Map<string, { count: number; resetAt: number }>();
@@ -32,15 +28,22 @@ function throttled(ip: string): boolean {
   return slot.count > MAX_ATTEMPTS;
 }
 
+// A well-formed dummy hash (salt:64-byte-key) so a missing account still runs
+// one scrypt verify — equalizing timing so the door doesn't leak which emails
+// exist.
+const DUMMY_HASH = `${"0".repeat(32)}:${"0".repeat(128)}`;
+
 export async function enter(
   _prev: EnterState,
   formData: FormData,
 ): Promise<EnterState> {
-  const profile = formData.get("profile");
-  const passcode = formData.get("passcode");
+  const email = String(formData.get("email") ?? "")
+    .trim()
+    .toLowerCase();
+  const password = formData.get("password");
 
-  if (typeof profile !== "string" || !profile) {
-    return { error: "Pick who you are first." };
+  if (!email || typeof password !== "string" || !password) {
+    return { error: "Enter your email and secret word." };
   }
 
   const ip =
@@ -50,34 +53,19 @@ export async function enter(
     return { error: "The door needs a moment. Try again in a little while." };
   }
 
-  const expected = process.env.APP_PASSCODE;
-  if (!expected) throw new Error("APP_PASSCODE is not set");
-  // HMAC both sides first: constant-time compare with no length leak.
-  const ok =
-    typeof passcode === "string" &&
-    timingSafeEqual(await hmacDigest(passcode), await hmacDigest(expected));
-  if (!ok) {
-    return { error: "Hmm — that's not the secret word." };
-  }
-  attempts.delete(ip);
-
-  // Passcode is right — confirm this keeper exists and belongs to a bond. (Real
-  // per-user credentials replace the shared passcode in a later phase.)
   const [keeper] = await db
-    .select({ id: profiles.id })
+    .select({ id: profiles.id, passwordHash: profiles.passwordHash })
     .from(profiles)
-    .where(eq(profiles.id, profile));
-  if (!keeper) {
-    return { error: "Pick who you are first." };
+    .where(eq(profiles.email, email));
+
+  // Always verify (against the dummy hash when the account/credential is
+  // missing) so timing doesn't reveal which emails are registered.
+  const ok = await verifyPassword(password, keeper?.passwordHash ?? DUMMY_HASH);
+  if (!keeper || !keeper.passwordHash || !ok) {
+    return { error: "That email and secret word don't match." };
   }
 
-  const token = await signSession(keeper.id);
-  (await cookies()).set(SESSION_COOKIE, token, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    maxAge: 60 * 60 * 24 * 365,
-    path: "/",
-  });
+  attempts.delete(ip);
+  await createSession(keeper.id);
   redirect("/");
 }

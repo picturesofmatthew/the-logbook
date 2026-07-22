@@ -51,20 +51,35 @@ export function timingSafeEqual(a: string, b: string): boolean {
   return diff === 0;
 }
 
-export async function signSession(userId: string): Promise<string> {
-  return `${userId}.${await hmac(userId)}`;
+// ── Session cookie ──
+// The cookie is `${token}.${hmac(token)}`. The HMAC lets the edge proxy confirm
+// we issued the token without a DB hit; the token's sha256 (hashToken) is the
+// key into the sessions table, where validity/expiry/revocation live. All Web
+// Crypto, so these run identically at the edge and on the server.
+
+export async function signToken(token: string): Promise<string> {
+  return `${token}.${await hmac(token)}`;
 }
 
-// A valid signature proves we issued this id — sufficient identity, no allowlist
-// (ids are globally unique). Split on the LAST dot so the id stays opaque.
-export async function verifySession(
-  token: string | undefined,
+// Returns the raw token iff the cookie carries our signature, else null. Split
+// on the LAST dot (the token is opaque hex; the sig is base64url — no dots).
+export async function readToken(
+  cookieValue: string | undefined,
 ): Promise<string | null> {
-  if (!token) return null;
-  const dot = token.lastIndexOf(".");
+  if (!cookieValue) return null;
+  const dot = cookieValue.lastIndexOf(".");
   if (dot <= 0) return null;
-  const userId = token.slice(0, dot);
-  const sig = token.slice(dot + 1);
-  if (!userId || !sig) return null;
-  return timingSafeEqual(sig, await hmac(userId)) ? userId : null;
+  const token = cookieValue.slice(0, dot);
+  const sig = cookieValue.slice(dot + 1);
+  if (!token || !sig) return null;
+  return timingSafeEqual(sig, await hmac(token)) ? token : null;
+}
+
+// sha256(token) as hex — the DB key. Only this hash is stored, so a DB leak
+// alone can't reconstruct a usable cookie (which also needs the HMAC).
+export async function hashToken(token: string): Promise<string> {
+  const digest = await crypto.subtle.digest("SHA-256", encoder.encode(token));
+  return [...new Uint8Array(digest)]
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
 }

@@ -43,6 +43,13 @@
       "when": 1784755753071,
       "tag": "0005_bond_tenant_constraints",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1784763119816,
+      "tag": "0006_accounts_and_sessions",
+      "breakpoints": true
     }
   ]
 }

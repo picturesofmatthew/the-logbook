@@ -44,6 +44,13 @@ export const profiles = pgTable("profiles", {
     .notNull(),
   slot: slotEnum("slot").notNull(),
   displayName: text("display_name").notNull(),
+  // Credentials (B2). Nullable through the seed of the two existing keepers;
+  // every real signup sets both. `email` is the login identity, always stored
+  // lowercased so a plain unique guards case-insensitively (NULLs are distinct,
+  // so the pre-account keepers can share "no email" until seeded).
+  // `password_hash` is a scrypt `salt:key`.
+  email: text("email").unique(),
+  passwordHash: text("password_hash"),
   // Calculator inputs (Mifflin-St Jeor). All optional until set up in settings.
   sex: text("sex", { enum: ["male", "female"] }),
   birthdate: date("birthdate"),
@@ -52,6 +59,20 @@ export const profiles = pgTable("profiles", {
     enum: ["sedentary", "light", "moderate", "active", "very_active"],
   }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Server-side sessions (B2): DB-backed so they can expire and be revoked. The
+// cookie carries a random token + its HMAC (edge-verifiable, no DB hit); only
+// the token's sha256 is stored here, so a DB leak alone can't forge a live
+// cookie. Deleting the row (logout / sever) revokes instantly.
+export const sessions = pgTable("sessions", {
+  // sha256(token) — the raw token lives only in the cookie.
+  tokenHash: text("token_hash").primaryKey(),
+  profileId: text("profile_id")
+    .references(() => profiles.id, { onDelete: "cascade" })
+    .notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
 });
 
 // Daily calorie/macro targets. New rows are appended when targets change so

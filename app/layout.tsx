@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Hanken_Grotesk } from "next/font/google";
-import { cookies } from "next/headers";
 import { CaptureSheet } from "@/components/shell/capture-sheet";
 import { PageTransition } from "@/components/shell/page-transition";
 import { Ribbon } from "@/components/shell/ribbon";
@@ -8,12 +7,9 @@ import { ShellProvider } from "@/components/shell/shell-provider";
 import { TopBar } from "@/components/shell/top-bar";
 import { SwRegister } from "@/components/sw-register";
 import { TzSync } from "@/components/tz-sync";
-import { eq } from "drizzle-orm";
-import { db } from "@/db";
-import { profiles } from "@/db/schema";
-import { SESSION_COOKIE, verifySession } from "@/lib/auth";
 import { currentTz, todayIso } from "@/lib/dates";
 import { hourInTz, lightStateForHour } from "@/lib/light";
+import { getSessionUser } from "@/lib/session";
 import "./globals.css";
 
 // Inklight type. Fraunces carries the grimoire display voice (a warm, soft
@@ -54,22 +50,17 @@ export default async function RootLayout({
   // Read the session without redirecting — the middleware already gates every
   // route but /enter, so a null profile here means we're on the door, which
   // must render bare (no chrome, no profile).
-  const token = (await cookies()).get(SESSION_COOKIE)?.value;
-  const userId = await verifySession(token);
+  const user = await getSessionUser();
 
   let chrome: { name: string; dateLabel: string } | null = null;
-  if (userId) {
-    const [row] = await db
-      .select({ displayName: profiles.displayName })
-      .from(profiles)
-      .where(eq(profiles.id, userId));
+  if (user) {
     const today = await todayIso();
     const dateLabel = new Intl.DateTimeFormat("en-US", {
       timeZone: tz,
       month: "short",
       day: "numeric",
     }).format(new Date(today + "T12:00:00"));
-    chrome = { name: row?.displayName ?? "", dateLabel };
+    chrome = { name: user.displayName, dateLabel };
   }
 
   return (

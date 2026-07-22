@@ -8,10 +8,16 @@ import { profiles, targets, weighIns } from "@/db/schema";
 import { LEDGER_TAG } from "@/lib/cache-tags";
 import { todayIso } from "@/lib/dates";
 import { safely } from "@/lib/safe";
-import { currentUser } from "@/lib/session";
+import { currentUser, destroySession } from "@/lib/session";
 import type { ActivityLevel, Sex } from "@/lib/engine/tdee";
 
 export type SetupState = { error: string } | null;
+
+// End the session (logout) and return to the door.
+export async function logout(): Promise<void> {
+  await destroySession();
+  redirect("/enter");
+}
 
 const SEXES = ["male", "female"] as const;
 const ACTIVITIES = [

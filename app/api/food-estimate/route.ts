@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { SESSION_COOKIE, verifySession } from "@/lib/auth";
+import { SESSION_COOKIE, readToken } from "@/lib/auth";
 import {
   gramsFor,
   parseFoodLine,
@@ -93,9 +93,9 @@ function capitalize(s: string): string {
 
 export async function GET(request: NextRequest) {
   // Defense in depth — the proxy already gates this, but the handler shouldn't
-  // trust that alone (and it keeps the USDA quota behind the passcode).
+  // trust that alone (and it keeps the USDA quota behind a real session).
   const token = request.cookies.get(SESSION_COOKIE)?.value;
-  if (!(await verifySession(token))) {
+  if (!(await readToken(token))) {
     return NextResponse.json({ error: "Not signed in." }, { status: 401 });
   }
 

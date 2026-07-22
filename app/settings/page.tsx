@@ -6,6 +6,7 @@ import { db } from "@/db";
 import { profiles, targets, weighIns } from "@/db/schema";
 import { todayIso } from "@/lib/dates";
 import { currentProfile } from "@/lib/session";
+import { logout } from "./actions";
 import { SetupForm, type SetupInitial } from "./setup-form";
 
 export const metadata: Metadata = {
@@ -64,6 +65,14 @@ export default async function SettingsPage() {
       <div className="mt-6">
         <SoundToggle />
       </div>
+      <form action={logout} className="mt-8 border-t border-ink/10 pt-6">
+        <button
+          type="submit"
+          className="wobbly-sm border-2 border-ink/20 bg-cream px-4 py-2 text-sm text-ink-soft shadow-card active:scale-[0.98]"
+        >
+          sign out
+        </button>
+      </form>
     </main>
   );
 }
