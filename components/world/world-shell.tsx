@@ -34,6 +34,7 @@ import { HearthDefs, HearthFar, HearthHeart, HearthMid } from "./rooms/hearth-sc
 import { HEARTH_ATMOSPHERE } from "./rooms/hearth-atmosphere";
 import { LibraryRoom, type LibrarySnapshot } from "./rooms/library-room";
 import { DocksRoom, type DocksSnapshot } from "./rooms/docks-room";
+import { OverviewScene, OVERVIEW_VIEWBOX } from "./rooms/overview-scene";
 import {
   GardenStub,
   LanternStub,
@@ -65,6 +66,12 @@ type WorldSlot = {
 const HEARTH: Cell = { col: 0, row: 0 };
 const SWIPE_MIN = 42; // px of travel on release to count as a swipe
 const FLICK = 66; // px mid-gesture that fires the move instantly (snappy)
+
+// the cold open — the whole world, held a beat, then a fluid push-in to the
+// hearth. All contained; no route change, no loading.
+type Phase = "overview" | "entering" | "live";
+const HOLD_MS = 850; // the beat you see the whole world before the push-in
+const ZOOM_MS = 1300; // the fluid zoom through the warm window to the hearth
 
 // a swipe means "travel the way you swiped" — turn your head across the world
 // (THE-LIGHTHOUSE.md): left → west/garden, right → east/docks, up → rise the
@@ -134,6 +141,29 @@ export function WorldShell({
   }>({ down: false, sx: 0, sy: 0, fired: false });
 
   const ease = reduced ? "none" : "transform 560ms cubic-bezier(0.33, 1, 0.68, 1)";
+
+  // ── the materialize: hold on the whole world, then push in to the hearth ──
+  const [phase, setPhase] = useState<Phase>("overview");
+
+  useEffect(() => {
+    // reduced-motion skips straight in; otherwise hold, then begin the push-in
+    const t = setTimeout(
+      () =>
+        setPhase((p) =>
+          p === "overview" ? (reduced ? "live" : "entering") : p,
+        ),
+      reduced ? 0 : HOLD_MS,
+    );
+    return () => clearTimeout(t);
+  }, [reduced]);
+
+  useEffect(() => {
+    if (phase !== "entering") return;
+    const t = setTimeout(() => setPhase("live"), ZOOM_MS);
+    return () => clearTimeout(t);
+  }, [phase]);
+
+  const enter = () => setPhase((p) => (p === "overview" ? "entering" : p));
 
   const sealHtml = useMemo(() => composeSeal(spec, { ground: "none" }), [spec]);
 
@@ -267,7 +297,7 @@ export function WorldShell({
 
   // ── swipe to travel — flick toward the room you want ──
   const onPointerDown = (e: React.PointerEvent) => {
-    if (moving) return;
+    if (phase !== "live" || moving) return;
     // let the affordance chips, the exit link, and the books take their own taps
     if ((e.target as HTMLElement).closest("button, a, [data-hotspot]")) return;
     const d = drag.current;
@@ -335,7 +365,7 @@ export function WorldShell({
 
   return (
     <div
-      className="world-shell"
+      className={`world-shell${phase === "entering" ? " arriving" : ""}`}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
@@ -384,24 +414,53 @@ export function WorldShell({
         <div className="world-line">{active.line}</div>
       </div>
 
-      {/* the ways through the world — shown only where a room actually is */}
-      {dirs.map(({ dir, cls, glyph, label }) =>
-        neighborFor(cam, dir) ? (
-          <button
-            key={dir}
-            type="button"
-            className={`world-nav world-nav-${cls}`}
-            aria-label={label}
-            onClick={() => go(dir)}
-          >
-            <span aria-hidden>{glyph}</span>
-          </button>
-        ) : null,
-      )}
+      {/* the ways through the world — shown only where a room actually is, and
+          only once you've arrived (never during the cold open) */}
+      {phase === "live"
+        ? dirs.map(({ dir, cls, glyph, label }) =>
+            neighborFor(cam, dir) ? (
+              <button
+                key={dir}
+                type="button"
+                className={`world-nav world-nav-${cls}`}
+                aria-label={label}
+                onClick={() => go(dir)}
+              >
+                <span aria-hidden>{glyph}</span>
+              </button>
+            ) : null,
+          )
+        : null}
 
-      <Link href="/" className="world-exit" aria-label="Leave the lighthouse">
-        <span aria-hidden>❮</span> leave
-      </Link>
+      {phase === "live" ? (
+        <Link href="/" className="world-exit" aria-label="Leave the lighthouse">
+          <span aria-hidden>❮</span> leave
+        </Link>
+      ) : null}
+
+      {/* THE COLD OPEN — the whole world held a beat, then a fluid push-in
+          through the warm window to the hearth. Tap (or wait) to enter. */}
+      {phase !== "live" ? (
+        <div
+          className={`world-coldopen${phase === "entering" ? " entering" : ""}`}
+          onClick={enter}
+          role={phase === "overview" ? "button" : undefined}
+          aria-label={phase === "overview" ? "Enter the lighthouse" : undefined}
+        >
+          <svg
+            className="world-scene"
+            viewBox={`0 0 ${OVERVIEW_VIEWBOX.width} ${OVERVIEW_VIEWBOX.height}`}
+            preserveAspectRatio="xMidYMid meet"
+            role="img"
+            aria-label="The whole world from afar: an island in a dark sea, the lighthouse rising with its lamp lit, a garden to the west, the docks and far shore to the east."
+          >
+            <OverviewScene />
+          </svg>
+          {phase === "overview" ? (
+            <span className="world-enter">enter</span>
+          ) : null}
+        </div>
+      ) : null}
     </div>
   );
 }
