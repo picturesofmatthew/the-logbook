@@ -75,6 +75,22 @@ export function JoinForm({ invite }: { invite?: string }) {
         </fieldset>
       ) : null}
 
+      <label className="flex items-start gap-2 text-xs leading-relaxed text-ink-soft">
+        <input type="checkbox" name="consent" required className="mt-0.5" />
+        <span>
+          I agree to the{" "}
+          <a
+            href="/privacy"
+            target="_blank"
+            className="text-terracotta underline underline-offset-2"
+          >
+            privacy policy
+          </a>{" "}
+          and consent to my health data (food, workouts, mood, notes, weight)
+          being processed to run the app.
+        </span>
+      </label>
+
       {state?.error ? (
         <p className="text-center font-display text-sm text-terracotta">
           {state.error}

@@ -30,6 +30,11 @@ export default function EnterPage() {
             begin a book
           </Link>
         </p>
+        <p className="mt-2 text-center text-xs text-ink-soft/70">
+          <Link href="/privacy" className="underline underline-offset-4">
+            privacy &amp; your health data
+          </Link>
+        </p>
       </div>
     </main>
   );

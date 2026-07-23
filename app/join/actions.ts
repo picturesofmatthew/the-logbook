@@ -39,6 +39,9 @@ export async function signup(
     return { error: "Your secret word needs at least 8 characters." };
   }
   if (!displayName) return { error: "What should we call you?" };
+  if (!formData.get("consent")) {
+    return { error: "Please agree to the privacy policy to continue." };
+  }
 
   // All DB work in one place so redirect()/createSession() (which throw) stay
   // outside the try — a catch must never swallow the redirect.
