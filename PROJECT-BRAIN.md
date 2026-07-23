@@ -10,11 +10,11 @@ the doc map. Last updated 2026-07-22.*
   been re-centered: **`THE-LIGHTHOUSE.md`** is the new canon — the app is a **lighthouse on an island**
   (garden west, library up the stair, docks + far shore east; the cast rises to the lamp). See the doc
   map + the 2026-07-22 decision log.
-- **Act One is LIVE** — a deployed Next.js 16 + Neon PWA at signedxsealed.com (serving from the
-  `inklight-v1-polish` branch, prod on Vercel). The core loop works today on real phones: the
-  two-keeper seal composing from both users' data, the full sigil engine (chords/tiers/legendaries),
-  the glade + beings, the spellbook, fast food/workout logging, ceremonies, sound. 50/50 engine tests
-  pass. Two hardcoded users (matthew/kennedy), passcode-gated.
+- **LIVE on `main`** — Next.js 16 + Neon PWA at signedxsealed.com (Vercel). The core loop runs on real
+  phones: the two-keeper seal from both users' data, the full sigil engine (chords/tiers/legendaries),
+  the glade + beings, the spellbook, fast food/workout logging + **voice "speak your day" logging**,
+  ceremonies, sound. **75/75** engine tests. **B2 accounts + pairing + at-rest encryption are live**
+  (the B1 passcode is retired); the DB was clean-wiped, awaiting the first real signup.
 - **This session (overnight 2026-07-20 → 21) made three big moves** — see the decision log.
 - **Nothing here is thrown away.** The stack decision + foundation + register are the playbook for the
   *native* build; the current call is only about *sequencing*.
@@ -33,20 +33,22 @@ users. This resolves the validate-first-vs-build-native fork: a 4-lens contingen
 native rewrite reaches parity with a *working* app while adding zero retention evidence and colliding
 with the STR launch + the Asia move + debt — so we build and validate on what already runs, for free.
 
-## Next up — development on the current PWA
+## Next up — build the Lighthouse world
 
-Three threads (all on the free stack, SVG/CSS — not Rive yet):
-1. **The core sigil system** — enhance the SVG `SigilGlyph`: the composed seal, chord-runes, the
-   emblem-ladder tiers (open→common→fine→resonant→legendary), and the completion ceremony in SVG/CSS.
-2. **The logging overhaul** — faster time-to-first-value (log-first, lore-later) + the macro/calorie
-   estimation fixes (`NEXT-SESSION.md` §2).
-3. **Compendium organization** — the four-books IA; the Compendium (beings + pantry/museum + artifacts)
-   as one navigable book in `/book`.
+The app is being re-centered as one inhabited place — a lighthouse on an island (`THE-LIGHTHOUSE.md`),
+built via **`WORLD-ENGINE.md`** ("engine once, rooms forever"; DOM/SVG-first, Pixi reserved). The
+flagship feeling-proof is `art/proto/hearth-hall.html`.
 
-Fold in the cheap `RISK-REGISTER.md` fixes as we touch these: the **colorblind seal** (shape/texture
-per keeper + Okabe–Ito palette), the **canonical-couple-day** rule, and the bigger design change —
-**standalone value for one keeper's half + an async ~36–48h close window** (so one partner is never
-stranded). Then the **boat-to-Kauai Phase 0** + a 30-day both-of-you retention test.
+1. **Promote the hearth proto into the app** — extract the shared engine (atmosphere, primitives,
+   camera) + land the hearth as the first real room, wired to real state.
+2. **Lock the Room contract**, then the **Glade / Docks / Library** rooms conform, the **nav shell**
+   (swipe/rise) stitches them, and the **cast cinematic** lands last.
+
+In parallel: Matthew + Kennedy dogfood voice logging; notes feed classifier tuning. Still-open logging
+friction to fold in when touched: water/mood/weight aren't in the fast capture path yet; meal could
+default by time of day; servings could remember last-used per food. Loop-reliability items (canonical
+couple-day is done; the async ~36–48h close window + love-tap/web-push remain) live in
+`RISK-REGISTER.md`.
 
 ## The document map (read order)
 
@@ -55,9 +57,9 @@ stranded). Then the **boat-to-Kauai Phase 0** + a 30-day both-of-you retention t
 | **PROJECT-BRAIN.md** (this) | Orientation, state, decision log, doc map. Read first. |
 | **BRAND-BIBLE.md** | **The founding brand bedrock (2026-07-22).** Essence, color, type, material, lighting, motif, voice, motion, application, do-not. The absolute place; `ART-BIBLE` (art) and the world docs inherit from it. |
 | **THE-LIGHTHOUSE.md** | **The world canon (2026-07-22).** The app is a lighthouse on an island — spatial architecture (garden/hearth/docks + tower), the cast cinematics, the archipelago, the three discipline lines. Read for the world/experience. |
-| **ROADMAP.md** | The phased build plan (Foundation → Art/UI → Coffers → Multi-user v1) — "what we're building, in what order." |
+| **WORLD-ENGINE.md** | **The build architecture (2026-07-22).** "Engine once, rooms forever" — the shared world engine + how rooms plug in; DOM/SVG-first (Pixi reserved). Read before building rooms. |
 | **SIGIL-HANDOFF.md** | The developed seal: its grammar, the swappable parts registry (`components/sigil/glyphs.ts`), and what's next. **Read to continue the sigil/art work.** |
-| **THE-SIGIL-TURN.md** | The current thesis: sigil-as-spell, the emblem ladder, the four books, creatures demoted to a summoned bonus. |
+| **THE-SIGIL-TURN.md** | The sigil-as-spell thesis, the emblem ladder, creatures-as-bonus. (The "four books" are now five, up the Lighthouse tower.) |
 | **RISK-REGISTER.md** | The 4-agent contingency findings, deduped + ranked by severity + phase. The "what to watch." |
 | **ACT-TWO-THE-FAR-SHORE.md** | The far shore / boat / Dream + **§Phase 0, the lean validate-first plan** (re-promoted). |
 | **COFFERS.md** | The real-money trip-fund research + funding decision (witness-not-holder; manual tracker → couple-owned rail; **never Stripe Connect**). Verified deep-research, 2026-07-21. |
@@ -67,7 +69,6 @@ stranded). Then the **boat-to-Kauai Phase 0** + a 30-day both-of-you retention t
 | **LAUNCH-PATH.md** | The **deferred** native build/ship plan (Expo + Convex + Rive, $0-until-users, reader-model billing). The "when we go native" playbook. |
 | **convex/schema.ts** | The backend spine — a **design artifact** (needs a real migration pass; RISK-REGISTER Tier 6). |
 | **lib/engine/sigil.ts** | The registry-driven sigil engine — adding a chord/legendary is one entry. |
-| **NEXT-SESSION.md** | Art tooling = resolved; **macro/calorie estimation logic is still open.** |
 | **CLAUDE.md** | Standing briefing + Quick Resume (points here). |
 
 ## Decision log — 2026-07-22

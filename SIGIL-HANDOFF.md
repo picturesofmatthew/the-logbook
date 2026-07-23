@@ -1,5 +1,12 @@
 # Sigil Hand-off — the developed seal, wired
 
+> **Status refreshed 2026-07-22.** The seal is live in prod (visually verified; 75/75 tests). The below
+> "not yet verified / see it next session," the `sigil-turn-foundation` / `d95aa69` / "50/50 tests"
+> markers, and the "de-pixel the fox" + "multi-user later" TODOs are all **done**. Still current and
+> worth keeping: the **swappable parts registry** (`composeSeal`) and the **latent signals not yet
+> wired into `SigilSpec`** (time-of-day, day-of-week, long-distance/tz chord, per-chord connections,
+> bespoke legendary cores).
+
 *Read this cold and you can keep iterating the seal without re-deriving anything. Written 2026-07-21,
 end of the Phase-1 opening session. Pairs with `ROADMAP.md` (the phase plan) and the design references
 in `art/reference/`.*

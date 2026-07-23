@@ -1,5 +1,10 @@
 # The Seal — Rive Authoring Blueprint
 
+> **PARKED (with `LAUNCH-PATH.md`).** Rive + Expo/RN is part of the native rewrite, on hold ($0 until
+> paying couples). The seal ships today as hand-authored SVG (`components/sigil/glyphs.ts`); the current
+> build path is **DOM/SVG-first** (`WORLD-ENGINE.md`). Kept for the faithful `SealVM ↔ SigilSpec` data
+> contract for when/if we go native.
+
 *Build the seal + completion ceremony in the Rive editor to this spec, so the seal composes
 procedurally, the ceremony is state-driven, and the Expo/RN app drives it all through data binding
 with zero glue. The data contract mirrors `SigilSpec` in `lib/engine/sigil.ts` exactly — the pure

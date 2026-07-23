@@ -1,50 +1,43 @@
-# The Logbook 🦊
+# Signed × Sealed
 
-A food museum for two. Matthew & Kennedy track calories, meals, and macros
-through a safe, nourishing cut — Animal Crossing museum × Tamagotchi, in
-earth tones on warm paper.
+A **two-player-mandatory** logbook for couples and gym partners, reframed as a shared arcane grimoire.
+Two people log food + workouts; each day composes a deterministic **sigil (the seal)** from *both*
+their data — and **the seal cannot close alone.** That one rule is the product.
 
-**The core trick:** the first time either person logs a new food, it's
-*donated* to the shared museum as a specimen card (macros, discoverer,
-date). The collection **is** the food database, so daily logging converges
-to 2–3 taps. A shared arctic fox grows antlers as you log days together —
-kit → yearling → young → adult → elder. It never scolds; at worst it gets
-a little lonely.
+Retention runs on *the spell you can only cast together* and an *accumulating shared book* — no
+streaks, never punishing. The world states the score wordlessly.
+
+**Live:** https://www.signedxsealed.com · IG [@signed_x_sealed](https://instagram.com/signed_x_sealed)
 
 ## Stack
 
-Next.js 16 (App Router) · Tailwind v4 · Drizzle + Neon Postgres ·
-USDA FoodData Central (donations only) · Vercel · installable PWA with an
-offline fallback page (live pages need a connection — no data caching).
-No auth service — a shared passcode signs an HMAC session cookie.
+Next.js 16 (App Router) · Tailwind v4 · Drizzle + Neon Postgres · USDA FoodData Central (food
+donations only) · Vercel · installable PWA with an offline fallback. Real accounts (email/password,
+DB-backed sessions); consumer-health data (notes, mood, weight, voice notes) is **encrypted at rest**.
 
 ## Commands
 
 ```
 npm run dev      # local dev
 npm run build    # production build
-npm test         # engine unit tests (totals, TDEE, pet, stamps)
-npm run seed     # seed profiles + pet (idempotent)
-npm run icons    # regenerate pixel icons from the sprite map
+npm test         # engine unit tests (pure logic in lib/engine/*)
+npm run icons    # regenerate app icons
 npx drizzle-kit generate   # write a versioned migration after editing db/schema.ts
 npm run migrate            # apply pending migrations to Neon
 ```
 
-Schema changes are versioned: edit `db/schema.ts`, then `generate` + `migrate`
-(never `push` — history lives in `db/migrations/`). The baseline for the
-pre-migration era was marked applied with `scripts/baseline-migrations.mjs`.
+Schema changes are versioned: edit `db/schema.ts`, then `generate` + `migrate` (never `push` — history
+lives in `db/migrations/`).
 
 ## Environment
 
-Copy `.env.example` → `.env.local`. Vars: `DATABASE_URL` (Neon, via
-Vercel marketplace), `APP_PASSCODE` (the shared secret word),
-`AUTH_SECRET` (cookie signing), `FDC_API_KEY` (free at
-https://api.data.gov/signup — `DEMO_KEY` works but is tightly
-rate-limited).
+Copy `.env.example` → `.env.local`. Key vars: `DATABASE_URL` (Neon), `ENCRYPTION_KEY` (32-byte hex —
+at-rest encryption; never rotate once data exists), `COUPLE_TZ` (the shared day-bucketing timezone),
+and `FDC_API_KEY` (free at https://api.data.gov/signup), plus the session-signing secret. See
+`.env.example` for the full list.
 
-## Where things live
+## Orientation (for contributors)
 
-- `lib/engine/` — pure logic: totals, TDEE calculator, pet growth/moods, stamps
-- `components/sprites.ts` — the fox pixel maps (preview with `scripts/preview-sprite.mjs`)
-- `db/schema.ts` — profiles, targets (history), foods/specimens, recipe_items, entries, weigh_ins, day_meta, pet
-- `app/` — journal (`/`), museum, trends, settings, enter (the door)
+Read **`PROJECT-BRAIN.md`** first. Canon: `BRAND-BIBLE.md` (brand bedrock), `THE-LIGHTHOUSE.md` (the
+world), `WORLD-ENGINE.md` (how it's built), `art/ART-BIBLE.md` (Inklight art direction). The pure
+engine + its unit tests live in `lib/engine/*` (`npm test`).

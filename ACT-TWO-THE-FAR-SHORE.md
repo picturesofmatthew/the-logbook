@@ -1,5 +1,11 @@
 # signed × sealed — Act Two: The Far Shore
 
+> **World frame updated 2026-07-22 by `THE-LIGHTHOUSE.md`.** The far shore now lives at the **east
+> Docks** of the lighthouse (the Glade → the west garden). The multi-tenant foundation this doc calls
+> "deferred" (households / `household_id` / auth / pairing) **shipped** as the `bond` / `Slot` model +
+> B2 accounts. The Act-Two *vision* (the vessel, the Dream, the Coffer) stands; read the old naming and
+> "requires deferred foundation" caveats as historical.
+
 *The vision doc for the app's second act. Act One (shipped, live at signedxsealed.com) built the world, the daily seal, and the living Glade. Act Two gives that world a soul and a destination: two people walking toward their treasure together, while the world conspires to help them.*
 
 *Written 2026-07-20 from a long build-and-brainstorm session. This is the canon — read it cold and you're oriented. Pair it with `DIRECTION.md` (the Inklight art bible) and the repo `CLAUDE.md` (operational Quick Resume).*
