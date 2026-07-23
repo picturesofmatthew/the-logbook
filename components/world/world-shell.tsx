@@ -17,7 +17,14 @@
 // reduced-motion. The camera + gestures live in useWorldCamera, the cold-open
 // gate in useColdOpen — this file builds the rooms and renders the world.
 
-import { useCallback, useEffect, useMemo, useRef, useSyncExternalStore } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { useRouter } from "next/navigation";
 import { useShell } from "@/components/shell/shell-provider";
 import { composeSeal } from "@/components/sigil/glyphs";
@@ -46,6 +53,7 @@ import {
   useWorldCamera,
   type Dir,
 } from "./use-world-camera";
+import { WorldSpread } from "./world-spread";
 
 type WorldSlot = {
   id: string;
@@ -99,9 +107,13 @@ export function WorldShell({
   const { openCapture, captureOpen } = useShell();
   const reduced = useReducedMotion();
 
+  // which book is open as an in-world spread over the world (by its href), or
+  // null. An open spread is an overlay that owns the input, like the log sheet.
+  const [openBook, setOpenBook] = useState<string | null>(null);
+
   // the two behaviours, each its own hook: the gate you cross, then the camera
-  // you steer. The camera's gestures read `phase`/`captureOpen` to stay quiet
-  // behind the gate and while the log sheet owns the input.
+  // you steer. The camera stays quiet behind the gate and while any overlay
+  // (the log sheet or an open book) owns the input.
   const { phase, enter } = useColdOpen(reduced);
   const {
     cam,
@@ -113,7 +125,11 @@ export function WorldShell({
     onPointerUp,
     onPointerCancel,
     endMove,
-  } = useWorldCamera({ phase, captureOpen, reduced });
+  } = useWorldCamera({
+    phase,
+    captureOpen: captureOpen || openBook !== null,
+    reduced,
+  });
 
   // focus anchors — the gate holds focus while it's up; the world root takes it
   // on arrival, so a keyboard user always has a landing spot (and arrow-nav works).
@@ -201,7 +217,7 @@ export function WorldShell({
         col: 0,
         row: 1,
         viewBox: WORLD_VIEWBOX,
-        scene: <LibraryRoom snapshot={library} onOpenBook={navTo} />,
+        scene: <LibraryRoom snapshot={library} onOpenBook={setOpenBook} />,
         air: libraryAir,
         eyebrow: "The Compendium · up the stair",
         line: libraryLine,
@@ -239,6 +255,7 @@ export function WorldShell({
       garden,
       gardenLine,
       navTo,
+      setOpenBook,
     ],
   );
 
@@ -350,6 +367,15 @@ export function WorldShell({
           <span className="world-invite-cta">invite them ❯</span>
         </button>
       ) : null}
+
+      {/* an opened book — the in-world spread over the world (from the library).
+          Closing sinks it back to the shelf; no route change, no re-climb. */}
+      <WorldSpread
+        open={openBook}
+        snapshot={library}
+        onClose={() => setOpenBook(null)}
+        onDeepLink={navTo}
+      />
 
       {/* THE COLD OPEN — the whole world held a beat, then a fluid push-in
           through the warm window to the hearth. Tap (or wait) to enter. */}

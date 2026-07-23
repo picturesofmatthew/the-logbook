@@ -101,6 +101,53 @@ matters here — the shore is *far*, and nearing it is progress you can see acro
 room will link to real money in the future* (`COFFERS.md` — the couple-owned trip fund), so it is
 built to hold that weight honestly.
 
+## Each room is its own world — dwellable interiors + the thread between them
+
+*Canon direction, 2026-07-23 (Matthew): "I want these rooms and pages to feel like their own
+individual worlds, all interconnected." This is the build principle for the next arc.*
+
+**A room is a place you dwell in, not a tableau you pass.** Today most rooms are a single
+establishing view with one hotspot that **routes OUT** to a legacy page (`/book`, `/shore`, …) —
+which breaks the spell and drops you back at the hearth on close. The build turns each room into its
+own small world you can **enter and stay in**:
+
+- **Two depths per room — establishing ↔ interior.** The **establishing view** is the room as you
+  arrive (the shelves, the sea, the glade). Tapping a hotspot opens an **interior spread IN the
+  world** — an overlay that belongs to that room, not a route change — and closing it returns you to
+  *that room*, where you were standing. The Book of Days opens as a real turnable spread on the
+  lectern; the vessel opens the shore you're sailing to; a being opens its lore. No page reload, no
+  re-climb. (The legacy `/book`, `/trends`, `/shore`, `/library` pages become these interiors, or
+  retire.)
+- **Each world keeps its own time & air.** The Garden rides the *real* clock (morning/dusk/night);
+  the interiors keep a timeless candlelit night; the Docks is always a starlit sea; the Lantern is
+  the one that flares. Distinct atmospheres are what make five rooms feel like five *places*.
+
+**What keeps them ONE world (the connective tissue) — the thread is the light and the data:**
+
+1. **One shared sky.** The same night and stars arc over the whole island; the overview shows them
+   all at once. Private islands, shared heavens (the archipelago).
+2. **The travelling light.** The seal you compose at the **hearth** is the *single flame*: it rises
+   the tower to light the **lantern**, whose **beam** reaches the **docks'** far shore. One act,
+   seen from every room.
+3. **The rippling day.** Every both-logged day is the **same fact wearing five faces** — it inks a
+   page in the **library**, grows the **garden**, lays a plank at the **docks**, may summon a
+   **being**, and lights the **lamp**. No room is an island of its own data; each is a different
+   *view* of the couple's lived days. That causal web is why crossing rooms feels like moving through
+   one life, not flipping tabs.
+
+**Build order (each room raised to "its own world," hero-art via Fable, ported by hand):**
+1. **Library / Compendium** — the flagship interior: the five books, and the **Book of Days opening
+   as an in-world spread** (this establishes the reusable spread/interior pattern the other books
+   reuse). *(Fable proto in flight, 2026-07-23 → `art/proto/library-compendium.html`.)*
+2. **Docks** — the vessel opens the **shore interior** (look out across the depth, the Dream drawn
+   near; coffers-linked later).
+3. **Garden** — deepen the living glade as a dwellable present (beings' lore, the familiar).
+4. **Hearth & Lantern** — the cast cinematic (the two keepers rise to the lamp; the beam sweeps the
+   shore) ties the thread together.
+
+Discipline unchanged: game-*feel* not scope; the current web stack; the spectacle stays *earned*;
+every ornament sits on a **true** number.
+
 ## The five books (the Compendium, up the stairs)
 
 Each a bound volume you pull down and open. **The inspiration engine:** every book shows the *whole*
