@@ -368,3 +368,36 @@ export const dreams = pgTable("dreams", {
     .default("active"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+// The ephemeral voice note — a keeper "speaks their day" and the clip is kept
+// for the partner to play (motivation + accountability), then erased "into the
+// night". One re-recordable note per keeper per day (PK profile+day, mirrors
+// weigh_ins / day_meta). NOT a blob store: a short clip lives as base64 in a
+// text column, AES-GCM encrypted at rest like the other consumer-health fields.
+// Liveness is driven by the couple-DAY (see lib/voice-notes) — a note is read
+// only while its `day` is today or yesterday, and older rows are lazily deleted
+// on read. No cron, no expiresAt column: the couple-day IS the clock.
+export const voiceNotes = pgTable(
+  "voice_notes",
+  {
+    bondId: text("bond_id")
+      .references(() => bonds.id)
+      .notNull(),
+    profileId: text("profile_id")
+      .references(() => profiles.id)
+      .notNull(),
+    day: date("day").notNull(),
+    // AES-GCM ciphertext of the base64 audio bytes (see lib/crypto).
+    audio: text("audio").notNull(),
+    mime: text("mime").notNull(),
+    // AES-GCM ciphertext of the transcript (nullable — Increment 0 has none).
+    transcript: text("transcript"),
+    durationS: integer("duration_s"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  // Read + lazily reaped by (bond, day); one live note per (profile, day).
+  (t) => [
+    primaryKey({ columns: [t.profileId, t.day] }),
+    index("voice_notes_bond_day_idx").on(t.bondId, t.day),
+  ],
+);
