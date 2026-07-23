@@ -158,54 +158,6 @@ export function GardenStub() {
   );
 }
 
-// ── THE DOCKS — east, the sea, the vessel, the far gold shore on the horizon ──
-export function DocksStub() {
-  return (
-    <>
-      <defs>
-        <linearGradient id="dk_sky" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#221d38" />
-          <stop offset="1" stopColor="#3a3350" />
-        </linearGradient>
-        <linearGradient id="dk_sea" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#2b2640" />
-          <stop offset="1" stopColor="#191521" />
-        </linearGradient>
-        <radialGradient id="dk_shore" cx="0.5" cy="0.5" r="0.5">
-          <stop offset="0" stopColor="#f0c878" />
-          <stop offset="1" stopColor="#f0c878" stopOpacity="0" />
-        </radialGradient>
-      </defs>
-      <rect x="0" y="0" width="1000" height="820" fill="url(#dk_sky)" />
-      <Stars />
-      {/* the sea */}
-      <rect x="0" y="800" width="1000" height="700" fill="url(#dk_sea)" />
-      {/* the far shore — a speck of gold on the horizon, and its glow */}
-      <ellipse cx="560" cy="800" rx="160" ry="34" fill="url(#dk_shore)" opacity="0.75" />
-      <rect x="536" y="792" width="48" height="12" rx="6" fill="#f0c878" />
-      {/* the vessel, sailing toward it */}
-      <g transform="translate(372 980)" opacity="0.95">
-        <path d="M-120 0 Q0 58 120 0 L92 42 Q0 66 -92 42 Z" fill="#2a2118" />
-        <path d="M0 4 V-152" stroke="#3a2f22" strokeWidth="10" strokeLinecap="round" />
-        <path d="M4 -150 L74 -58 L4 -58 Z" fill="#c9b48c" opacity="0.85" />
-      </g>
-      {/* a few slow swells */}
-      <g stroke="#3a3450" strokeWidth="4" opacity="0.5" fill="none">
-        <path d="M120 900 q60 -18 120 0 t120 0" />
-        <path d="M640 1010 q60 -18 120 0 t120 0" />
-      </g>
-      {/* the dock, underfoot */}
-      <rect x="0" y="1320" width="1000" height="180" fill="#241c14" />
-      <g stroke="#150e09" strokeWidth="6" opacity="0.55">
-        <path d="M130 1320 V1500" />
-        <path d="M370 1320 V1500" />
-        <path d="M630 1320 V1500" />
-        <path d="M870 1320 V1500" />
-      </g>
-    </>
-  );
-}
-
 // ── THE LANTERN — the top, the light. Lit by the LIVE spell. ──
 export function LanternStub({ spec }: { spec: SigilSpec }) {
   const lit = spec.completed;

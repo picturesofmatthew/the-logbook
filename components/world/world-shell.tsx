@@ -33,8 +33,8 @@ import { Atmosphere } from "./atmosphere";
 import { HearthDefs, HearthFar, HearthHeart, HearthMid } from "./rooms/hearth-scene";
 import { HEARTH_ATMOSPHERE } from "./rooms/hearth-atmosphere";
 import { LibraryRoom, type LibrarySnapshot } from "./rooms/library-room";
+import { DocksRoom, type DocksSnapshot } from "./rooms/docks-room";
 import {
-  DocksStub,
   GardenStub,
   LanternStub,
   STUB_VIEWBOX,
@@ -112,13 +112,15 @@ export function WorldShell({
   spec,
   standingLine,
   library,
+  docks,
 }: {
   spec: SigilSpec;
   standingLine: string | null;
   library: LibrarySnapshot;
+  docks: DocksSnapshot;
 }) {
   const router = useRouter();
-  const openBook = useCallback((href: string) => router.push(href), [router]);
+  const navTo = useCallback((href: string) => router.push(href), [router]);
   const [cam, setCam] = useState<Cell>(HEARTH);
   const [moving, setMoving] = useState(false);
   const reduced = useReducedMotion();
@@ -142,6 +144,12 @@ export function WorldShell({
     library.days === 0
       ? "five books, waiting for their first page."
       : "your kept self — the silver waits to be inked to gold.";
+
+  const docksLine = docks.dream
+    ? docks.complete
+      ? `${docks.dream.name} — reached. the vessel rests at the shore.`
+      : `toward ${docks.dream.name} · ${docks.planksLaid} of ${docks.plankGoal} planks`
+    : "no far shore yet — name the Dream you sail toward.";
 
   const slots: WorldSlot[] = useMemo(
     () => [
@@ -182,19 +190,19 @@ export function WorldShell({
         col: 1,
         row: 0,
         viewBox: STUB_VIEWBOX,
-        scene: <DocksStub />,
+        scene: <DocksRoom snapshot={docks} onOpen={navTo} />,
         air: docksAir,
         eyebrow: "The Docks · east",
-        line: "the vessel, and the far shore — coming into focus.",
+        line: docksLine,
         aria:
-          "The docks east of the hearth: a night sea, the vessel sailing out, and a speck of gold on the horizon — the far shore. This room is coming into focus.",
+          "The docks east of the hearth: a night sea under stars, the vessel sailing out across the depth toward a speck of gold on the horizon — the far shore, your Dream. A locked coffer waits on the dock. Tap the vessel to look toward the shore.",
       },
       {
         id: "library",
         col: 0,
         row: 1,
         viewBox: STUB_VIEWBOX,
-        scene: <LibraryRoom snapshot={library} onOpenBook={openBook} />,
+        scene: <LibraryRoom snapshot={library} onOpenBook={navTo} />,
         air: libraryAir,
         eyebrow: "The Compendium · up the stair",
         line: libraryLine,
@@ -219,7 +227,18 @@ export function WorldShell({
           : "The lamp room at the top of the tower: the light is dark, waiting for the day's seal to close.",
       },
     ],
-    [sealHtml, standingLine, lit, solo, spec, library, libraryLine, openBook],
+    [
+      sealHtml,
+      standingLine,
+      lit,
+      solo,
+      spec,
+      library,
+      libraryLine,
+      docks,
+      docksLine,
+      navTo,
+    ],
   );
 
   const active =

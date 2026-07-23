@@ -70,6 +70,21 @@ export default async function HearthPage() {
     })),
   };
 
+  // The Docks read the boat/Dream already composed in the glade state — the
+  // vessel's place in the depth is planksLaid / plankGoal toward the far shore.
+  const docks = {
+    dream: glade.dream
+      ? {
+          name: glade.dream.name,
+          distanceDays: glade.dream.distanceDays,
+          reachedDay: glade.dream.reachedDay,
+        }
+      : null,
+    planksLaid: glade.boat?.planksLaid ?? 0,
+    plankGoal: glade.boat?.plankGoal ?? 0,
+    complete: glade.boat?.complete ?? false,
+  };
+
   const dayData = {
     journal,
     meta: extras.meta,
@@ -110,6 +125,11 @@ export default async function HearthPage() {
       : "an open page, still to keep together";
 
   return (
-    <WorldShell spec={sigil} standingLine={standingLine} library={library} />
+    <WorldShell
+      spec={sigil}
+      standingLine={standingLine}
+      library={library}
+      docks={docks}
+    />
   );
 }

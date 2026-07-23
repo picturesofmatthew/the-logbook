@@ -243,7 +243,7 @@ export function LibraryRoom({
         return (
           <g
             key={b.id}
-            className="lib-book"
+            className="world-hotspot"
             data-hotspot="true"
             role="button"
             tabIndex={0}

@@ -981,6 +981,15 @@ html[data-light="night"] .glade-day-only {
   inset: 0;
   overflow: hidden;
 }
+/* a tappable object inside a room — a book on the shelf, the vessel at the dock */
+.world-hotspot {
+  cursor: pointer;
+}
+.world-hotspot:focus-visible {
+  outline: 2px solid rgba(232, 200, 134, 0.85);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
 /* the air + the inscription fade through a camera move, so the swap of one
    room's particles/letter for the next is never seen mid-slide */
 .world-air-dim {
