@@ -113,6 +113,19 @@ export function LibraryRune(props: RuneProps) {
   );
 }
 
+// A hearth — a firebox arch on the hearthstone with a flame at its heart. The
+// home of the Lighthouse world: the mantle where the day's seal is cast.
+export function HearthRune(props: RuneProps) {
+  return (
+    <Svg {...props}>
+      <path d="M5 20 V11 q0 -2.4 2.4 -2.4 H16.6 Q19 8.6 19 11 V20" />
+      <path d="M3.4 20 H20.6" />
+      <path d="M12 18 C10 16.6 10.3 14 12 12.1 C13.7 14 14 16.6 12 18 Z" />
+      <path d="M12 17.3 C11.1 16.5 11.3 15.2 12 14.2" opacity="0.7" />
+    </Svg>
+  );
+}
+
 // A stag's crown — antlers branching over a still head. Marks the bestiary.
 export function BestiaryRune(props: RuneProps) {
   return (
