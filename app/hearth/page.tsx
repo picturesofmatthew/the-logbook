@@ -13,10 +13,12 @@ import {
   getWorkoutsForDay,
   keeperDayFromDay,
 } from "@/lib/data";
-import { todayIso } from "@/lib/dates";
+import { diffDays, todayIso } from "@/lib/dates";
 import { getGladeState } from "@/lib/ledger";
-import { BEINGS } from "@/lib/engine/beings";
+import { BEINGS, paleElkGlimpsed } from "@/lib/engine/beings";
+import { stageForDays } from "@/lib/engine/familiar";
 import { composeSigil, LEGENDARIES } from "@/lib/engine/sigil";
+import type { BeingStages } from "@/components/glade/glade-scene";
 
 // The Lighthouse — the whole inhabited world, entered at the hearth. The World
 // Shell holds all five rooms on one spatial canvas and moves a camera between
@@ -101,6 +103,32 @@ export default async function HearthPage() {
     firstPage: glade.firstBothDay === today,
   });
 
+  // The Garden is the REAL glade — the same living scene the home grew, wired to
+  // the same vitality/beings/familiar (reflecting the engine, not redrawn).
+  const beingStages = Object.fromEntries(
+    glade.beings.map((b) => [b.id, b.stage]),
+  ) as BeingStages;
+  const garden = {
+    tier: glade.tier,
+    beings: beingStages,
+    familiarStage: stageForDays(familiarState.lifetimeDays),
+    familiarName: familiarState.name,
+    inklings: familiarState.loggedToday.length,
+    hearthDay:
+      sigil.chords.includes("hearth") || sigil.legendary === "feast-seal",
+    mossLit:
+      familiarState.loggedToday.includes("moss") || dayWorkouts.moss.length > 0,
+    emberLit:
+      familiarState.loggedToday.includes("ember") ||
+      dayWorkouts.ember.length > 0,
+    paleElk: paleElkGlimpsed({
+      gladeTier: glade.tier,
+      daysSinceLegendary: glade.lastLegendaryDay
+        ? diffDays(today, glade.lastLegendaryDay)
+        : null,
+    }),
+  };
+
   // The standing line — warm, viewer-aware, never a scold (mirrors the glade
   // home). A solo log is a kept half awaiting the second hand; a sealed day is
   // the light, kept together.
@@ -130,6 +158,7 @@ export default async function HearthPage() {
       standingLine={standingLine}
       library={library}
       docks={docks}
+      garden={garden}
     />
   );
 }

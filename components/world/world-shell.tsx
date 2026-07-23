@@ -35,8 +35,8 @@ import { HEARTH_ATMOSPHERE } from "./rooms/hearth-atmosphere";
 import { LibraryRoom, type LibrarySnapshot } from "./rooms/library-room";
 import { DocksRoom, type DocksSnapshot } from "./rooms/docks-room";
 import { OverviewScene, OVERVIEW_VIEWBOX } from "./rooms/overview-scene";
+import { GardenRoom, type GardenSnapshot } from "./rooms/garden-room";
 import {
-  GardenStub,
   LanternStub,
   STUB_VIEWBOX,
   docksAir,
@@ -56,7 +56,11 @@ type WorldSlot = {
   row: number;
   className?: string;
   viewBox: { width: number; height: number };
+  /** the room's SVG content, drawn into the shared world-scene svg. */
   scene: React.ReactNode;
+  /** OR a full custom layer (a room that isn't a single svg — e.g. the Garden,
+   *  which embeds the real GladeScene + familiar). Takes precedence over scene. */
+  render?: React.ReactNode;
   air: AtmosphereConfig;
   eyebrow: string;
   line: string;
@@ -120,11 +124,13 @@ export function WorldShell({
   standingLine,
   library,
   docks,
+  garden,
 }: {
   spec: SigilSpec;
   standingLine: string | null;
   library: LibrarySnapshot;
   docks: DocksSnapshot;
+  garden: GardenSnapshot;
 }) {
   const router = useRouter();
   const navTo = useCallback((href: string) => router.push(href), [router]);
@@ -181,6 +187,13 @@ export function WorldShell({
       : `toward ${docks.dream.name} · ${docks.planksLaid} of ${docks.plankGoal} planks`
     : "no far shore yet — name the Dream you sail toward.";
 
+  const gardenLine =
+    garden.mossLit && garden.emberLit
+      ? `both fires are lit — the glade is ${garden.tier}`
+      : garden.mossLit || garden.emberLit
+        ? `a fire is kept — the glade is ${garden.tier}`
+        : `the living present — the glade is ${garden.tier}`;
+
   const slots: WorldSlot[] = useMemo(
     () => [
       {
@@ -188,12 +201,13 @@ export function WorldShell({
         col: -1,
         row: 0,
         viewBox: STUB_VIEWBOX,
-        scene: <GardenStub />,
+        scene: null,
+        render: <GardenRoom snapshot={garden} />,
         air: gardenAir,
         eyebrow: "The Garden · west",
-        line: "the glade — coming into focus.",
+        line: gardenLine,
         aria:
-          "A dusk garden west of the hearth: a moon over far hills, a tree, and the antlered familiar curled asleep on the ground. This room is coming into focus.",
+          "The garden west of the hearth: the living glade with the familiar and the beings that keep it, blooming or hushed with the day's vitality.",
       },
       {
         id: "hearth",
@@ -267,6 +281,8 @@ export function WorldShell({
       libraryLine,
       docks,
       docksLine,
+      garden,
+      gardenLine,
       navTo,
     ],
   );
@@ -385,15 +401,17 @@ export function WorldShell({
             style={{ transform: `translate(${s.col * 100}%, ${-s.row * 100}%)` }}
             aria-hidden={s.id !== active.id}
           >
-            <svg
-              className="world-scene"
-              viewBox={`0 0 ${s.viewBox.width} ${s.viewBox.height}`}
-              preserveAspectRatio="xMidYMid meet"
-              role="img"
-              aria-label={s.aria}
-            >
-              {s.scene}
-            </svg>
+            {s.render ?? (
+              <svg
+                className="world-scene"
+                viewBox={`0 0 ${s.viewBox.width} ${s.viewBox.height}`}
+                preserveAspectRatio="xMidYMid meet"
+                role="img"
+                aria-label={s.aria}
+              >
+                {s.scene}
+              </svg>
+            )}
           </div>
         ))}
       </div>

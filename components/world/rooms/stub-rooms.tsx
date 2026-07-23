@@ -113,51 +113,6 @@ function Stars({ fill = "#f2e6c4", opacity = 0.8 }: { fill?: string; opacity?: n
   );
 }
 
-// ── THE GARDEN — west, the glade (dusk, mossy, the familiar at rest) ──
-export function GardenStub() {
-  return (
-    <>
-      <defs>
-        <linearGradient id="gd_sky" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#5b5170" />
-          <stop offset=".55" stopColor="#585564" />
-          <stop offset="1" stopColor="#49493f" />
-        </linearGradient>
-        <linearGradient id="gd_ground" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#3c4a30" />
-          <stop offset="1" stopColor="#28331f" />
-        </linearGradient>
-        <radialGradient id="gd_moon" cx="0.5" cy="0.5" r="0.5">
-          <stop offset="0" stopColor="#f3e6c0" />
-          <stop offset="1" stopColor="#f3e6c0" stopOpacity="0" />
-        </radialGradient>
-      </defs>
-      <rect x="0" y="0" width="1000" height="1500" fill="url(#gd_sky)" />
-      <circle cx="742" cy="360" r="150" fill="url(#gd_moon)" opacity="0.5" />
-      <circle cx="742" cy="360" r="64" fill="#f1e4bf" opacity="0.85" />
-      {/* far hills */}
-      <path d="M0 1040 Q260 940 520 1010 T1000 980 V1500 H0 Z" fill="#3a4636" opacity="0.65" />
-      {/* the near ground */}
-      <path d="M0 1120 Q300 1060 560 1120 T1000 1100 V1500 H0 Z" fill="url(#gd_ground)" />
-      {/* a tree */}
-      <g opacity="0.92">
-        <path d="M300 1200 V960" stroke="#2b241c" strokeWidth="16" strokeLinecap="round" />
-        <circle cx="300" cy="912" r="120" fill="#33422a" />
-        <circle cx="228" cy="964" r="78" fill="#2e3b26" />
-        <circle cx="372" cy="962" r="84" fill="#38472d" />
-      </g>
-      {/* the familiar, curled — a resting silhouette on the warm ground */}
-      <g transform="translate(636 1236)" opacity="0.92">
-        <ellipse cx="0" cy="0" rx="84" ry="50" fill="#d8c9a6" />
-        <path d="M62 -22 q64 -30 74 26 q-42 -8 -74 -4 Z" fill="#cbb98f" />
-        <circle cx="-58" cy="-12" r="30" fill="#e2d4b3" />
-        <path d="M-72 -30 l10 -22 l14 18 Z" fill="#e2d4b3" />
-        <path d="M-46 -32 l6 -22 l16 16 Z" fill="#e2d4b3" />
-      </g>
-    </>
-  );
-}
-
 // ── THE LANTERN — the top, the light. Lit by the LIVE spell. ──
 export function LanternStub({ spec }: { spec: SigilSpec }) {
   const lit = spec.completed;

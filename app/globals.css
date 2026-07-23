@@ -981,6 +981,39 @@ html[data-light="night"] .glade-day-only {
   inset: 0;
   overflow: hidden;
 }
+/* ── The Garden room — the real glade, embedded in the west slot ──
+   The room's own sky is painted with the same light vars the glade uses, so the
+   sky and the skyless glade band meet without a seam. Rides the app light-script
+   (morning / dusk / night) — the one room lit by NOW. */
+.garden-room {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: linear-gradient(
+    180deg,
+    var(--glade-sky-top) 0%,
+    var(--glade-sky-bottom) 56%,
+    var(--glade-ground-top) 100%
+  );
+}
+.garden-band {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+.garden-band > svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.garden-fox {
+  position: absolute;
+  bottom: 7%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
 /* a tappable object inside a room — a book on the shelf, the vessel at the dock */
 .world-hotspot {
   cursor: pointer;
