@@ -1,0 +1,896 @@
+<title>Signed × Sealed — The Docks</title>
+<!--
+  THE DOCKS / THE SHORE ROAD — the fourth flagship proto (sister to hearth-hall.html,
+  library-compendium.html and lantern-lamp.html)
+  ─────────────────────────────────────────────────────────────────────────────────
+  East of the Hearth Hall, at the island's foot: the dock, the cold water, and the
+  couple's vessel sailing out toward the far shore — the Dream (KAUAI here), built
+  toward plank by plank with every both-logged day. Same night, same law as the
+  sisters: one warm light, ink line + gouache wash, every ornament sits on a true
+  thing. This is the island's FUTURE pole. DEPTH IS THE HERO: you look OUT across
+  dark water at something far and gold, and the vessel's place along that depth IS
+  the wordless score.
+
+  WHAT EACH ELEMENT REPRESENTS
+  · THE VESSEL — the couple's boat, built plank by plank (a plank = a day both
+    signed). Its hull wears three GOLD seams — the planks already laid, the lived
+    days — while above the gunwale two SILVER ghost-strakes hang dash-outlined,
+    the planks still waiting to be lived. It sails unmanned: the keepers are at
+    the hearth; their signed days carry it. A garnet × is pressed on the sail —
+    the seal, posted to the future. Tapping the vessel (later) opens the far
+    shore interior; here it makes gold motes fly the road and the shore answer.
+  · THE SCORE — planksLaid 23 of plankGoal 60 (frac ≈ .38): the vessel sits 38%
+    of the way out along the depth between dock-edge and horizon, drawn at .84
+    scale (distance shrinks it honestly). The tally card on the plank stack
+    states the same number in words. Nothing decorative disagrees with the data.
+  · THE FAR SHORE — the same three-gold-rects thumbnail the hearth's east window
+    and the lamp keep on their horizons: recognizably the SAME shore. Named on
+    the dock's fingerboard placard: KAUAI · THE FAR SHORE.
+  · THE LIGHTHOUSE + THE BEAM — the tower rises behind you to the west (frame
+    left, the way the sisters compress geography); two small windows glow on its
+    spine (hearth below, library above) and the lamp is LIT — tonight's seal is
+    complete — so its beam crosses the whole sky and lands on the far shore.
+    The connective tissue made visible: one light, seen from every room.
+  · THE TWO ROADS ON THE WATER — the beam lays a broken GOLD track from the
+    shore back toward the dock (the lived road; the vessel rides it), and the
+    low moon lays a broken SILVER track beside it (the waiting road). Gold-lived,
+    silver-waiting — the world's whole language, written on the sea.
+  · THE PLANK STACK + TALLY — two cut planks (silver-edged, ready) and two
+    dash-outlined ghost planks above them: the days not yet lived, stacked and
+    patient. The pinned card reads PLANKS LAID · 23 OF 60 / ONE PLANK · ONE
+    SIGNED DAY. Honest, never nagging.
+  · THE LOCKED COFFER — dim, clasped, a paper tag on the padlock: LATER. This
+    room is built to hold real money honestly in the future (COFFERS.md — the
+    couple-owned trip fund; the app never holds a cent), so the coffer waits
+    visibly without faking anything now. Its keyhole matches the world's one
+    key. Pressing it gives only a silver shimmer: not yet.
+  · THE DOCK LANTERN — the one warm near source. A wick-spirit lives inside
+    (one of the small folk), leaning out over the water, keeping watch for the
+    boat. Its light pools on the boards and glimmers on the water below.
+  · THE CAST-OFF ROPE on the east bollard — the vessel WAS tied here; it has
+    sailed. The rope coil on the west bollard waits for its return.
+  · THE SHARED SKY — the same stars as every other room: THE FERRY asterism,
+    the small × asterism (two hands, written in the heavens), and a low warm
+    moon. West along the shore, the dark headland of the island's garden, two
+    garden lanterns still lit.
+
+  INTERACTIVE HOTSPOTS (later, in the world shell)
+  · the vessel      -> opens the far shore interior (look out across the depth,
+                       the Dream drawn near — rendered at port time)
+  · the coffer      -> LATER (COFFERS.md; nothing opens until money is honest)
+  · the placard     -> name / rename the Dream
+  · the far shore   -> peek at the Dream
+  In this proto: pressing near the vessel blooms a gold ring, motes fly the
+  water-road toward the shore, and the shore glimmers back — the same gesture
+  language as the hearth seal, the library books, the lamp.
+
+  Rendering: hand-composed inline SVG (single-weight cocoa ink + flat gouache
+  fills, brand hues only — no white, no black, no gray; the night sea holds the
+  sisters' cool indigos, kept warm-leaning) + one <canvas> for breath: spray at
+  the pilings, mist drifting the water, motes in the lantern light. Violet
+  appears nowhere at the docks — the union lives up the tower. Stillness is the
+  resting state; the vessel's slow bob is the one thing that never quite sleeps.
+-->
+<style>
+:root{
+  --night:#2f2820; --raised:#3a3128; --deep:#241e18;
+  --cream:#fbf6ea; --paper:#f5eddc;
+  --moss:#7c8a4d;  --pine:#5b6b3c;
+  --terra:#c4704b; --gold:#d9a441; --wick:#f7e3ae;
+  --garnet:#93372b; --violet:#8d7aa8; --illum:#c9b3e3;
+  --sky:#453a54;   --dusk:#6f5a78;  --silver:#bdb7a8;
+  --ink:#2b2014;   --wood:#3a2c1e; --stone:#3b322a; --hearthdk:#1e1913;
+  --terradeep:#8a4c33; --pageshade:#e6d9bd;
+  color-scheme:dark;
+}
+html,body{margin:0;padding:0;overflow:hidden;background:var(--deep)}
+#stage{
+  position:fixed; inset:0; overflow:hidden;
+  background:radial-gradient(130% 95% at 50% 42%, #382f47 0%, #2a2436 50%, #241e18 100%);
+  font-family:Georgia,"Iowan Old Style",serif;
+  --px:0; --py:0;
+}
+#scene{position:absolute;inset:0;width:100%;height:100%;display:block;overflow:visible}
+#air{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+#grain{
+  position:absolute;inset:0;pointer-events:none;opacity:.07;
+  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' seed='47' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.85 0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:240px 240px;
+}
+/* parallax layers — the same whisper of depth as the sisters */
+#layer-far,#layer-mid,#layer-heart{will-change:transform}
+#layer-far  {transform:translate3d(calc(var(--px)*6px),  calc(var(--py)*4px),0)}
+#layer-mid  {transform:translate3d(calc(var(--px)*10px), calc(var(--py)*6px),0)}
+#layer-heart{transform:translate3d(calc(var(--px)*14px), calc(var(--py)*9px),0)}
+
+/* ── the vessel: a slow bob, the one motion that never quite sleeps ── */
+#vesselg{transform-box:fill-box;transform-origin:50% 68%;animation:bob 7.2s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-.5deg)}
+  50%{transform:translateY(-6px) rotate(.55deg)}}
+#vreflect{animation:reflsh 7.2s ease-in-out infinite}
+@keyframes reflsh{0%,100%{opacity:.55}50%{opacity:.38}}
+
+/* ── the water: glints breathe at their own tempos; the sea never hurries ── */
+.shim{animation:shimwave 8.5s ease-in-out infinite}
+.shim.s2{animation-delay:-2.8s;animation-duration:9.5s}
+.shim.s3{animation-delay:-5.6s;animation-duration:7.6s}
+@keyframes shimwave{0%,100%{opacity:.45}50%{opacity:1}}
+
+/* ── the beam: lit because today is sealed; it breathes like the lamp above ── */
+#beamshimmer{animation:beamshim 7s ease-in-out infinite}
+@keyframes beamshim{0%,100%{opacity:.8}50%{opacity:1}}
+
+/* ── silver: what waits, shimmering faintly — never gone, never nagging ── */
+.ghost{animation:ghostsh 6.4s ease-in-out infinite}
+.ghost.g2{animation-delay:-2.1s}.ghost.g3{animation-delay:-4.3s}
+@keyframes ghostsh{0%,100%{opacity:.4}50%{opacity:.64}}
+
+/* the dock lantern's wick-spirit: it leans when it keeps watch */
+#wisp{transform-box:fill-box;transform-origin:50% 100%;animation:wisplean 3.8s ease-in-out infinite}
+@keyframes wisplean{0%,100%{transform:rotate(-2.2deg) scaleY(1)}38%{transform:rotate(1.8deg) scaleY(1.06)}
+  70%{transform:rotate(-.6deg) scaleY(.96)}}
+
+.twinkle{animation:star 7s ease-in-out infinite}
+@keyframes star{0%,100%{opacity:.35}50%{opacity:.95}}
+
+/* the answers a warm hand raises */
+#bloomring{opacity:0;transform-box:fill-box;transform-origin:50% 50%;transform:scale(.94);
+  transition:opacity 1.6s ease, transform 1.6s ease}
+#bloomring.on{opacity:.55;transform:scale(1.06);transition:opacity .22s ease, transform .22s ease}
+#shoreflare{opacity:0;transition:opacity 1.8s ease}
+#shoreflare.on{opacity:.65;transition:opacity .3s ease}
+#cofferring{opacity:0;transform-box:fill-box;transform-origin:50% 50%;transform:scale(.96);
+  transition:opacity 1.4s ease, transform 1.4s ease}
+#cofferring.on{opacity:.3;transform:scale(1.04);transition:opacity .2s ease, transform .2s ease}
+
+/* ── the inscription: a letter, never a notification ── */
+.inscription{
+  position:absolute;left:0;right:0;
+  bottom:calc(3.2dvh + env(safe-area-inset-bottom,0px));
+  text-align:center;pointer-events:none;padding:0 1.5rem;
+}
+.inscription .eyebrow{
+  font-family:"Courier New",Courier,monospace;font-size:.62rem;font-weight:600;
+  letter-spacing:.34em;text-transform:uppercase;
+  color:rgba(251,246,234,.48);margin-bottom:.55rem;
+}
+.inscription .line{
+  font-family:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+  font-style:italic;
+  font-size:clamp(.95rem, .8rem + .9vw, 1.3rem);
+  color:rgba(245,237,220,.9);
+  text-shadow:0 1px 14px rgba(217,164,65,.16);
+  text-wrap:balance;
+}
+
+/* stillness for those who ask for it */
+@media (prefers-reduced-motion:reduce){
+  #vesselg,#vreflect,.shim,#beamshimmer,.ghost,#wisp,.twinkle{animation:none}
+  #bloomring,#shoreflare,#cofferring{transition:none}
+  #layer-far,#layer-mid,#layer-heart{transform:none}
+}
+</style>
+<div id="stage">
+<svg id="scene" viewBox="0 0 1000 1500" preserveAspectRatio="xMidYMid meet" role="img"
+  aria-label="A wooden dock at the foot of a lighthouse island, at night, looking east across dark water. A small sailboat, its hull seamed with gold planks and two silver ghost-planks still unbuilt above its gunwale, sails out along a broken gold track of light toward a tiny gold shore on the horizon named Kauai. Behind, at frame left, the lighthouse rises with two lit windows, its beam crossing the starry sky to land on that same far shore. A low warm moon lays a silver track on the water beside the gold one. On the dock: a locked dim coffer tagged LATER, a stack of waiting planks with a tally card reading 23 of 60, a fingerboard placard pointing to Kauai, mooring posts with rope, and one warm lantern with a small flame-spirit inside, keeping watch.">
+<defs>
+  <!-- the shared sky, and the sea that keeps it -->
+  <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#2a2436"/><stop offset=".5" stop-color="#382f47"/>
+    <stop offset=".84" stop-color="#453a54"/><stop offset="1" stop-color="#574862"/>
+  </linearGradient>
+  <linearGradient id="seaG" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#2a2436"/><stop offset=".55" stop-color="#241f28"/>
+    <stop offset="1" stop-color="#241e18"/>
+  </linearGradient>
+  <linearGradient id="deckG" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#33291d"/><stop offset="1" stop-color="#241e18"/>
+  </linearGradient>
+  <linearGradient id="pageG" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#f5eddc"/><stop offset="1" stop-color="#e6d9bd"/>
+  </linearGradient>
+  <!-- the beam, leaving the lamp for the shore it knows -->
+  <linearGradient id="beamG" gradientUnits="userSpaceOnUse" x1="92" y1="244" x2="700" y2="590">
+    <stop offset="0" stop-color="#f7e3ae" stop-opacity=".2"/>
+    <stop offset=".55" stop-color="#d9a441" stop-opacity=".07"/>
+    <stop offset="1" stop-color="#d9a441" stop-opacity=".025"/>
+  </linearGradient>
+  <linearGradient id="lanceG" gradientUnits="userSpaceOnUse" x1="92" y1="244" x2="700" y2="590">
+    <stop offset="0" stop-color="#fbf6ea" stop-opacity=".3"/>
+    <stop offset=".6" stop-color="#f7e3ae" stop-opacity=".1"/>
+    <stop offset="1" stop-color="#f7e3ae" stop-opacity=".03"/>
+  </linearGradient>
+  <!-- light -->
+  <radialGradient id="glowSmG">
+    <stop offset="0" stop-color="#f7e3ae" stop-opacity=".4"/>
+    <stop offset="1" stop-color="#f7e3ae" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="moonGlowG">
+    <stop offset="0" stop-color="#f5eddc" stop-opacity=".16"/>
+    <stop offset="1" stop-color="#f5eddc" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="haloG">
+    <stop offset="0" stop-color="#f7e3ae" stop-opacity=".3"/>
+    <stop offset=".5" stop-color="#d9a441" stop-opacity=".12"/>
+    <stop offset="1" stop-color="#d9a441" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="silverRingG">
+    <stop offset="0" stop-color="#bdb7a8" stop-opacity=".2"/>
+    <stop offset=".6" stop-color="#bdb7a8" stop-opacity=".1"/>
+    <stop offset="1" stop-color="#bdb7a8" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="shadG">
+    <stop offset="0" stop-color="#1e1913" stop-opacity=".55"/>
+    <stop offset="1" stop-color="#1e1913" stop-opacity="0"/>
+  </radialGradient>
+</defs>
+
+<!-- ═══════════ FAR: the night, the water, the shore the world points at ═══════════ -->
+<g id="layer-far">
+  <!-- the sky, drawn far past the frame so the parallax stays inside the night -->
+  <rect x="-700" y="-400" width="2900" height="1002" fill="url(#skyG)"/>
+
+  <!-- stars: the same heavens every room keeps -->
+  <g fill="#fbf6ea">
+    <circle cx="150" cy="86" r="1.2" opacity=".55"/><circle cx="238" cy="140" r="1" opacity=".45"/>
+    <circle cx="330" cy="70" r="1.3" opacity=".6"/><circle cx="420" cy="150" r=".9" opacity=".4"/>
+    <circle cx="520" cy="96" r="1.2" opacity=".55"/><circle cx="600" cy="60" r="1" opacity=".45"/>
+    <circle cx="700" cy="120" r="1.3" opacity=".6"/><circle cx="920" cy="90" r="1.2" opacity=".5"/>
+    <circle cx="960" cy="180" r="1" opacity=".42"/><circle cx="884" cy="286" r="1" opacity=".42"/>
+    <circle cx="60" cy="180" r="1" opacity=".42"/><circle cx="130" cy="260" r=".9" opacity=".36"/>
+    <circle cx="382" cy="238" r="1" opacity=".44"/><circle cx="470" cy="300" r=".9" opacity=".38"/>
+    <circle cx="560" cy="212" r="1.1" opacity=".48"/><circle cx="656" cy="286" r=".9" opacity=".4"/>
+    <circle cx="760" cy="220" r="1" opacity=".44"/><circle cx="330" cy="366" r=".9" opacity=".36"/>
+    <circle cx="450" cy="420" r="1" opacity=".4"/><circle cx="580" cy="384" r=".9" opacity=".35"/>
+    <circle cx="760" cy="420" r="1" opacity=".4"/><circle cx="900" cy="470" r=".9" opacity=".36"/>
+    <circle cx="620" cy="480" r=".9" opacity=".33"/><circle cx="500" cy="520" r=".8" opacity=".3"/>
+    <circle cx="486" cy="176" r="1.1" opacity=".5" class="twinkle" style="animation-delay:-3s"/>
+    <circle cx="810" cy="140" r="1.2" opacity=".55" class="twinkle" style="animation-delay:-5.4s"/>
+    <circle cx="204" cy="330" r="1" opacity=".45" class="twinkle" style="animation-delay:-1.8s"/>
+  </g>
+  <!-- THE FERRY — the boat asterism; tonight the water shows it its little sister -->
+  <g>
+    <path d="M 250 268 L 278 281 L 315 278 L 342 261" fill="none" stroke="#fbf6ea" stroke-width=".9" stroke-opacity=".28"/>
+    <line x1="297" y1="279" x2="297" y2="222" stroke="#fbf6ea" stroke-width=".9" stroke-opacity=".28"/>
+    <circle cx="250" cy="268" r="1.8" fill="#fbf6ea" opacity=".8"/>
+    <circle cx="278" cy="281" r="1.5" fill="#fbf6ea" opacity=".7"/>
+    <circle cx="315" cy="278" r="1.7" fill="#fbf6ea" opacity=".75"/>
+    <circle cx="342" cy="261" r="1.5" fill="#fbf6ea" opacity=".7"/>
+    <circle cx="297" cy="222" r="2.1" fill="#fbf6ea" opacity=".9" class="twinkle" style="animation-delay:-2s"/>
+  </g>
+  <!-- the small × asterism: two hands crossing, written in the heavens -->
+  <g stroke="#fbf6ea" stroke-width=".9" stroke-opacity=".26">
+    <line x1="828" y1="196" x2="846" y2="216"/><line x1="846" y1="196" x2="828" y2="216"/>
+  </g>
+  <circle cx="828" cy="196" r="1.4" fill="#fbf6ea" opacity=".7"/>
+  <circle cx="846" cy="216" r="1.4" fill="#fbf6ea" opacity=".65"/>
+  <circle cx="846" cy="196" r="1.2" fill="#fbf6ea" opacity=".6" class="twinkle" style="animation-delay:-5s"/>
+  <circle cx="828" cy="216" r="1.2" fill="#fbf6ea" opacity=".6"/>
+
+  <!-- THE LOW MOON — warm parchment, near the water it silvers -->
+  <circle cx="176" cy="470" r="62" fill="url(#moonGlowG)"/>
+  <circle cx="176" cy="470" r="21" fill="#e6d9bd"/>
+  <circle cx="169" cy="463" r="3.2" fill="#bdb7a8" opacity=".32"/>
+  <circle cx="184" cy="474" r="2.2" fill="#bdb7a8" opacity=".26"/>
+  <circle cx="174" cy="481" r="1.6" fill="#bdb7a8" opacity=".22"/>
+  <path d="M 158 478 A 21 21 0 0 0 194 478" fill="none" stroke="#d9a441" stroke-width="1.2" stroke-opacity=".22"/>
+
+  <!-- THE LIGHTHOUSE, west — behind you; the frame keeps it the way memory does -->
+  <g>
+    <!-- the garden headland, dark, its two lanterns still lit -->
+    <path d="M -700 602 L -700 566 C -300 540, -80 546, 30 552 C 120 557, 200 574, 244 590 C 258 596, 266 599, 270 602 Z" fill="#1e1913" opacity=".95"/>
+    <path d="M 148 566 l 9 -18 l 9 18 Z" fill="#241e18"/>
+    <path d="M 176 572 l 8 -15 l 8 15 Z" fill="#241e18"/>
+    <path d="M 206 580 l 7 -13 l 7 13 Z" fill="#241e18"/>
+    <circle cx="120" cy="576" r="1.4" fill="#d9a441" opacity=".6" class="twinkle" style="animation-duration:8s"/>
+    <circle cx="164" cy="584" r="1.2" fill="#d9a441" opacity=".5"/>
+    <!-- the tower: it stands over everything you do down here -->
+    <path d="M 56 602 L 72 262 L 100 262 L 116 602 Z" fill="#241e18"/>
+    <line x1="99" y1="270" x2="113" y2="596" stroke="#d9a441" stroke-width="1" stroke-opacity=".1"/>
+    <!-- two windows lit on the spine: the hearth below, the library above -->
+    <rect x="82" y="470" width="7" height="11" rx="2" fill="#d9a441" opacity=".3"/>
+    <rect x="80" y="382" width="7" height="11" rx="2" fill="#d9a441" opacity=".24"/>
+    <!-- gallery + lamp room -->
+    <rect x="62" y="252" width="48" height="10" rx="2" fill="#241e18"/>
+    <g stroke="#241e18" stroke-width="2">
+      <line x1="68" y1="252" x2="68" y2="242"/><line x1="86" y1="252" x2="86" y2="242"/>
+      <line x1="104" y1="252" x2="104" y2="242"/>
+    </g>
+    <line x1="64" y1="243" x2="108" y2="243" stroke="#241e18" stroke-width="2.5"/>
+    <rect x="70" y="222" width="32" height="22" rx="2" fill="#241e18" stroke="#d9a441" stroke-width="1" stroke-opacity=".3"/>
+    <path d="M 66 222 Q 86 206 106 222 Z" fill="#241e18"/>
+    <line x1="86" y1="208" x2="86" y2="198" stroke="#d9a441" stroke-width="1.4" stroke-opacity=".5"/>
+    <path d="M 82 200 L 90 206 M 90 200 L 82 206" stroke="#d9a441" stroke-width="1.4"
+      stroke-linecap="round" fill="none" opacity=".6"/>
+    <!-- the lamp itself: lit, because tonight both hands were on it -->
+    <circle cx="86" cy="234" r="26" fill="url(#glowSmG)" opacity=".9"/>
+    <circle cx="86" cy="234" r="5" fill="#f7e3ae"/>
+    <circle cx="86" cy="234" r="9" fill="#f7e3ae" opacity=".25"/>
+  </g>
+
+  <!-- THE BEAM — it exists because today is sealed; it knows where the shore is -->
+  <g id="beamshimmer">
+    <polygon points="94,234 94,252 718,608 686,570" fill="url(#beamG)"/>
+    <polygon points="94,240 94,247 708,600 698,588" fill="url(#lanceG)"/>
+  </g>
+
+  <!-- the horizon: eye level, as it always is -->
+  <rect x="-700" y="600" width="2900" height="556" fill="url(#seaG)"/>
+  <line x1="-700" y1="600" x2="2200" y2="600" stroke="#453a54" stroke-width="1.3" stroke-opacity=".85"/>
+
+  <!-- THE FAR SHORE: the same thumbnail of gold every room keeps — the Dream -->
+  <circle cx="700" cy="596" r="30" fill="url(#glowSmG)" opacity=".5"/>
+  <circle id="shoreflare" cx="700" cy="596" r="44" fill="url(#glowSmG)"/>
+  <g fill="#d9a441">
+    <rect x="688" y="594.4" width="7" height="1.9" rx=".9"/>
+    <rect x="697" y="593.8" width="5" height="1.7" rx=".8"/>
+    <rect x="705" y="594.6" width="4" height="1.5" rx=".7"/>
+  </g>
+  <circle cx="697" cy="592.2" r="1.5" fill="#f7e3ae" class="twinkle" style="animation-delay:-1s;animation-duration:9s"/>
+  <path d="M 697 602 q 2 10 -1 20 q -2 10 1 22" fill="none" stroke="#d9a441" stroke-width="1.4" stroke-opacity=".3"/>
+
+  <!-- the wide water: far lines tight, near lines loose — the depth doing its work -->
+  <g stroke="#453a54" stroke-width="1.2" stroke-opacity=".5">
+    <line x1="80" y1="622" x2="146" y2="622"/><line x1="330" y1="616" x2="398" y2="616"/>
+    <line x1="520" y1="628" x2="590" y2="628"/><line x1="840" y1="620" x2="908" y2="620"/>
+    <line x1="250" y1="648" x2="332" y2="648"/><line x1="560" y1="660" x2="640" y2="660"/>
+    <line x1="806" y1="656" x2="890" y2="656"/><line x1="60" y1="676" x2="150" y2="676"/>
+  </g>
+  <g stroke="#453a54" stroke-width="1.4" stroke-opacity=".42">
+    <line x1="360" y1="712" x2="470" y2="712"/><line x1="740" y1="736" x2="850" y2="736"/>
+    <line x1="90" y1="760" x2="200" y2="760"/><line x1="460" y1="796" x2="580" y2="796"/>
+    <line x1="820" y1="820" x2="940" y2="820"/><line x1="230" y1="850" x2="360" y2="850"/>
+  </g>
+  <g stroke="#453a54" stroke-width="1.7" stroke-opacity=".32">
+    <line x1="520" y1="900" x2="670" y2="900"/><line x1="60" y1="940" x2="220" y2="940"/>
+    <line x1="770" y1="980" x2="930" y2="980"/><line x1="300" y1="1010" x2="470" y2="1010"/>
+  </g>
+  <!-- the last slow swells before the dock -->
+  <g stroke="#453a54" stroke-width="3" stroke-opacity=".32" fill="none">
+    <path d="M 100 1064 q 60 -16 120 0 t 120 0"/>
+    <path d="M 560 1096 q 66 -18 132 0 t 132 0"/>
+    <path d="M 230 1128 q 60 -16 120 0 t 120 0"/>
+  </g>
+  <!-- a dusky glint or two where the moon touches the swell -->
+  <g stroke="#6f5a78" stroke-width="1.6" stroke-opacity=".3" class="shim s3">
+    <line x1="256" y1="742" x2="300" y2="742"/><line x1="130" y1="892" x2="186" y2="892"/>
+  </g>
+
+  <!-- THE SILVER ROAD — the moon's track: the waiting, laid on the water -->
+  <g stroke="#bdb7a8" stroke-linecap="round">
+    <g class="shim">
+      <line x1="168" y1="618" x2="186" y2="618" stroke-width="1.4" stroke-opacity=".3"/>
+      <line x1="160" y1="660" x2="192" y2="660" stroke-width="1.5" stroke-opacity=".26"/>
+      <line x1="152" y1="714" x2="198" y2="714" stroke-width="1.6" stroke-opacity=".2"/>
+    </g>
+    <g class="shim s2">
+      <line x1="146" y1="782" x2="206" y2="782" stroke-width="1.8" stroke-opacity=".16"/>
+      <line x1="138" y1="866" x2="214" y2="866" stroke-width="2" stroke-opacity=".12"/>
+      <line x1="128" y1="964" x2="222" y2="964" stroke-width="2.2" stroke-opacity=".08"/>
+    </g>
+  </g>
+
+  <!-- THE GOLD ROAD — the beam's track: the lived, and the vessel rides it -->
+  <g stroke="#d9a441" stroke-linecap="round">
+    <g class="shim s2">
+      <line x1="692" y1="618" x2="712" y2="618" stroke-width="1.5" stroke-opacity=".3"/>
+      <line x1="686" y1="650" x2="718" y2="650" stroke-width="1.6" stroke-opacity=".26"/>
+      <line x1="680" y1="696" x2="724" y2="696" stroke-width="1.7" stroke-opacity=".22"/>
+    </g>
+    <g class="shim">
+      <line x1="672" y1="756" x2="732" y2="756" stroke-width="1.9" stroke-opacity=".18"/>
+      <line x1="660" y1="830" x2="742" y2="830" stroke-width="2.1" stroke-opacity=".14"/>
+      <line x1="646" y1="908" x2="754" y2="908" stroke-width="2.3" stroke-opacity=".1"/>
+    </g>
+    <g class="shim s3">
+      <line x1="620" y1="1052" x2="756" y2="1052" stroke-width="2.5" stroke-opacity=".07"/>
+      <line x1="600" y1="1120" x2="770" y2="1120" stroke-width="2.6" stroke-opacity=".05"/>
+    </g>
+  </g>
+</g>
+
+<!-- ═══════════ MID: the vessel, out on the depth — the wordless score ═══════════ -->
+<g id="layer-mid">
+  <!-- its wake, already giving itself back to the sea -->
+  <g fill="none" stroke="#f5eddc" stroke-width="2" stroke-opacity=".07">
+    <path d="M 592 976 C 540 1022, 480 1072, 420 1128"/>
+    <path d="M 700 982 C 726 1026, 748 1074, 764 1124"/>
+  </g>
+
+  <!-- the halo a warm hand raises around the vessel -->
+  <circle id="bloomring" cx="655" cy="940" r="130" fill="url(#haloG)"/>
+
+  <!-- the reflection holds the boat the way the book holds the day -->
+  <g id="vreflect">
+    <ellipse cx="655" cy="980" rx="64" ry="8" fill="#1e1913" opacity=".55"/>
+    <line x1="620" y1="982" x2="668" y2="982" stroke="#d9a441" stroke-width="1.4" stroke-opacity=".18" class="shim"/>
+    <line x1="640" y1="988" x2="676" y2="988" stroke="#f5eddc" stroke-width="1" stroke-opacity=".08" class="shim s2"/>
+  </g>
+
+  <!-- THE VESSEL — 23 of 60 planks: 38% out along the depth, at .84 scale.
+       Gold seams = planks laid (days lived). Silver dashed strakes = planks
+       waiting. The garnet × on the sail = the seal, posted to the future. -->
+  <g transform="translate(655 942) scale(.84)">
+    <g id="vesselg">
+      <!-- the ghost strakes: the boat it is still becoming -->
+      <path d="M -88 -20 C -34 -10, 30 -9, 86 -26" fill="none" stroke="#bdb7a8"
+        stroke-width="1.6" stroke-dasharray="5 5" stroke-opacity=".5" class="ghost"/>
+      <path d="M -84 -28 C -32 -18, 28 -17, 80 -34" fill="none" stroke="#bdb7a8"
+        stroke-width="1.3" stroke-dasharray="4 6" stroke-opacity=".32" class="ghost g2"/>
+      <!-- the hull that exists: laid plank by plank -->
+      <path d="M -92 -12 C -34 -2, 34 -2, 92 -18 L 74 18 C 30 30, -32 30, -64 20 Z"
+        fill="#3a2c1e" stroke="#241e18" stroke-width="2"/>
+      <path d="M -92 -12 C -34 -2, 34 -2, 92 -18" fill="none" stroke="#241e18" stroke-width="2.5"/>
+      <path d="M -89 -14.5 C -34 -5, 34 -5, 89 -20.5" fill="none" stroke="#d9a441" stroke-width="1" stroke-opacity=".35"/>
+      <!-- three gold seams: the lived days banding the hull -->
+      <path d="M -84 -2 C -30 8, 30 8, 84 -6" fill="none" stroke="#d9a441" stroke-width="1.2" stroke-opacity=".5"/>
+      <path d="M -76 8 C -28 17, 28 17, 76 4" fill="none" stroke="#d9a441" stroke-width="1.1" stroke-opacity=".38"/>
+      <path d="M -66 16 C -24 24, 24 24, 66 13" fill="none" stroke="#d9a441" stroke-width="1" stroke-opacity=".26"/>
+      <!-- plank butts: the joins of real carpentry -->
+      <g stroke="#241e18" stroke-width="1" stroke-opacity=".4">
+        <line x1="-30" y1="-6" x2="-31" y2="4"/><line x1="34" y1="-7" x2="33" y2="3"/>
+        <line x1="0" y1="6" x2="-1" y2="15"/><line x1="52" y1="2" x2="51" y2="11"/>
+      </g>
+      <!-- mast, yard, and the sail that carries their days -->
+      <rect x="1.5" y="-122" width="4.5" height="112" rx="2" fill="#3a2c1e"/>
+      <line x1="5.5" y1="-118" x2="5.5" y2="-14" stroke="#d9a441" stroke-width=".8" stroke-opacity=".2"/>
+      <line x1="-2" y1="-112" x2="30" y2="-121" stroke="#3a2c1e" stroke-width="3.5" stroke-linecap="round"/>
+      <path d="M 9 -114 C 50 -92, 62 -58, 58 -26 L 9 -30 Z" fill="#f5eddc" opacity=".93"/>
+      <path d="M 16 -102 C 40 -83, 48 -58, 46 -34" fill="none" stroke="#e6d9bd" stroke-width="2"/>
+      <path d="M 9 -114 C 50 -92, 62 -58, 58 -26" fill="none" stroke="#2b2014" stroke-width="1" stroke-opacity=".25"/>
+      <!-- the seal, pressed on the sail: a letter posted to the future -->
+      <g stroke="#93372b" stroke-width="2.4" stroke-linecap="round" opacity=".82">
+        <line x1="28" y1="-64" x2="40" y2="-52"/><line x1="40" y1="-64" x2="28" y2="-52"/>
+      </g>
+      <circle cx="34" cy="-58" r="8.5" fill="none" stroke="#93372b" stroke-width="1" stroke-opacity=".4"/>
+      <!-- pennant: garnet, flying home -->
+      <path d="M 3.7 -122 L -20 -115 L 3.7 -109 Z" fill="#93372b" opacity=".95"/>
+      <!-- the stern lantern: a little of the hearth rides along -->
+      <circle cx="-83" cy="-22" r="13" fill="url(#glowSmG)" opacity=".8"/>
+      <rect x="-87.5" y="-28" width="8" height="10" rx="2" fill="#241e18" stroke="#d9a441" stroke-width="1" stroke-opacity=".7"/>
+      <circle cx="-83.5" cy="-23" r="1.8" fill="#f7e3ae"/>
+      <!-- tiller, lashed: nobody steers; the days do -->
+      <path d="M -80 -10 L -98 -22" stroke="#3a2c1e" stroke-width="2.5" stroke-linecap="round"/>
+    </g>
+  </g>
+</g>
+
+<!-- ═══════════ HEART: the dock underfoot — where the future is kept honestly ═══════════ -->
+<g id="layer-heart">
+  <!-- the dock's edge beam, catching the lantern -->
+  <rect x="-700" y="1148" width="2900" height="18" fill="#3a2c1e"/>
+  <line x1="-700" y1="1150" x2="2200" y2="1150" stroke="#f7e3ae" stroke-width="1.4" stroke-opacity=".13"/>
+  <line x1="-700" y1="1165" x2="2200" y2="1165" stroke="#1e1913" stroke-width="2.5" stroke-opacity=".6"/>
+  <!-- the deck -->
+  <rect x="-700" y="1166" width="2900" height="700" fill="url(#deckG)"/>
+  <g stroke="#1e1913" stroke-width="2" stroke-opacity=".45">
+    <line x1="-700" y1="1206" x2="2200" y2="1206"/><line x1="-700" y1="1250" x2="2200" y2="1250"/>
+    <line x1="-700" y1="1300" x2="2200" y2="1300"/><line x1="-700" y1="1358" x2="2200" y2="1358"/>
+    <line x1="-700" y1="1426" x2="2200" y2="1426"/>
+  </g>
+  <g stroke="#1e1913" stroke-width="1.6" stroke-opacity=".26">
+    <line x1="140" y1="1166" x2="136" y2="1206"/><line x1="440" y1="1206" x2="434" y2="1250"/>
+    <line x1="780" y1="1166" x2="776" y2="1206"/><line x1="262" y1="1250" x2="256" y2="1300"/>
+    <line x1="660" y1="1250" x2="654" y2="1300"/><line x1="920" y1="1300" x2="912" y2="1358"/>
+    <line x1="80" y1="1300" x2="72" y2="1358"/><line x1="540" y1="1358" x2="530" y2="1426"/>
+    <line x1="350" y1="1426" x2="340" y2="1490"/>
+  </g>
+  <!-- the lantern's warmth pooled on the boards -->
+  <ellipse cx="790" cy="1240" rx="310" ry="92" fill="#d9a441" opacity=".06"/>
+  <ellipse cx="780" cy="1210" rx="160" ry="52" fill="#f7e3ae" opacity=".05"/>
+
+  <!-- ── WEST BOLLARD + the coil that waits for the vessel's return ── -->
+  <g>
+    <ellipse cx="150" cy="1184" rx="34" ry="7" fill="url(#shadG)"/>
+    <rect x="136" y="1096" width="30" height="84" rx="8" fill="#3a2c1e" stroke="#241e18" stroke-width="1.6"/>
+    <ellipse cx="151" cy="1096" rx="15" ry="5.5" fill="#46402f" stroke="#241e18" stroke-width="1.2"/>
+    <line x1="140" y1="1102" x2="140" y2="1174" stroke="#d9a441" stroke-width="1" stroke-opacity=".16"/>
+    <!-- rope wraps -->
+    <g stroke="#6b5a44" stroke-width="4.5" fill="none">
+      <path d="M 136 1116 Q 151 1121 166 1116"/>
+      <path d="M 136 1126 Q 151 1131 166 1126"/>
+      <path d="M 136 1136 Q 151 1141 166 1136"/>
+    </g>
+    <path d="M 138 1140 C 122 1160, 108 1186, 100 1212" fill="none" stroke="#6b5a44" stroke-width="4.5"/>
+    <!-- the coil, patient -->
+    <g fill="none" stroke="#6b5a44" stroke-width="4.5" opacity=".9">
+      <ellipse cx="96" cy="1232" rx="36" ry="13"/>
+      <ellipse cx="96" cy="1224" rx="28" ry="10"/>
+      <ellipse cx="96" cy="1217" rx="20" ry="7.5"/>
+    </g>
+    <path d="M 78 1224 A 28 10 0 0 1 92 1215" fill="none" stroke="#d9a441" stroke-width="1" stroke-opacity=".2"/>
+  </g>
+
+  <!-- ── THE COFFER — locked, dim, honest: built to hold real money LATER ── -->
+  <g>
+    <ellipse cx="205" cy="1396" rx="108" ry="13" fill="url(#shadG)"/>
+    <circle id="cofferring" cx="205" cy="1330" r="120" fill="url(#silverRingG)"/>
+    <!-- domed lid -->
+    <path d="M 118 1290 L 118 1272 Q 205 1234 292 1272 L 292 1290 Z" fill="#33291d" stroke="#241e18" stroke-width="2"/>
+    <!-- body -->
+    <rect x="118" y="1290" width="174" height="102" rx="8" fill="#2e2418" stroke="#241e18" stroke-width="2"/>
+    <line x1="118" y1="1291" x2="292" y2="1291" stroke="#1e1913" stroke-width="2" stroke-opacity=".7"/>
+    <!-- dim brass straps: they will shine when the coffer earns its gold -->
+    <g>
+      <rect x="148" y="1252" width="11" height="140" rx="3" fill="#3a3128"/>
+      <rect x="251" y="1252" width="11" height="140" rx="3" fill="#3a3128"/>
+      <line x1="150" y1="1256" x2="150" y2="1388" stroke="#d9a441" stroke-width="1" stroke-opacity=".22"/>
+      <line x1="253" y1="1256" x2="253" y2="1388" stroke="#d9a441" stroke-width="1" stroke-opacity=".22"/>
+    </g>
+    <!-- corner caps -->
+    <g fill="#3a3128" stroke="#d9a441" stroke-width=".8" stroke-opacity=".2">
+      <path d="M 118 1378 l 14 0 l -14 14 Z"/><path d="M 292 1378 l -14 0 l 14 14 Z"/>
+    </g>
+    <!-- the plate: it says what it is, and no more -->
+    <rect x="168" y="1300" width="74" height="15" rx="2" fill="#3a3128" stroke="#d9a441" stroke-width=".9" stroke-opacity=".3"/>
+    <text x="205" y="1310.5" text-anchor="middle" font-family="'Courier New',Courier,monospace"
+      font-size="7" letter-spacing="1.2" fill="#d9a441" opacity=".55">THE COFFER</text>
+    <!-- hasp + padlock; the keyhole waits for the world's one key -->
+    <rect x="193" y="1282" width="24" height="26" rx="3" fill="#3a3128" stroke="#241e18" stroke-width="1.4"/>
+    <path d="M 197 1330 L 197 1322 A 8 8 0 0 1 213 1322 L 213 1330" fill="none" stroke="#6b5a44" stroke-width="4"/>
+    <rect x="190" y="1330" width="30" height="25" rx="5" fill="#33291d" stroke="#241e18" stroke-width="1.6"/>
+    <line x1="193" y1="1333" x2="193" y2="1351" stroke="#d9a441" stroke-width="1" stroke-opacity=".18"/>
+    <circle cx="205" cy="1339" r="3" fill="#241e18" stroke="#d9a441" stroke-width=".8" stroke-opacity=".3"/>
+    <line x1="205" y1="1341" x2="205" y2="1348" stroke="#241e18" stroke-width="2.4"/>
+    <!-- the paper tag, tied to the lock: one word, kept -->
+    <path d="M 218 1338 C 226 1338, 232 1342, 236 1348" fill="none" stroke="#e6d9bd" stroke-width="1" stroke-opacity=".5"/>
+    <g transform="rotate(9 254 1356)">
+      <rect x="236" y="1347" width="37" height="19" rx="2" fill="url(#pageG)" opacity=".9"/>
+      <circle cx="240.5" cy="1356.5" r="1.4" fill="none" stroke="#4a3a28" stroke-width=".8"/>
+      <text x="258" y="1359.5" text-anchor="middle" font-family="'Courier New',Courier,monospace"
+        font-size="6.2" letter-spacing="1" fill="#4a3a28">LATER</text>
+    </g>
+  </g>
+
+  <!-- ── THE PLACARD: a fingerboard for a place that is mostly a promise ── -->
+  <g transform="rotate(-1.5 401 1080)">
+    <rect x="396" y="1030" width="10" height="142" rx="3" fill="#3a2c1e" stroke="#241e18" stroke-width="1.4"/>
+    <line x1="398" y1="1036" x2="398" y2="1166" stroke="#d9a441" stroke-width="1" stroke-opacity=".16"/>
+    <path d="M 396 1172 L 386 1180 L 416 1180 L 406 1172 Z" fill="#33291d"/>
+    <!-- KAUAI, pointing out across the water -->
+    <path d="M 410 1042 L 540 1042 L 562 1057 L 540 1072 L 410 1072 Z"
+      fill="#3a2c1e" stroke="#241e18" stroke-width="1.6"/>
+    <path d="M 414 1046 L 538 1046 L 556 1057 L 538 1068 L 414 1068 Z"
+      fill="none" stroke="#d9a441" stroke-width="1" stroke-opacity=".35"/>
+    <text x="478" y="1062" text-anchor="middle" font-family="'Courier New',Courier,monospace"
+      font-size="15" letter-spacing="4" fill="#d9a441" opacity=".9">KAUAI</text>
+    <!-- and under it, what it is -->
+    <path d="M 410 1082 L 512 1082 L 528 1092.5 L 512 1103 L 410 1103 Z"
+      fill="#3a2c1e" stroke="#241e18" stroke-width="1.4"/>
+    <text x="464" y="1096" text-anchor="middle" font-family="'Courier New',Courier,monospace"
+      font-size="7" letter-spacing="1.6" fill="#bdb7a8" opacity=".75">THE FAR SHORE</text>
+    <circle cx="401" cy="1052" r="1.8" fill="#d9a441" opacity=".5"/>
+    <circle cx="401" cy="1092" r="1.6" fill="#d9a441" opacity=".4"/>
+  </g>
+
+  <!-- ── THE PLANK STACK + TALLY: the days not yet lived, stacked and patient ── -->
+  <g>
+    <ellipse cx="608" cy="1352" rx="96" ry="10" fill="url(#shadG)"/>
+    <!-- two ghost planks: dash-outlined, still only intentions -->
+    <g fill="none" stroke="#bdb7a8" stroke-dasharray="6 5">
+      <rect x="552" y="1258" width="132" height="14" rx="3" stroke-width="1.3" stroke-opacity=".3"
+        class="ghost g3" transform="rotate(-1.5 618 1265)"/>
+      <rect x="546" y="1276" width="138" height="15" rx="3" stroke-width="1.5" stroke-opacity=".42"
+        class="ghost" transform="rotate(1 615 1283)"/>
+    </g>
+    <!-- two cut planks: real wood, silver-edged, ready for their days -->
+    <g transform="rotate(1.5 611 1304)">
+      <rect x="538" y="1296" width="146" height="16" rx="3" fill="#33291d" stroke="#241e18" stroke-width="1.4"/>
+      <line x1="542" y1="1299" x2="680" y2="1299" stroke="#bdb7a8" stroke-width="1" stroke-opacity=".4"/>
+      <ellipse cx="684" cy="1304" rx="2.6" ry="4.5" fill="#46402f"/>
+    </g>
+    <g transform="rotate(-2 608 1322)">
+      <rect x="532" y="1314" width="152" height="17" rx="3" fill="#3a2c1e" stroke="#241e18" stroke-width="1.4"/>
+      <line x1="536" y1="1317" x2="680" y2="1317" stroke="#bdb7a8" stroke-width="1" stroke-opacity=".45"/>
+      <ellipse cx="532" cy="1322.5" rx="3" ry="5" fill="#46402f"/>
+    </g>
+    <!-- the tally, pinned: the score in words, and the law under it -->
+    <g transform="rotate(-2 608 1362)">
+      <rect x="546" y="1344" width="124" height="36" rx="2" fill="url(#pageG)" opacity=".95"/>
+      <rect x="546" y="1344" width="124" height="36" rx="2" fill="none" stroke="#2b2014" stroke-width=".9" stroke-opacity=".25"/>
+      <circle cx="608" cy="1348.5" r="2" fill="#d9a441"/>
+      <text x="608" y="1360" text-anchor="middle" font-family="'Courier New',Courier,monospace"
+        font-size="7.2" letter-spacing="1" fill="#4a3a28">PLANKS LAID &#183; 23 OF 60</text>
+      <text x="608" y="1372" text-anchor="middle" font-family="'Courier New',Courier,monospace"
+        font-size="5" letter-spacing=".7" fill="#7a6a54">ONE PLANK &#183; ONE SIGNED DAY</text>
+    </g>
+  </g>
+
+  <!-- ── EAST BOLLARD: the rope cast off — the vessel has sailed ── -->
+  <g>
+    <ellipse cx="900" cy="1160" rx="30" ry="6" fill="url(#shadG)"/>
+    <rect x="886" y="1082" width="28" height="76" rx="7" fill="#3a2c1e" stroke="#241e18" stroke-width="1.6"/>
+    <ellipse cx="900" cy="1082" rx="14" ry="5" fill="#46402f" stroke="#241e18" stroke-width="1.2"/>
+    <line x1="909" y1="1088" x2="909" y2="1152" stroke="#f7e3ae" stroke-width="1" stroke-opacity=".18"/>
+    <g stroke="#6b5a44" stroke-width="4" fill="none">
+      <path d="M 886 1102 Q 900 1106 914 1102"/>
+      <path d="M 886 1112 Q 900 1116 914 1112"/>
+    </g>
+    <!-- the last of the line, over the edge; a ring of water where it touches -->
+    <path d="M 898 1116 C 908 1128, 916 1138, 919 1150" fill="none" stroke="#6b5a44" stroke-width="4"/>
+    <path d="M 912 1144 A 8 3 0 1 0 928 1144" fill="none" stroke="#f5eddc" stroke-width="1" stroke-opacity=".12"/>
+  </g>
+
+  <!-- ── THE DOCK LANTERN: the one warm near light; the small folk keep this one too ── -->
+  <g>
+    <ellipse cx="800" cy="1246" rx="36" ry="7" fill="url(#shadG)"/>
+    <rect x="794" y="1012" width="12" height="230" rx="3" fill="#3a2c1e" stroke="#241e18" stroke-width="1.4"/>
+    <line x1="797" y1="1018" x2="797" y2="1236" stroke="#d9a441" stroke-width="1" stroke-opacity=".2"/>
+    <path d="M 786 1242 L 814 1242 L 810 1224 L 790 1224 Z" fill="#33291d" stroke="#241e18" stroke-width="1.2"/>
+    <!-- the bracket arm, and its brass curl -->
+    <path d="M 800 1020 C 782 1012, 764 1014, 752 1024" fill="none" stroke="#3a3128" stroke-width="6"/>
+    <path d="M 800 1019 C 783 1011, 766 1013, 754 1022" fill="none" stroke="#d9a441" stroke-width="1" stroke-opacity=".35"/>
+    <circle cx="750" cy="1026" r="3" fill="none" stroke="#d9a441" stroke-width="1.1" stroke-opacity=".45"/>
+    <line x1="752" y1="1027" x2="752" y2="1034" stroke="#6b5a44" stroke-width="1.6"/>
+    <!-- the lantern, and its light on the water below -->
+    <circle cx="752" cy="1072" r="46" fill="url(#glowSmG)" opacity=".9"/>
+    <circle cx="752" cy="1030" r="3.5" fill="none" stroke="#d9a441" stroke-width="1.2" stroke-opacity=".6"/>
+    <path d="M 734 1046 L 770 1046 L 762 1034 L 742 1034 Z" fill="#241e18" stroke="#d9a441" stroke-width="1.3" stroke-opacity=".75"/>
+    <rect x="732" y="1046" width="40" height="50" rx="4" fill="#241e18" opacity=".85"
+      stroke="#d9a441" stroke-width="1.5" stroke-opacity=".8"/>
+    <line x1="744" y1="1048" x2="744" y2="1094" stroke="#d9a441" stroke-width="1" stroke-opacity=".4"/>
+    <line x1="760" y1="1048" x2="760" y2="1094" stroke="#d9a441" stroke-width="1" stroke-opacity=".4"/>
+    <ellipse cx="752" cy="1099" rx="12" ry="3" fill="#3a3128" stroke="#d9a441" stroke-width="1" stroke-opacity=".4"/>
+    <!-- the wick-spirit: it leans out over the water, watching the boat -->
+    <g id="wisp">
+      <path d="M 752 1058 C 758 1065, 759 1072, 752 1078 C 745 1072, 746 1065, 752 1058 Z" fill="#d9a441"/>
+      <path d="M 752 1063 C 755.5 1067, 756 1071, 752 1075 C 748 1071, 748.5 1067, 752 1063 Z" fill="#f7e3ae"/>
+      <circle cx="749.8" cy="1068.5" r=".9" fill="#2b2014"/>
+      <circle cx="754.2" cy="1068.5" r=".9" fill="#2b2014"/>
+    </g>
+    <!-- the lantern's own small road on the water: near gold, humbler than the beam's -->
+    <g stroke="#d9a441" stroke-linecap="round" class="shim s3">
+      <line x1="742" y1="1116" x2="762" y2="1116" stroke-width="1.6" stroke-opacity=".22"/>
+      <line x1="736" y1="1134" x2="768" y2="1134" stroke-width="1.8" stroke-opacity=".16"/>
+    </g>
+  </g>
+</g>
+
+<!-- the night closes in at the edges, the way it does over water -->
+<rect x="-700" y="-400" width="2900" height="2300" fill="url(#vignApply)" pointer-events="none"/>
+<defs>
+  <radialGradient id="vignApply" gradientUnits="userSpaceOnUse" cx="500" cy="740" r="1180">
+    <stop offset="0" stop-color="#241e18" stop-opacity="0"/>
+    <stop offset=".48" stop-color="#241e18" stop-opacity="0"/>
+    <stop offset=".72" stop-color="#241e18" stop-opacity=".45"/>
+    <stop offset="1" stop-color="#241e18" stop-opacity=".92"/>
+  </radialGradient>
+</defs>
+</svg>
+
+<canvas id="air" aria-hidden="true"></canvas>
+<div id="grain" aria-hidden="true"></div>
+
+<div class="inscription">
+  <div class="eyebrow">The Docks &middot; 23 of 60 planks laid</div>
+  <div class="line">&ldquo;plank by plank, the sea gets smaller.&rdquo;</div>
+</div>
+</div>
+<script>
+(function () {
+  "use strict";
+  var stage = document.getElementById("stage");
+  var canvas = document.getElementById("air");
+  var ctx = canvas.getContext("2d");
+  var bloomRing = document.getElementById("bloomring");
+  var shoreFlare = document.getElementById("shoreflare");
+  var cofferRing = document.getElementById("cofferring");
+  var prm = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  var W = 0, H = 0, S = 1, OX = 0, OY = 0, DPR = 1;
+  var raf = null, last = 0;
+  var px = 0, py = 0, tx = 0, ty = 0;
+  var lastPress = 0;
+
+  /* the score: the one true number this room renders */
+  var VESSEL = { x: 655, y: 940 };   /* 23 of 60 planks -> 38% out along the depth */
+  var COFFER = { x: 205, y: 1330 };
+
+  function rgb(hex) {
+    return [parseInt(hex.slice(1, 3), 16), parseInt(hex.slice(3, 5), 16), parseInt(hex.slice(5, 7), 16)];
+  }
+  var GOLD = rgb("#d9a441"), WICK = rgb("#f7e3ae"), PAPER = rgb("#f5eddc"),
+      CREAM = rgb("#fbf6ea"), SILVER = rgb("#bdb7a8");
+
+  function resize() {
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth; H = window.innerHeight;
+    canvas.width = Math.round(W * DPR);
+    canvas.height = Math.round(H * DPR);
+    S = Math.min(W / 1000, H / 1500);
+    OX = (W - 1000 * S) / 2;
+    OY = (H - 1500 * S) / 2;
+    if (prm.matches) drawStatic();
+  }
+
+  function rnd(a, b) { return a + Math.random() * (b - a); }
+  function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+  /* ── particles, in scene units ── */
+  var P = [];
+  function seed(p, kind, burst) {
+    p.kind = kind;
+    p.age = 0;
+    if (kind === "spray") {
+      /* cold breath at the pilings: the sea announcing itself, gently */
+      p.x = pick([rnd(100, 220), rnd(840, 950)]); p.y = rnd(1136, 1152);
+      p.vx = rnd(-4, 4); p.vy = -rnd(14, 34);
+      p.life = rnd(0.9, 2); p.r = rnd(0.5, 1.3);
+      p.c = pick([PAPER, PAPER, CREAM, SILVER]); p.a = rnd(0.08, 0.2);
+      p.tw = 0; p.ph = 0;
+    } else if (kind === "drift") {
+      /* mist walking the water: the depth made visible, slowly */
+      p.x = rnd(-40, 1040); p.y = rnd(640, 1120);
+      p.vx = rnd(6, 20) * (Math.random() < 0.5 ? -1 : 1); p.vy = rnd(-2, 2);
+      p.life = rnd(8, 14); p.r = rnd(1, 2.4);
+      p.c = PAPER; p.a = rnd(0.03, 0.09);
+      p.tw = 0; p.ph = 0;
+    } else if (kind === "mote") {
+      /* warm motes in the lantern's keep */
+      p.x = rnd(722, 782); p.y = rnd(1030, 1100);
+      p.vx = rnd(-3, 3); p.vy = -rnd(4, 12);
+      p.life = rnd(3, 6); p.r = rnd(0.5, 1.4);
+      p.c = pick([WICK, GOLD, GOLD]); p.a = rnd(0.12, 0.3);
+      p.tw = rnd(2, 4); p.ph = rnd(0, 6.28);
+    } else {
+      /* "road": a warm hand touched the vessel — gold flies the water-road to the shore */
+      p.x = rnd(620, 690); p.y = rnd(900, 960);
+      var lift = rnd(50, 120);
+      p.vx = lift * 0.14 + rnd(-4, 4); p.vy = -lift;
+      p.life = rnd(1.6, 3.2); p.r = rnd(0.6, 1.7);
+      p.c = pick([WICK, GOLD, GOLD, CREAM]); p.a = rnd(0.25, 0.55);
+      p.tw = rnd(2, 5); p.ph = rnd(0, 6.28);
+    }
+    p.wob = rnd(0.6, 2.2); p.wph = rnd(0, 6.28);
+    return p;
+  }
+  function fillPool() {
+    P.length = 0;
+    var total = Math.max(30, Math.min(72, Math.round((W * H) / 26000)));
+    for (var i = 0; i < total; i++) {
+      var k = i < total * 0.3 ? "spray" : (i < total * 0.72 ? "drift" : "mote");
+      var p = seed({}, k);
+      p.age = rnd(0, p.life);
+      P.push(p);
+    }
+  }
+
+  function glow(x, y, r, c, a) {
+    if (a <= 0.004) return;
+    var g = ctx.createRadialGradient(x, y, 0, x, y, r);
+    g.addColorStop(0, "rgba(" + c[0] + "," + c[1] + "," + c[2] + "," + a.toFixed(3) + ")");
+    g.addColorStop(1, "rgba(" + c[0] + "," + c[1] + "," + c[2] + ",0)");
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, 6.2832);
+    ctx.fill();
+  }
+
+  function drawAmbience(t, on) {
+    var f = on ? (0.5 + 0.3 * Math.sin(t * 1.43) + 0.18 * Math.sin(t * 3.7 + 1.2)) : 0.5;
+    glow(752, 1072, 150, WICK, 0.1 + 0.04 * f);                                     /* the dock lantern */
+    glow(790, 1230, 260, GOLD, 0.045 + 0.02 * f);                                    /* its pool on the boards */
+    glow(700, 596, 40, WICK, on ? 0.1 + 0.05 * Math.sin(t * 0.7) : 0.1);             /* the far shore */
+    glow(690, 780, 150, GOLD, on ? 0.035 + 0.016 * Math.sin(t * 0.9 + 2) : 0.04);    /* the gold road */
+    glow(176, 470, 100, PAPER, on ? 0.05 + 0.014 * Math.sin(t * 0.5) : 0.05);        /* the low moon */
+    glow(170, 760, 110, SILVER, on ? 0.022 + 0.01 * Math.sin(t * 0.8 + 1) : 0.025);  /* the silver road */
+    glow(86, 234, 60, WICK, on ? 0.09 + 0.04 * Math.sin(t * 1.1 + 3) : 0.09);        /* the lamp, behind you */
+    glow(585, 923, 22, WICK, on ? 0.08 + 0.035 * Math.sin(t * 1.6) : 0.08);          /* the vessel's stern light */
+    glow(655, 936, 90, GOLD, on ? 0.028 + 0.012 * Math.sin(t * 1.2 + 4) : 0.03);     /* the vessel, kept warm */
+  }
+
+  function frame(now) {
+    raf = requestAnimationFrame(frame);
+    var dt = Math.min((now - last) / 1000, 0.05) || 0.016;
+    last = now;
+    var t = now / 1000;
+
+    px += (tx - px) * 0.055;
+    py += (ty - py) * 0.055;
+    stage.style.setProperty("--px", px.toFixed(4));
+    stage.style.setProperty("--py", py.toFixed(4));
+
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    ctx.setTransform(S * DPR, 0, 0, S * DPR, OX * DPR, OY * DPR);
+
+    drawAmbience(t, true);
+
+    var i, p, k, al;
+    for (i = 0; i < P.length; i++) {
+      p = P[i];
+      p.age += dt;
+      if (p.age >= p.life) { seed(p, p.kind === "road" ? "drift" : p.kind); continue; }
+      p.x += (p.vx + Math.sin(t * p.wob + p.wph) * 4) * dt;
+      p.y += p.vy * dt;
+      if (p.kind === "road" && p.y < 610) { seed(p, "drift"); continue; }
+      k = p.age / p.life;
+      al = p.a * Math.sin(Math.PI * Math.min(1, k));
+      if (p.tw) al *= 0.7 + 0.3 * Math.sin(t * p.tw + p.ph);
+      if (al <= 0.004) continue;
+      ctx.fillStyle = "rgba(" + p.c[0] + "," + p.c[1] + "," + p.c[2] + "," + al.toFixed(3) + ")";
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, 6.2832);
+      ctx.fill();
+    }
+  }
+
+  /* reduced motion: one still frame — the vessel held mid-water, the shore waiting */
+  function drawStatic() {
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    ctx.setTransform(S * DPR, 0, 0, S * DPR, OX * DPR, OY * DPR);
+    drawAmbience(0, false);
+    var i, p;
+    for (i = 0; i < 14; i++) {
+      p = seed({}, i < 5 ? "spray" : (i < 11 ? "drift" : "mote"));
+      ctx.fillStyle = "rgba(" + p.c[0] + "," + p.c[1] + "," + p.c[2] + "," + (p.a * 0.5).toFixed(3) + ")";
+      ctx.beginPath();
+      ctx.arc(p.x + rnd(-20, 20), p.y - rnd(0, 20), p.r, 0, 6.2832);
+      ctx.fill();
+    }
+  }
+
+  /* a warm hand on the water:
+     near the vessel -> gold flies the road, and the far shore glimmers back.
+     near the coffer -> only a silver shimmer. Not yet. Honest. */
+  function onPress(e) {
+    if (prm.matches) return;
+    var now = performance.now();
+    if (now - lastPress < 500) return;
+    var ux = (e.clientX - OX) / S, uy = (e.clientY - OY) / S;
+    var dx = ux - VESSEL.x, dy = uy - VESSEL.y;
+    if (dx * dx + dy * dy <= 170 * 170) {
+      lastPress = now;
+      if (bloomRing) {
+        bloomRing.classList.add("on");
+        setTimeout(function () { bloomRing.classList.remove("on"); }, 240);
+      }
+      if (shoreFlare) {
+        shoreFlare.classList.add("on");
+        setTimeout(function () { shoreFlare.classList.remove("on"); }, 420);
+      }
+      var i, p;
+      for (i = 0; i < 12; i++) {
+        p = P[Math.floor(Math.random() * P.length)];
+        if (p) seed(p, "road", true);
+      }
+      return;
+    }
+    dx = ux - COFFER.x; dy = uy - COFFER.y;
+    if (dx * dx + dy * dy <= 130 * 130) {
+      lastPress = now;
+      if (cofferRing) {
+        cofferRing.classList.add("on");
+        setTimeout(function () { cofferRing.classList.remove("on"); }, 260);
+      }
+    }
+  }
+
+  function onMove(e) {
+    if (prm.matches) return;
+    tx = Math.max(-1, Math.min(1, (e.clientX / W - 0.5) * 2));
+    ty = Math.max(-1, Math.min(1, (e.clientY / H - 0.5) * 2));
+  }
+
+  function start() {
+    if (raf) { cancelAnimationFrame(raf); raf = null; }
+    if (prm.matches) { drawStatic(); return; }
+    fillPool();
+    last = performance.now();
+    raf = requestAnimationFrame(frame);
+  }
+
+  window.addEventListener("resize", function () { resize(); if (!prm.matches && !raf) start(); });
+  window.addEventListener("pointermove", onMove, { passive: true });
+  window.addEventListener("pointerdown", onPress, { passive: true });
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) { if (raf) { cancelAnimationFrame(raf); raf = null; } }
+    else start();
+  });
+  if (prm.addEventListener) prm.addEventListener("change", function () { resize(); start(); });
+
+  resize();
+  start();
+})();
+</script>

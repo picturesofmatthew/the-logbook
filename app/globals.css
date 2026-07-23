@@ -1000,6 +1000,18 @@ html[data-light="night"] .glade-day-only {
     var(--glade-ground-top) 100%
   );
 }
+/* the ornate SETTING — walls, tower, arbor gate, beds, bench, sundial — drawn
+   in front of the CSS light-script sky and behind/around the live glade band.
+   overflow:visible lets the architecture bleed past the letterboxed viewBox to
+   the room edges; the parent .garden-room clips it. */
+.garden-scene {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
 .garden-band {
   position: absolute;
   left: 0;
@@ -1986,6 +1998,329 @@ html[data-light="night"] .glade-day-only {
   .ln-hatchbreath,
   .ln-kindle,
   .ln-twinkle {
+    animation: none;
+  }
+}
+
+/* ── The Docks room — its bespoke motion (art/proto/docks-shore.html) ──
+   The island's future pole: the one motion that never quite sleeps is the
+   vessel's slow bob out on the depth, its reflection breathing beneath it; the
+   two water-roads (gold-lived, silver-waiting) glint at their own unhurried
+   tempos; the beam breathes as it lands on the far shore; the silver ghost-
+   strakes shimmer faintly (never gone, never nagging); the dock lantern's wick-
+   spirit leans as it keeps watch; the stars twinkle. Everything else holds still
+   (BRAND-BIBLE §9). Names are dk-* so they never collide with the other rooms
+   drawn into the shell's one shared svg. */
+.dk-bob {
+  transform-box: fill-box;
+  transform-origin: 50% 68%;
+  animation: dk-bob 7.2s ease-in-out infinite;
+}
+@keyframes dk-bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-0.5deg);
+  }
+  50% {
+    transform: translateY(-6px) rotate(0.55deg);
+  }
+}
+/* the reflection holds the boat; it fades and firms as the water breathes */
+.dk-reflect {
+  animation: dk-reflect 7.2s ease-in-out infinite;
+}
+@keyframes dk-reflect {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.38;
+  }
+}
+/* the water: glints breathe at their own tempos; the sea never hurries */
+.dk-shim {
+  animation: dk-shim 8.5s ease-in-out infinite;
+}
+.dk-shim-2 {
+  animation: dk-shim 9.5s ease-in-out infinite;
+  animation-delay: -2.8s;
+}
+.dk-shim-3 {
+  animation: dk-shim 7.6s ease-in-out infinite;
+  animation-delay: -5.6s;
+}
+@keyframes dk-shim {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+/* the beam: lit because the light is kept; it breathes like the lamp above */
+.dk-beam {
+  animation: dk-beam 7s ease-in-out infinite;
+}
+@keyframes dk-beam {
+  0%,
+  100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+/* silver: what waits, shimmering faintly — never gone, never nagging */
+.dk-ghost {
+  animation: dk-ghostsh 6.4s ease-in-out infinite;
+}
+.dk-ghost-2 {
+  animation: dk-ghostsh 6.4s ease-in-out infinite;
+  animation-delay: -2.1s;
+}
+.dk-ghost-3 {
+  animation: dk-ghostsh 6.4s ease-in-out infinite;
+  animation-delay: -4.3s;
+}
+@keyframes dk-ghostsh {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.64;
+  }
+}
+/* the dock lantern's wick-spirit: it leans when it keeps watch */
+.dk-wisp {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: dk-wisplean 3.8s ease-in-out infinite;
+}
+@keyframes dk-wisplean {
+  0%,
+  100% {
+    transform: rotate(-2.2deg) scaleY(1);
+  }
+  38% {
+    transform: rotate(1.8deg) scaleY(1.06);
+  }
+  70% {
+    transform: rotate(-0.6deg) scaleY(0.96);
+  }
+}
+.dk-twinkle {
+  animation: dk-star 7s ease-in-out infinite;
+}
+@keyframes dk-star {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+/* stillness for those who ask for it */
+@media (prefers-reduced-motion: reduce) {
+  .dk-bob,
+  .dk-reflect,
+  .dk-shim,
+  .dk-shim-2,
+  .dk-shim-3,
+  .dk-beam,
+  .dk-ghost,
+  .dk-ghost-2,
+  .dk-ghost-3,
+  .dk-wisp,
+  .dk-twinkle {
+    animation: none;
+  }
+}
+
+/* ── The Garden room — its bespoke motion (art/proto/garden-west.html) ──
+   The one room lit by NOW. The ornate walled-garden SETTING is drawn into
+   .garden-scene, layered in front of the light-script sky and around the live
+   .garden-band (the real GladeScene) at its foot. Only a garden's honest dusk
+   stirrings move: the union rose breathes at the arbor crown; the hearth-gate
+   and crook-lantern flames waver; green things sway; the birdbath shimmers and
+   its wick-spirit bathes; the first stars twinkle (night only); two swifts
+   cross late. Everything else holds still (BRAND-BIBLE §9). Names are gd-* so
+   they never collide with the other rooms. */
+.gd-unionhalo {
+  animation: gd-halopulse 4.4s ease-in-out infinite;
+}
+@keyframes gd-halopulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+/* the gate's hearthlight and the crook lantern breathe like a kept flame */
+.gd-flame {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: gd-candlef 1.9s ease-in-out infinite;
+}
+.gd-flame.slow {
+  animation-duration: 2.7s;
+  animation-delay: -1.1s;
+}
+@keyframes gd-candlef {
+  0%,
+  100% {
+    transform: scaleY(1);
+    opacity: 0.92;
+  }
+  26% {
+    transform: scaleY(1.12) skewX(1.4deg);
+    opacity: 1;
+  }
+  52% {
+    transform: scaleY(0.9) skewX(-1deg);
+    opacity: 0.82;
+  }
+  77% {
+    transform: scaleY(1.05);
+    opacity: 0.97;
+  }
+}
+.gd-gatelight {
+  animation: gd-gatebr 5.2s ease-in-out infinite;
+}
+@keyframes gd-gatebr {
+  0%,
+  100% {
+    opacity: 0.85;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+/* the hearth's west window, seen from outside — firelight, and the sigil's breath */
+.gd-winglow {
+  animation: gd-winbr 4.4s ease-in-out infinite;
+}
+@keyframes gd-winbr {
+  0%,
+  100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+/* green things stir; nothing hurries */
+.gd-sway {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: gd-sway 7s ease-in-out infinite;
+}
+.gd-sway.s2 {
+  animation-duration: 8.6s;
+  animation-delay: -3.2s;
+}
+.gd-sway.s3 {
+  animation-duration: 6.2s;
+  animation-delay: -1.7s;
+}
+@keyframes gd-sway {
+  0%,
+  100% {
+    transform: rotate(-1.4deg);
+  }
+  50% {
+    transform: rotate(1.6deg);
+  }
+}
+.gd-rosespray {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: gd-sway 9s ease-in-out infinite;
+  animation-delay: -4s;
+}
+/* the birdbath water holds the last of the light */
+.gd-shimmer {
+  animation: gd-shim 5.6s ease-in-out infinite;
+}
+@keyframes gd-shim {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.75;
+  }
+}
+/* the wick-spirit at the rim bobs like a bathing bird */
+.gd-wispbath {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: gd-wispbob 3.4s ease-in-out infinite;
+}
+@keyframes gd-wispbob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-2deg);
+  }
+  45% {
+    transform: translateY(-2.5px) rotate(2deg);
+  }
+  70% {
+    transform: translateY(-0.5px) rotate(0deg);
+  }
+}
+/* first stars, arriving from the east (night only) */
+.gd-twinkle {
+  animation: gd-star 7s ease-in-out infinite;
+}
+@keyframes gd-star {
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+/* two swifts, late home */
+.gd-swifts {
+  animation: gd-swift 38s ease-in-out infinite;
+}
+@keyframes gd-swift {
+  0%,
+  100% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  8% {
+    opacity: 0.55;
+  }
+  50% {
+    transform: translate(-90px, -26px);
+    opacity: 0.55;
+  }
+  92% {
+    opacity: 0;
+  }
+}
+/* stillness for those who ask for it */
+@media (prefers-reduced-motion: reduce) {
+  .gd-unionhalo,
+  .gd-flame,
+  .gd-gatelight,
+  .gd-winglow,
+  .gd-sway,
+  .gd-rosespray,
+  .gd-shimmer,
+  .gd-wispbath,
+  .gd-twinkle,
+  .gd-swifts {
     animation: none;
   }
 }

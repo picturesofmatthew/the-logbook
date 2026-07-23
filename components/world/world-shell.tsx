@@ -107,9 +107,11 @@ export function WorldShell({
   const { openCapture, captureOpen } = useShell();
   const reduced = useReducedMotion();
 
-  // which book is open as an in-world spread over the world (by its href), or
-  // null. An open spread is an overlay that owns the input, like the log sheet.
-  const [openBook, setOpenBook] = useState<string | null>(null);
+  // which interior is open as an in-world spread over the world (a book, or the
+  // shore — by the href its hotspot fires), or null. An open spread is an overlay
+  // that owns the input, like the log sheet.
+  const [openInterior, setOpenInterior] = useState<string | null>(null);
+  const closeInterior = useCallback(() => setOpenInterior(null), []);
 
   // the two behaviours, each its own hook: the gate you cross, then the camera
   // you steer. The camera stays quiet behind the gate and while any overlay
@@ -127,7 +129,7 @@ export function WorldShell({
     endMove,
   } = useWorldCamera({
     phase,
-    captureOpen: captureOpen || openBook !== null,
+    captureOpen: captureOpen || openInterior !== null,
     reduced,
   });
 
@@ -205,7 +207,7 @@ export function WorldShell({
         col: 1,
         row: 0,
         viewBox: WORLD_VIEWBOX,
-        scene: <DocksRoom snapshot={docks} onOpen={navTo} />,
+        scene: <DocksRoom snapshot={docks} onOpen={setOpenInterior} />,
         air: docksAir,
         eyebrow: "The Docks · east",
         line: docksLine,
@@ -217,7 +219,7 @@ export function WorldShell({
         col: 0,
         row: 1,
         viewBox: WORLD_VIEWBOX,
-        scene: <LibraryRoom snapshot={library} onOpenBook={setOpenBook} />,
+        scene: <LibraryRoom snapshot={library} onOpenBook={setOpenInterior} />,
         air: libraryAir,
         eyebrow: "The Compendium · up the stair",
         line: libraryLine,
@@ -254,8 +256,7 @@ export function WorldShell({
       docksLine,
       garden,
       gardenLine,
-      navTo,
-      setOpenBook,
+      setOpenInterior,
     ],
   );
 
@@ -371,9 +372,10 @@ export function WorldShell({
       {/* an opened book — the in-world spread over the world (from the library).
           Closing sinks it back to the shelf; no route change, no re-climb. */}
       <WorldSpread
-        open={openBook}
-        snapshot={library}
-        onClose={() => setOpenBook(null)}
+        open={openInterior}
+        library={library}
+        docks={docks}
+        onClose={closeInterior}
         onDeepLink={navTo}
       />
 
