@@ -10,6 +10,8 @@
 // Tapping the vessel opens the full shore page; the boat/Dream engine
 // (lib/engine/boat.ts, /shore) stays the source of truth.
 
+import { Hotspot } from "./hotspot";
+
 export type DocksSnapshot = {
   dream: {
     name: string;
@@ -111,25 +113,15 @@ export function DocksRoom({
       </g>
 
       {/* the vessel — a tap opens the shore; its place in the depth is the score */}
-      <g
-        className="world-hotspot"
-        data-hotspot="true"
-        role="button"
-        tabIndex={0}
-        aria-label={
+      <Hotspot
+        label={
           dream
             ? complete
               ? `Open the shore — ${dream.name}, reached`
               : `Open the shore — toward ${dream.name}, ${planksLaid} of ${plankGoal} planks`
             : "Open the shore — name the Dream you sail toward"
         }
-        onClick={() => onOpen("/shore")}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            onOpen("/shore");
-          }
-        }}
+        onActivate={() => onOpen("/shore")}
         transform={`translate(${vx} ${vy}) scale(${vs})`}
       >
         <path d="M-74 42 Q0 72 74 42" stroke="#3a3450" strokeWidth="5" fill="none" opacity="0.4" />
@@ -142,7 +134,7 @@ export function DocksRoom({
         <path d="M8 -148 Q72 -102 76 -54 L8 -54 Z" fill="#d8c39a" opacity="0.9" />
         <path d="M-8 -142 Q-56 -102 -52 -60 L-8 -60 Z" fill="#c2ad84" opacity="0.8" />
         <path d="M0 -152 l30 8 l-30 9 Z" fill="#c9754a" />
-      </g>
+      </Hotspot>
 
       {/* the dock, underfoot */}
       <rect x="0" y="1348" width="1000" height="152" fill="#211a12" />

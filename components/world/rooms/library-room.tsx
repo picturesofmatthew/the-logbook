@@ -13,6 +13,8 @@
 // Tapping a book opens it (the shell routes to its page). The book interiors
 // stay as the current pages for now; Phase 2b makes them in-world spreads.
 
+import { Hotspot } from "./hotspot";
+
 export type LibrarySnapshot = {
   /** sealed (both-logged) days — the Book of Days */
   days: number;
@@ -241,20 +243,10 @@ export function LibraryRoom({
         const x = x0 + i * (w + gap);
         const goldH = Math.max(b.goldFrac > 0 ? 22 : 0, b.height * b.goldFrac);
         return (
-          <g
+          <Hotspot
             key={b.id}
-            className="world-hotspot"
-            data-hotspot="true"
-            role="button"
-            tabIndex={0}
-            aria-label={`Open the ${b.title} — ${b.count}`}
-            onClick={() => onOpenBook(b.href)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                onOpenBook(b.href);
-              }
-            }}
+            label={`Open the ${b.title} — ${b.count}`}
+            onActivate={() => onOpenBook(b.href)}
           >
             {/* the whole of what's possible — silver ghost-outline */}
             <rect
@@ -318,7 +310,7 @@ export function LibraryRoom({
             >
               {b.count}
             </text>
-          </g>
+          </Hotspot>
         );
       })}
 

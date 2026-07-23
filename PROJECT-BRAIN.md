@@ -5,6 +5,13 @@ the doc map. Last updated 2026-07-22.*
 
 ## Status snapshot
 
+- **⚡ Update 2026-07-23 — the Lighthouse world IS the app (shipped + live).** `/` now renders the world:
+  opening the site crosses a mandatory **cold-open gate** (the whole world → *begin* → a fluid push-in to
+  the hearth); all five rooms (hearth · garden · docks · library · lantern) are real and swipe/rise-navigable;
+  the day is logged at the hearth; the old glade home retired (glade → Garden room, seal → hearth mantle,
+  horizon → Docks). Shipped as **World Engine 1–9/n** on `main`. A **review + simplify pass**
+  (`REVIEW-PLAN.md`) is underway — the core loop is verified moved byte-identical; a11y/interaction fixes +
+  an in-world invite are landing. See the 2026-07-23 decision log.
 - **⚡ Update 2026-07-22 — voice shipped + a new world canon.** "Speak your day" voice logging is live
   in prod; the B2–B4 cutover is deployed (DB clean-wiped, awaiting first signup). And the world has
   been re-centered: **`THE-LIGHTHOUSE.md`** is the new canon — the app is a **lighthouse on an island**
@@ -33,18 +40,21 @@ users. This resolves the validate-first-vs-build-native fork: a 4-lens contingen
 native rewrite reaches parity with a *working* app while adding zero retention evidence and colliding
 with the STR launch + the Asia move + debt — so we build and validate on what already runs, for free.
 
-## Next up — build the Lighthouse world
+## Next up — polish the Lighthouse world
 
-The app is being re-centered as one inhabited place — a lighthouse on an island (`THE-LIGHTHOUSE.md`),
-built via **`WORLD-ENGINE.md`** ("engine once, rooms forever"; DOM/SVG-first, Pixi reserved). The
-flagship feeling-proof is `art/proto/hearth-hall.html`.
+The world is **built and live** as one inhabited place — a lighthouse on an island (`THE-LIGHTHOUSE.md`),
+built via **`WORLD-ENGINE.md`** ("engine once, rooms forever"; DOM/SVG-first, Pixi reserved). The shell,
+the five rooms, the swipe/rise camera, and the cold-open gate all ship. What remains is *polish + spectacle*,
+not structure:
 
-1. **Promote the hearth proto into the app** — extract the shared engine (atmosphere, primitives,
-   camera) + land the hearth as the first real room, wired to real state.
-2. **Lock the Room contract**, then the **Glade / Docks / Library** rooms conform, the **nav shell**
-   (swipe/rise) stitches them, and the **cast cinematic** lands last.
+1. **Ornate hero graphics** — a **Fable-subagent plan** for sigil-level art (hearth-hall mantle/cast with
+   two chosen sprites + splayed Spellbook, the tower, the island), then polish passes. Today's art is v1
+   CSS/SVG against the feeling-proof `art/proto/hearth-hall.html`.
+2. **In-world interiors + cinematics** — make the book/vessel open as in-world spreads (they route OUT to
+   sub-pages today); land the **cast cinematic** (rise to the lamp → beam sweeps the shore); bring
+   settings/invite fully in-world.
 
-In parallel: Matthew + Kennedy dogfood voice logging; notes feed classifier tuning. Still-open logging
+In parallel: Matthew + Kennedy dogfood the world + voice logging; notes feed classifier tuning. Still-open logging
 friction to fold in when touched: water/mood/weight aren't in the fast capture path yet; meal could
 default by time of day; servings could remember last-used per food. Loop-reliability items (canonical
 couple-day is done; the async ~36–48h close window + love-tap/web-push remain) live in
@@ -70,6 +80,24 @@ couple-day is done; the async ~36–48h close window + love-tap/web-push remain)
 | **convex/schema.ts** | The backend spine — a **design artifact** (needs a real migration pass; RISK-REGISTER Tier 6). |
 | **lib/engine/sigil.ts** | The registry-driven sigil engine — adding a chord/legendary is one entry. |
 | **CLAUDE.md** | Standing briefing + Quick Resume (points here). |
+
+## Decision log — 2026-07-23
+
+1. **The world became home (World Engine 1–9/n, live on `main`).** The Lighthouse canon shipped as the app:
+   `/` renders `WorldShell` (camera + swipe/rise + the cold-open gate + in-world logging); the old glade
+   home was retired and its pieces relocated (glade → Garden room, seal → hearth mantle, horizon → Docks).
+   The five rooms — hearth · garden · docks · library · lantern — are all real. The **core-loop pipeline**
+   (recording legendaries/arrivals/reached-shores + firing the four completion ceremonies) was **relocated
+   from the old home into the new `/` byte-for-byte** (verified in the review; only `stamps` intentionally
+   dropped). `hearth/page.tsx` → redirect to `/`; the "museum" → **the Apothecary**; Relics retired.
+2. **Review + simplify pass** (`REVIEW-PLAN.md`). Findings: the loop moved intact and the gate does not
+   replay after logging (`openCapture` is an in-place overlay; `router.refresh()` is soft, so `WorldShell`
+   stays mounted). Fixes landed: cold-open gate made keyboard-operable; the global arrow-key handler guarded
+   (phase/dialog/edge); off-screen room hotspots taken out of the tab order; the capture scrim raised above
+   the world (dim + tap-to-close restored); a **second-keeper invite** surfaced in-world. Then a `/simplify`
+   pass on the world components (tests green).
+3. **Still canon-only (next):** the ornate hero graphics (Fable), in-world book/vessel interiors, the cast
+   cinematics. Art today is v1 CSS/SVG; the structure is the thing that's done.
 
 ## Decision log — 2026-07-22
 

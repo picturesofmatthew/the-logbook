@@ -971,6 +971,10 @@ html[data-light="night"] .glade-day-only {
   user-select: none;
   -webkit-user-select: none;
 }
+/* the root is a programmatic focus landing spot (tabIndex -1) — no ring on it */
+.world-shell:focus {
+  outline: none;
+}
 .world-camera {
   position: absolute;
   inset: 0;
@@ -1035,6 +1039,15 @@ html[data-light="night"] .glade-day-only {
   overflow: hidden;
   cursor: pointer;
   background: radial-gradient(120% 100% at 50% 42%, #1d1938 0%, #14112a 60%, #0d0b18 100%);
+}
+/* the gate is one full-screen button; show the keyboard focus ring on the begin
+   pill, never as an outline around the whole screen */
+.world-coldopen:focus {
+  outline: none;
+}
+.world-coldopen:focus-visible .world-begin {
+  outline: 2px solid rgba(232, 200, 134, 0.9);
+  outline-offset: 4px;
 }
 .world-coldopen .world-scene {
   transform-origin: 50% 55%; /* the warm hearth window — the push-in flies here */
@@ -1221,6 +1234,36 @@ html[data-light="night"] .glade-day-only {
 }
 .world-log:active {
   transform: translateX(-50%) scale(0.97);
+}
+
+/* the second-keeper call — a book can't seal alone. Sits just above the log
+   button at the hearth, a warm dashed invitation, until the ember arrives. */
+.world-invite {
+  position: fixed;
+  bottom: calc(10dvh + 3.7rem + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 44;
+  max-width: min(88vw, 22rem);
+  padding: 0.5rem 1rem;
+  text-align: center;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 0.82rem;
+  line-height: 1.35;
+  color: rgba(245, 237, 220, 0.82);
+  background: rgba(36, 30, 24, 0.42);
+  border: 1px dashed rgba(217, 164, 65, 0.5);
+  border-radius: 13px 9px 12px 10px / 10px 12px 9px 13px;
+  backdrop-filter: blur(2px);
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+.world-invite:hover {
+  border-color: rgba(232, 200, 134, 0.9);
+}
+.world-invite-cta {
+  color: #f2c877;
+  white-space: nowrap;
 }
 
 /* the ways through the world — a soft chip at each edge where a room truly is */

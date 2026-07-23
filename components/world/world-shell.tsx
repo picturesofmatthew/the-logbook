@@ -2,9 +2,10 @@
 
 // The World Shell — the Lighthouse made one place (THE-LIGHTHOUSE.md).
 //
-// The World Engine gave us the per-room stage (RoomStage). The Shell is the
-// thing above it: a single spatial canvas that holds all five rooms as
-// positioned layers and moves a camera between them. Two gestures, exactly as
+// The Shell IS the world engine: a single spatial canvas that holds all five
+// rooms as positioned layers and moves a camera between them. (It superseded
+// the earlier per-room stage; scenes now render directly into a shared svg.)
+// Two gestures, exactly as
 // the world is built:
 //
 //   · SWIPE — cross the island (ground floor, y=0):  GARDEN ← HEARTH → DOCKS
@@ -36,15 +37,15 @@ import { LibraryRoom, type LibrarySnapshot } from "./rooms/library-room";
 import { DocksRoom, type DocksSnapshot } from "./rooms/docks-room";
 import { OverviewScene, OVERVIEW_VIEWBOX } from "./rooms/overview-scene";
 import { GardenRoom, type GardenSnapshot } from "./rooms/garden-room";
+import { LanternRoom } from "./rooms/lantern-room";
 import {
-  LanternStub,
-  STUB_VIEWBOX,
+  WORLD_VIEWBOX,
   docksAir,
   gardenAir,
   lanternDarkAir,
   lanternLitAir,
   libraryAir,
-} from "./rooms/stub-rooms";
+} from "./rooms/world-air";
 import type { AtmosphereConfig } from "./atmosphere-config";
 
 type Cell = { col: number; row: number };
@@ -125,19 +126,27 @@ export function WorldShell({
   library,
   docks,
   garden,
+  needsKeeper,
 }: {
   spec: SigilSpec;
   standingLine: string | null;
   library: LibrarySnapshot;
   docks: DocksSnapshot;
   garden: GardenSnapshot;
+  /** the bond has no second keeper yet — surface the invite at the hearth. */
+  needsKeeper: boolean;
 }) {
   const router = useRouter();
   const navTo = useCallback((href: string) => router.push(href), [router]);
-  const { openCapture } = useShell();
+  const { openCapture, captureOpen } = useShell();
   const [cam, setCam] = useState<Cell>(HEARTH);
   const [moving, setMoving] = useState(false);
   const reduced = useReducedMotion();
+
+  // focus anchors — the gate holds focus while it's up; the world root takes it
+  // on arrival, so a keyboard user always has a landing spot (and arrow-nav works).
+  const rootRef = useRef<HTMLDivElement>(null);
+  const gateRef = useRef<HTMLDivElement>(null);
 
   // swipe bookkeeping (a ref, so tracking a gesture never re-renders React)
   const drag = useRef<{
@@ -161,6 +170,17 @@ export function WorldShell({
 
   const enter = () =>
     setPhase((p) => (p !== "overview" ? p : reduced ? "live" : "entering"));
+
+  // latest phase/cam/captureOpen for the once-bound window key listener, so it
+  // never fires behind the gate or while the capture sheet owns the keyboard.
+  const liveRef = useRef({ phase, cam, captureOpen });
+  liveRef.current = { phase, cam, captureOpen };
+
+  // move focus with the gate: onto it while it's up, into the world on arrival.
+  useEffect(() => {
+    if (phase === "overview") gateRef.current?.focus();
+    else if (phase === "live") rootRef.current?.focus();
+  }, [phase]);
 
   const sealHtml = useMemo(() => composeSeal(spec, { ground: "none" }), [spec]);
 
@@ -191,7 +211,7 @@ export function WorldShell({
         id: "garden",
         col: -1,
         row: 0,
-        viewBox: STUB_VIEWBOX,
+        viewBox: WORLD_VIEWBOX,
         scene: null,
         render: <GardenRoom snapshot={garden} />,
         air: gardenAir,
@@ -224,7 +244,7 @@ export function WorldShell({
         id: "docks",
         col: 1,
         row: 0,
-        viewBox: STUB_VIEWBOX,
+        viewBox: WORLD_VIEWBOX,
         scene: <DocksRoom snapshot={docks} onOpen={navTo} />,
         air: docksAir,
         eyebrow: "The Docks · east",
@@ -236,7 +256,7 @@ export function WorldShell({
         id: "library",
         col: 0,
         row: 1,
-        viewBox: STUB_VIEWBOX,
+        viewBox: WORLD_VIEWBOX,
         scene: <LibraryRoom snapshot={library} onOpenBook={navTo} />,
         air: libraryAir,
         eyebrow: "The Compendium · up the stair",
@@ -248,8 +268,8 @@ export function WorldShell({
         id: "lantern",
         col: 0,
         row: 2,
-        viewBox: STUB_VIEWBOX,
-        scene: <LanternStub spec={spec} />,
+        viewBox: WORLD_VIEWBOX,
+        scene: <LanternRoom spec={spec} />,
         air: lit ? lanternLitAir : lanternDarkAir,
         eyebrow: "The Lantern · the light",
         line: lit
@@ -347,15 +367,24 @@ export function WorldShell({
 
   // arrow keys — the same moves, for a keyboard (or a reduced-motion pref)
   useEffect(() => {
+    const map: Record<string, Dir> = {
+      ArrowLeft: "west",
+      ArrowRight: "east",
+      ArrowUp: "up",
+      ArrowDown: "down",
+    };
     const onKey = (e: KeyboardEvent) => {
-      const map: Record<string, Dir> = {
-        ArrowLeft: "west",
-        ArrowRight: "east",
-        ArrowUp: "up",
-        ArrowDown: "down",
-      };
+      const { phase, cam, captureOpen } = liveRef.current;
+      // only when you're actually in the world — not behind the gate, and not
+      // while the capture sheet or any dialog/field owns the keyboard
+      if (phase !== "live" || captureOpen) return;
+      const t = e.target as HTMLElement | null;
+      if (
+        t?.closest("input, textarea, select, [contenteditable], [role='dialog']")
+      )
+        return;
       const dir = map[e.key];
-      if (!dir) return;
+      if (!dir || !neighborFor(cam, dir)) return; // no move here → let the key be
       e.preventDefault();
       goRef.current(dir);
     };
@@ -372,6 +401,8 @@ export function WorldShell({
 
   return (
     <div
+      ref={rootRef}
+      tabIndex={-1}
       className={`world-shell${phase === "entering" ? " arriving" : ""}`}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
@@ -391,6 +422,7 @@ export function WorldShell({
             className={`world-slot ${s.className ?? ""}`}
             style={{ transform: `translate(${s.col * 100}%, ${-s.row * 100}%)` }}
             aria-hidden={s.id !== active.id}
+            inert={s.id !== active.id}
           >
             {s.render ?? (
               <svg
@@ -454,13 +486,35 @@ export function WorldShell({
         </button>
       ) : null}
 
+      {/* the second keeper — a book can't seal alone, so a solo bond's first
+          call is to invite. Shown at the hearth until the ember arrives. */}
+      {phase === "live" && cam.col === 0 && cam.row === 0 && needsKeeper ? (
+        <button
+          type="button"
+          className="world-invite"
+          aria-label="Invite your keeper — your book waits for its second keeper"
+          onClick={() => navTo("/invite")}
+        >
+          your book waits for its second keeper —{" "}
+          <span className="world-invite-cta">invite them ❯</span>
+        </button>
+      ) : null}
+
       {/* THE COLD OPEN — the whole world held a beat, then a fluid push-in
           through the warm window to the hearth. Tap (or wait) to enter. */}
       {phase !== "live" ? (
         <div
+          ref={gateRef}
           className={`world-coldopen${phase === "entering" ? " entering" : ""}`}
           onClick={enter}
+          onKeyDown={(e) => {
+            if (phase === "overview" && (e.key === "Enter" || e.key === " ")) {
+              e.preventDefault();
+              enter();
+            }
+          }}
           role={phase === "overview" ? "button" : undefined}
+          tabIndex={phase === "overview" ? 0 : -1}
           aria-label={
             phase === "overview" ? "Begin — enter the lighthouse" : undefined
           }

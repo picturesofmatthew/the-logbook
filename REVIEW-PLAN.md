@@ -118,3 +118,46 @@ Quality only — no behavior change. Run `npm test` (75/75) + build after.
 4. **Triage §4** into a real next-build order (my read: in-world book interiors + settings-from-world are the highest-value seams).
 
 *Everything in §4 is a "wire it as we build" follow-up — none block the loop, which is live and working.*
+
+---
+
+## 6. Status — this pass (2026-07-23)
+
+**§1 Canon — DONE.** `CLAUDE.md` Quick Resume, `PROJECT-BRAIN.md` (status + a 2026-07-23 decision log),
+`THE-LIGHTHOUSE.md` (built-vs-canon section), `WORLD-ENGINE.md` (shell-superseded-RoomStage note) all
+updated to "the world IS the app."
+
+**§2 Review — DONE.** Findings + resolution:
+- **2a (core loop)** — verified **moved byte-for-byte** (diffed new `app/page.tsx` vs `d8a57b6:app/page.tsx`).
+  Only `stamps` intentionally dropped; the `&& isToday` guard collapse is equivalent. ✅
+- **2b (gate ↔ log ↔ refresh)** — **safe**: `openCapture()` is an in-place overlay (context bool), not a
+  route; `router.refresh()` is soft → `WorldShell` never unmounts, `phase` stays `live`, the gate does not
+  replay. Seal-complete lights the Lantern + fires `SealCeremony` through the same refresh. ✅
+- **Fixed** — (#1) the cold-open gate was keyboard/AT-inoperable → now `tabIndex`+`onKeyDown`(Enter/Space)
+  + focus follows the gate in and the world on arrival; (#2) the global arrow-key handler was unguarded →
+  now bails unless `phase==="live"`, ignores when the capture sheet / a field / a dialog owns the keyboard,
+  and only `preventDefault`s when a neighbor exists; (#3) off-screen room hotspots stayed Tab-focusable →
+  non-active slots now `inert`; (#4/2c) the capture scrim sat *behind* the world (z-40 < z-50) → raised to
+  z-50 so it dims **and** tap-to-close works over the world.
+- **2d** — snapshots read the right fields; `shores.id` (number) is a benign React key; no new redundant
+  queries. ✅
+- **Product** — surfaced the **second-keeper invite** in-world (a hearth affordance, shown until the ember
+  arrives) so first-run pairing isn't stranded behind a covered ribbon.
+
+**§3 Simplify — mostly DONE (2 deliberately deferred).**
+- DONE: deleted the dead `RoomStage`/`room.ts`; extracted `rooms/world-air.ts` (one `roomAir` factory +
+  the five air configs) and renamed `stub-rooms.tsx` → `lantern-room.tsx` (`LanternStub` → `LanternRoom`);
+  factored `rooms/hotspot.tsx` (shared `<Hotspot>`) into the docks + library.
+- **Deferred — `getWorldSnapshot` in lib/**: the pure-assembly-only version is a *lateral* move (an
+  11-field input bag duplicating several lib return-types, no query de-risk); the version that genuinely
+  de-risks 2d must co-locate the world **reads**, which entangles the live loop's read→write→ceremony-gate
+  ordering. Do it deliberately when the async-close work next touches `app/page.tsx`.
+- **Deferred — extract `useColdOpen` / `useCamera` from `world-shell.tsx`** (the headline "large file"
+  item): the phase/camera/gesture/key state is tightly interwoven (the `liveRef` + focus effect span both
+  gate and camera) and was *just* modified for the a11y fixes; a clean cut is real surgery whose regression
+  is **interaction-shaped** (not caught by `tsc`/tests). Warrants its own focused pass **with the browser
+  verification §2b/§2e call for** — safer than a big-bang refactor right before dogfooding.
+
+**Green after the pass:** `npm test` 75/75 · `tsc --noEmit` clean · `npm run build` compiles, all 20 routes.
+**Not yet done:** real-browser verification of the interaction fixes (§2b/§2e) — recommended before/at the
+start of dogfooding, per the standing "don't auto-launch the browser" rule.

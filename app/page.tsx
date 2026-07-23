@@ -205,6 +205,7 @@ export default async function Home() {
         library={library}
         docks={docks}
         garden={garden}
+        needsKeeper={!members.ember}
       />
 
       {/* the completion ceremonies — overlays that fire over the world, grandest

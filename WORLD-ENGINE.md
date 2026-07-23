@@ -39,6 +39,17 @@ every corner, quality that holds the `BRAND-BIBLE.md`.
 - **Game bindings** — real data drives it: the sigil takes the real `SigilSpec`, the glade takes
   vitality, the docks take boat progress. The world reads `lib/engine/*`.
 
+> **As built (2026-07-23, World Engine 1–9/n).** The nav shell landed as
+> **`components/world/world-shell.tsx`** — a single spatial canvas that holds all five rooms as positioned
+> `.world-slot` layers and moves one `.world-camera` between them (swipe on the ground row, rise on the
+> centre column; arrow-keys + edge affordances mirror both). It **superseded the per-room `RoomStage`**:
+> the shell renders each room's scene **directly** into a shared `<svg>` (or a full custom layer, as the
+> Garden does), and swaps **one shell-level `Atmosphere`** to the active room's air on arrival — rather
+> than each room mounting its own stage + atmosphere. `RoomStage`/`room.ts` were **deleted** in the
+> simplify pass (2026-07-23) — the shell is the engine now, so the dead per-room stage is gone. The
+> cold-open **gate** (whole world → *begin* → push-in) lives in the shell too. Room atmospheres live in
+> `rooms/world-air.ts` (one `roomAir` factory + the five configs); shared hotspots in `rooms/hotspot.tsx`.
+
 ## The content pipeline (per `ART-BIBLE.md`)
 
 - **Crisp / interactive** (the sigil, the familiar, hotspots, UI) → **SVG composers.**

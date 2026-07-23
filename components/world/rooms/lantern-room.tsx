@@ -1,93 +1,9 @@
-// The World Engine — honest room stubs.
-//
-// Phase 1 of the Lighthouse world (THE-LIGHTHOUSE.md) is the SPINE: the camera
-// that lets you cross the island (swipe) and climb the tower (rise). The hearth
-// is the one real room; these four are honest placeholders — each a named,
-// atmospheric scene that says "coming into focus," never a fake finished room.
-// Phase 2 replaces each with its true room (garden ← the glade, docks ← the
-// shore + vessel, library ← the five books, lantern ← the full beam cinematic).
-//
-// The Lantern is the exception: it already reads the LIVE spell, so one true
-// thing is moving in the world from day one — the light lit by the seal.
+// THE LANTERN — the top of the tower, the light. The one stub that already
+// reads the LIVE spell, so one true thing moves in the world from day one: the
+// lamp lit by the day's seal (lit / solo-kindled / dark), the beam sweeping out
+// to the far shore when the day is sealed. The air configs live in world-air.ts.
 
-import type { AtmosphereConfig, RGB } from "../atmosphere-config";
-import { hexToRgb } from "../atmosphere-config";
 import type { SigilSpec } from "@/lib/engine/sigil";
-
-// Every stub is authored in the hearth's portrait frame, so all five rooms
-// scale into a phone screen the same way.
-export const STUB_VIEWBOX = { width: 1000, height: 1500 };
-
-// A gentle mote-drift + one warm glow — the light breath of a room not yet
-// fully built, so even the stubs feel inhabited rather than empty.
-function stubAir(
-  colors: RGB[],
-  glow: { x: number; y: number; r: number; color: RGB; alpha: number },
-): AtmosphereConfig {
-  return {
-    viewBox: STUB_VIEWBOX,
-    density: 44000,
-    minParticles: 14,
-    maxParticles: 38,
-    emitters: [
-      {
-        kind: "mote",
-        weight: 1,
-        spawn: { type: "rect", x: [40, 960], y: [120, 1360] },
-        vx: [-5, 5],
-        vy: [-16, -4],
-        life: [7, 14],
-        radius: [1.1, 2.6],
-        alpha: [0.1, 0.34],
-        colors,
-        twinkle: true,
-        wobble: [0.4, 1.6],
-      },
-    ],
-    glows: [{ ...glow, flicker: { amp: glow.alpha * 0.4, freq: 1.1 } }],
-  };
-}
-
-const GOLD = hexToRgb("#e8b866");
-const VIOLET = hexToRgb("#b9a2d6");
-const MOSS = hexToRgb("#9fb27a");
-const SEAFOAM = hexToRgb("#8fb2c8");
-
-export const gardenAir = stubAir([MOSS, GOLD], {
-  x: 500,
-  y: 1180,
-  r: 520,
-  color: hexToRgb("#4a5a38"),
-  alpha: 0.16,
-});
-export const docksAir = stubAir([SEAFOAM, GOLD], {
-  x: 540,
-  y: 800,
-  r: 560,
-  color: hexToRgb("#2a3350"),
-  alpha: 0.14,
-});
-export const libraryAir = stubAir([GOLD, VIOLET], {
-  x: 500,
-  y: 660,
-  r: 560,
-  color: hexToRgb("#5a3f24"),
-  alpha: 0.2,
-});
-export const lanternLitAir = stubAir([GOLD], {
-  x: 500,
-  y: 500,
-  r: 660,
-  color: hexToRgb("#e8b866"),
-  alpha: 0.28,
-});
-export const lanternDarkAir = stubAir([hexToRgb("#8a7a5a")], {
-  x: 500,
-  y: 500,
-  r: 420,
-  color: hexToRgb("#3a3020"),
-  alpha: 0.12,
-});
 
 // a few fixed stars (deterministic — no Math.random, which the world must not
 // depend on) as [x, y, r]
@@ -103,9 +19,9 @@ const STARS: [number, number, number][] = [
   [180, 380, 1.7],
 ];
 
-function Stars({ fill = "#f2e6c4", opacity = 0.8 }: { fill?: string; opacity?: number }) {
+function Stars({ opacity = 0.8 }: { opacity?: number }) {
   return (
-    <g fill={fill} opacity={opacity}>
+    <g fill="#f2e6c4" opacity={opacity}>
       {STARS.map(([x, y, r], i) => (
         <circle key={i} cx={x} cy={y} r={r} />
       ))}
@@ -113,8 +29,7 @@ function Stars({ fill = "#f2e6c4", opacity = 0.8 }: { fill?: string; opacity?: n
   );
 }
 
-// ── THE LANTERN — the top, the light. Lit by the LIVE spell. ──
-export function LanternStub({ spec }: { spec: SigilSpec }) {
+export function LanternRoom({ spec }: { spec: SigilSpec }) {
   const lit = spec.completed;
   const solo = !lit && spec.moss.inked !== spec.ember.inked;
   const core = lit ? "#ffe6a6" : solo ? "#e0b878" : "#5f5238";

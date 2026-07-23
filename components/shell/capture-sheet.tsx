@@ -224,7 +224,7 @@ export function CaptureSheet() {
         type="button"
         aria-label="Close"
         onClick={closeCapture}
-        className={`fixed inset-0 z-40 bg-ink/40 transition-opacity duration-300 ${
+        className={`fixed inset-0 z-50 bg-ink/40 transition-opacity duration-300 ${
           captureOpen ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
       />

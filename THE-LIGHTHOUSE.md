@@ -9,6 +9,24 @@ we see it in-app.*
 
 ---
 
+## What's built vs. canon-only (2026-07-23)
+
+This doc is the *whole* vision; the world shipped as **World Engine 1–9/n** is its skeleton. What's real
+in-app today:
+
+- **Built:** `/` renders the world; the mandatory **cold-open gate** (whole world → *begin* → push-in to the
+  hearth); all five rooms (hearth · garden · docks · library · lantern) real and **swipe/rise**-navigable; the
+  day **logged at the hearth**; the **lamp lit by the live spell**; the four completion ceremonies; the
+  library's five books + reached-shores mantel; the docks vessel + far shore; the Garden's living glade
+  (the old home's glade, relocated).
+- **Canon-only (not yet built):** the **ornate hero art** (today's rooms are v1 CSS/SVG, not the painterly
+  `hearth-hall.html` bar); the full **cast cinematic** (the two keepers rising to the lamp, beam sweeping the
+  shore); **in-world book/vessel interiors** (they route OUT to sub-pages today, breaking immersion); the
+  **archipelago** (private islands, shared heavens); a world-wide **day/night cycle** (only the Garden rides
+  the light-script now).
+
+Everything below is the target; iterate the built world toward it.
+
 ## The world in one breath
 
 **You and your keeper live in a lighthouse on an island, under a shared sky. You keep the light.**

@@ -5,7 +5,7 @@
 // "Atmosphere engine — one Canvas particle/glow system, parameterized per
 // room"). Coordinates are SCENE-SPACE (the room's viewBox units), so emitters
 // and glows stay registered to the art at any viewport — the renderer maps
-// scene → screen with the same xMidYMid-meet scale the RoomStage SVG uses.
+// scene → screen with the same xMidYMid-meet scale the room scene SVG uses.
 //
 // Pure types + one helper. No React, no DOM — safe to import anywhere.
 
@@ -83,7 +83,7 @@ export type GlowPoint = {
 };
 
 export type AtmosphereConfig = {
-  /** scene-space, must match the RoomStage viewBox so particles register. */
+  /** scene-space, must match the room scene viewBox so particles register. */
   viewBox: { width: number; height: number };
   emitters: Emitter[];
   glows: GlowPoint[];
