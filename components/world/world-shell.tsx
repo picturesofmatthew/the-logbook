@@ -25,8 +25,8 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useShell } from "@/components/shell/shell-provider";
 import { composeSeal } from "@/components/sigil/glyphs";
 import type { SigilSpec } from "@/lib/engine/sigil";
 import { Atmosphere } from "./atmosphere";
@@ -134,6 +134,7 @@ export function WorldShell({
 }) {
   const router = useRouter();
   const navTo = useCallback((href: string) => router.push(href), [router]);
+  const { openCapture } = useShell();
   const [cam, setCam] = useState<Cell>(HEARTH);
   const [moving, setMoving] = useState(false);
   const reduced = useReducedMotion();
@@ -450,10 +451,17 @@ export function WorldShell({
           )
         : null}
 
-      {phase === "live" ? (
-        <Link href="/" className="world-exit" aria-label="Leave the lighthouse">
-          <span aria-hidden>❮</span> leave
-        </Link>
+      {/* log the day — the diegetic capture at the hearth. The ribbon retires;
+          the daily loop needs zero navigation, so the day is logged from home. */}
+      {phase === "live" && cam.col === 0 && cam.row === 0 ? (
+        <button
+          type="button"
+          className="world-log"
+          aria-label="Log the day — speak, eat, or train"
+          onClick={() => openCapture()}
+        >
+          <span aria-hidden>❧</span> log the day
+        </button>
       ) : null}
 
       {/* THE COLD OPEN — the whole world held a beat, then a fluid push-in

@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   BookRune,
-  GladeRune,
   HearthRune,
   LibraryRune,
   QuillRune,
@@ -12,22 +11,23 @@ import {
 } from "./rune-icons";
 import { useShell } from "./shell-provider";
 
-// The ribbon reads as two clusters around the quill: the PLACES you inhabit
-// (the hearth, the glade) and the ARCHIVE you keep (the Compendium's books).
+// The world is home now, so `/` IS the Lighthouse (the old hearth + glade tabs
+// collapse into one "home"). This ribbon is transitional chrome for the sub-pages
+// (the world covers it at home); full retirement follows as the books move
+// in-world. Two clusters around the quill: home + library | the record.
 const LEFT = [
-  { href: "/hearth", label: "hearth", Rune: HearthRune },
-  { href: "/", label: "glade", Rune: GladeRune },
+  { href: "/", label: "home", Rune: HearthRune },
+  { href: "/library", label: "library", Rune: LibraryRune },
 ] as const;
 
 const RIGHT = [
-  { href: "/library", label: "library", Rune: LibraryRune },
   { href: "/book", label: "spellbook", Rune: BookRune },
   { href: "/trends", label: "almanac", Rune: TrendsRune },
 ] as const;
 
 // The book's page order — used to turn forward (deeper) or back (toward the
-// front) depending on where you are. The hearth is index 0 (home — canon).
-const ORDER = ["/hearth", "/", "/library", "/book", "/trends"];
+// front) depending on where you are. Home (the world) is index 0.
+const ORDER = ["/", "/library", "/book", "/trends"];
 
 function directionType(pathname: string, href: string): string {
   const from = ORDER.indexOf(pathname);
