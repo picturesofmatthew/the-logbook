@@ -1153,6 +1153,19 @@ html[data-light="night"] .glade-day-only {
     transform: rotate(7deg);
   }
 }
+/* the shore lanterns breathe gently */
+.ov-lantern-glow {
+  animation: ov-lantern-glow 3.4s ease-in-out infinite;
+}
+@keyframes ov-lantern-glow {
+  0%,
+  100% {
+    opacity: 0.72;
+  }
+  50% {
+    opacity: 1;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .world-coldopen.entering .world-scene {
     transition:
@@ -1162,7 +1175,8 @@ html[data-light="night"] .glade-day-only {
   .world-shell.arriving .world-camera,
   .world-begin,
   .ov-twinkle,
-  .ov-beam {
+  .ov-beam,
+  .ov-lantern-glow {
     animation: none;
   }
 }

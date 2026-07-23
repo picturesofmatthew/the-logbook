@@ -1,10 +1,11 @@
 // The Overview — the whole world, seen from afar (THE-LIGHTHOUSE.md, the cold
 // open). The gate the app opens on: the island the world lives on, the
-// lighthouse rising from it with its lamp lit and a slow beam, the garden to the
-// west and the docks to the east, a far-off island low on the horizon, and a sky
-// of stars strung into constellations. Already alive — stars twinkle, the beam
-// sweeps, a warm window glows at the hearth. On "begin," the shell zooms THROUGH
-// that warm window and arrives inside, at the hearth.
+// lighthouse rising from it with its lamp lit (the ONE light) and a slow beam,
+// the garden to the west and the docks at the water's edge to the east with the
+// vessel moored, a far-off island low on the horizon, small lanterns dotting the
+// shore, and a sky of stars strung into constellations. Already alive — stars
+// twinkle, the beam sweeps, a warm window glows at the hearth. On "begin," the
+// shell zooms THROUGH that warm window and arrives inside, at the hearth.
 //
 // The zoom origin is the warm window (~50% / 55% of the frame), so the push-in
 // flies into the lighthouse and dissolves to the hearth interior.
@@ -36,7 +37,6 @@ const STARS: [number, number, number][] = [
 
 // constellations — vertices strung by faint lines, the stars to steer by
 const CONSTELLATIONS: [number, number][][] = [
-  // a keeper's plough, upper left
   [
     [96, 210],
     [170, 168],
@@ -45,7 +45,6 @@ const CONSTELLATIONS: [number, number][][] = [
     [352, 214],
     [300, 268],
   ],
-  // a diamond, near the moon
   [
     [640, 150],
     [712, 108],
@@ -84,6 +83,17 @@ function Constellations() {
   );
 }
 
+// a small warm lantern dotting the shore — a soft halo over a bright core
+function Lantern({ x, y, s = 1 }: { x: number; y: number; s?: number }) {
+  return (
+    <g className="ov-lantern-glow" style={{ animationDelay: `${(x % 5) * 0.6}s` }}>
+      <circle cx={x} cy={y} r={26 * s} fill="url(#ov_lantern)" opacity="0.8" />
+      <circle cx={x} cy={y} r={4.5 * s} fill="#ffdf9e" />
+      <circle cx={x} cy={y} r={2.2 * s} fill="#fff4d6" />
+    </g>
+  );
+}
+
 export function OverviewScene() {
   return (
     <>
@@ -102,7 +112,7 @@ export function OverviewScene() {
           <stop offset="1" stopColor="#f4ead0" stopOpacity="0" />
         </radialGradient>
         <linearGradient id="ov_moonpath" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#f4ead0" stopOpacity="0.5" />
+          <stop offset="0" stopColor="#f4ead0" stopOpacity="0.28" />
           <stop offset="1" stopColor="#f4ead0" stopOpacity="0" />
         </linearGradient>
         <radialGradient id="ov_lamp" cx="0.5" cy="0.5" r="0.5">
@@ -120,6 +130,10 @@ export function OverviewScene() {
         <radialGradient id="ov_far" cx="0.5" cy="0.5" r="0.5">
           <stop offset="0" stopColor="#f0c878" />
           <stop offset="1" stopColor="#f0c878" stopOpacity="0" />
+        </radialGradient>
+        <radialGradient id="ov_lantern" cx="0.5" cy="0.5" r="0.5">
+          <stop offset="0" stopColor="#ffcf7a" stopOpacity="0.85" />
+          <stop offset="1" stopColor="#ffcf7a" stopOpacity="0" />
         </radialGradient>
       </defs>
 
@@ -146,85 +160,102 @@ export function OverviewScene() {
       </g>
       <Constellations />
 
-      {/* the sea */}
-      <rect x="0" y="912" width="1000" height="588" fill="url(#ov_sea)" />
-      {/* the moon's path shimmering on the water */}
-      <path d="M812 912 L860 1500 L764 1500 Z" fill="url(#ov_moonpath)" opacity="0.6" />
+      {/* the sea — the whole foreground is water */}
+      <rect x="0" y="906" width="1000" height="594" fill="url(#ov_sea)" />
+      {/* the moon's path, softly shimmering toward us */}
+      <path d="M812 908 L852 1500 L772 1500 Z" fill="url(#ov_moonpath)" />
+      {/* a couple of slow swells on the open water */}
+      <g stroke="#312b48" strokeWidth="3" opacity="0.5" fill="none">
+        <path d="M120 1200 q70 -16 140 0 t140 0" />
+        <path d="M540 1320 q70 -16 140 0 t140 0" />
+      </g>
 
       {/* the far-off island — the Dream, low on the eastern horizon, its own
           small light burning */}
-      <path d="M812 912 Q872 884 936 906 Q972 918 972 912 L972 924 Q890 936 812 924 Z" fill="#1a1628" />
-      <ellipse cx="900" cy="910" rx="70" ry="16" fill="url(#ov_far)" opacity="0.7" />
-      <circle cx="900" cy="906" r="4" fill="#ffe6a6" />
+      <path d="M812 908 Q872 882 936 904 Q972 916 972 910 L972 922 Q890 934 812 922 Z" fill="#181425" />
+      <ellipse cx="900" cy="906" rx="70" ry="16" fill="url(#ov_far)" opacity="0.7" />
+      <circle cx="900" cy="902" r="4" fill="#ffe6a6" />
 
-      {/* the beam, sweeping slowly out over the water */}
+      {/* the beam, sweeping slowly out over the water — cast FROM the lamp */}
       <g
         className="ov-beam"
         style={{ transformBox: "fill-box", transformOrigin: "0% 50%" }}
       >
-        <polygon points="500,700 1120,560 1120,900 500,760" fill="url(#ov_beam)" />
+        <polygon points="500,640 1140,528 1140,868 500,702" fill="url(#ov_beam)" />
       </g>
 
-      {/* the island the world lives on — a silhouette landmass on the sea */}
+      {/* the island the world lives on — a landmass on the sea, with a shore */}
       <path
-        d="M120 976 Q300 856 500 872 Q720 890 880 984 Q916 1006 916 1060 L84 1060 Q84 1004 120 976 Z"
-        fill="#221d2e"
+        d="M120 970 Q300 862 500 876 Q706 890 872 980 Q912 1002 908 1052 L92 1052 Q88 1000 120 970 Z"
+        fill="#241f30"
       />
+      {/* the shore-line where the land meets the water */}
       <path
-        d="M120 976 Q300 856 500 872 Q720 890 880 984"
-        fill="none"
-        stroke="#3a3350"
+        d="M92 1052 L908 1052"
+        stroke="#3a3652"
         strokeWidth="3"
-        opacity="0.55"
+        opacity="0.5"
       />
 
       {/* the garden, west on the island — a cluster of trees */}
       <g opacity="0.92">
-        <path d="M244 970 V930" stroke="#1a2216" strokeWidth="7" strokeLinecap="round" />
-        <circle cx="244" cy="916" r="32" fill="#2c3a26" />
-        <path d="M298 972 V940" stroke="#1a2216" strokeWidth="6" strokeLinecap="round" />
-        <circle cx="298" cy="930" r="25" fill="#33422a" />
-        <path d="M202 974 V950" stroke="#1a2216" strokeWidth="5" strokeLinecap="round" />
-        <circle cx="202" cy="942" r="20" fill="#2c3a26" />
-        <path d="M330 976 V956" stroke="#1a2216" strokeWidth="4" strokeLinecap="round" />
-        <circle cx="330" cy="948" r="15" fill="#38472d" />
+        <path d="M232 1006 V966" stroke="#1a2216" strokeWidth="7" strokeLinecap="round" />
+        <circle cx="232" cy="952" r="30" fill="#2c3a26" />
+        <path d="M286 1010 V978" stroke="#1a2216" strokeWidth="6" strokeLinecap="round" />
+        <circle cx="286" cy="968" r="24" fill="#33422a" />
+        <path d="M190 1012 V988" stroke="#1a2216" strokeWidth="5" strokeLinecap="round" />
+        <circle cx="190" cy="980" r="19" fill="#2c3a26" />
       </g>
 
-      {/* the docks, east on the island — a pier and the vessel at rest */}
-      <g opacity="0.92">
-        <rect x="694" y="992" width="128" height="10" rx="3" fill="#2a2018" />
-        <path d="M720 1002 V1034 M786 1002 V1034" stroke="#170f09" strokeWidth="5" />
-        <g transform="translate(656 968) scale(0.52)">
-          <path d="M-60 0 Q0 30 60 0 L46 22 Q0 34 -46 22 Z" fill="#1c160f" />
-          <path d="M0 2 V-72" stroke="#2a2016" strokeWidth="8" strokeLinecap="round" />
-          <path d="M4 -70 L42 -28 L4 -28 Z" fill="#b7a37c" opacity="0.85" />
+      {/* the docks — a pier reaching from the island's shore OUT into the water,
+          with the vessel moored at its end (in the water, below the shoreline) */}
+      <g>
+        <path d="M636 1050 L820 1090 L816 1104 L632 1064 Z" fill="#2a2018" />
+        <g stroke="#160f09" strokeWidth="5" opacity="0.8">
+          <path d="M672 1058 V1092" />
+          <path d="M744 1074 V1108" />
+          <path d="M812 1092 V1128" />
         </g>
+      </g>
+      <g transform="translate(742 1120)">
+        {/* a soft ripple where the hull sits in the water */}
+        <ellipse cx="0" cy="22" rx="58" ry="7" fill="#3a3450" opacity="0.45" />
+        <path d="M-52 0 Q0 26 52 0 L40 20 Q0 30 -40 20 Z" fill="#1c160f" />
+        <path d="M0 2 V-66" stroke="#2a2016" strokeWidth="7" strokeLinecap="round" />
+        <path d="M4 -64 L40 -24 L4 -24 Z" fill="#b7a37c" opacity="0.85" />
       </g>
 
       {/* THE LIGHTHOUSE — the heart, rising from the island centre. The push-in
           flies into the warm window and arrives at the hearth. */}
       <g>
         {/* the tower */}
-        <path d="M456 1016 L468 700 L532 700 L544 1016 Z" fill="#cabfa8" />
-        <path d="M456 1016 L468 700 L500 700 L500 1016 Z" fill="#b2a88e" />
+        <path d="M456 1050 L468 700 L532 700 L544 1050 Z" fill="#cabfa8" />
+        <path d="M456 1050 L468 700 L500 700 L500 1050 Z" fill="#b2a88e" />
         {/* barber stripes */}
-        <path d="M461 884 L539 884 L541 928 L459 928 Z" fill="#9c5238" opacity="0.85" />
-        <path d="M465 784 L535 784 L537 824 L463 824 Z" fill="#9c5238" opacity="0.7" />
-        {/* the warm hearth window — the zoom target */}
-        <ellipse cx="500" cy="838" rx="74" ry="74" fill="url(#ov_window)" opacity="0.9" />
-        <rect x="484" y="830" width="32" height="40" rx="14" fill="#f3c574" />
-        <rect x="488" y="834" width="24" height="32" rx="11" fill="#ffe6b0" />
+        <path d="M461 890 L539 890 L541 934 L459 934 Z" fill="#9c5238" opacity="0.85" />
+        <path d="M465 786 L535 786 L537 826 L463 826 Z" fill="#9c5238" opacity="0.7" />
+        {/* the warm hearth window — a small glow, not a second light (the zoom
+            target lives here) */}
+        <ellipse cx="500" cy="840" rx="30" ry="30" fill="url(#ov_window)" opacity="0.55" />
+        <rect x="488" y="828" width="24" height="30" rx="10" fill="#e6b56a" opacity="0.85" />
+        <rect x="491" y="831" width="18" height="24" rx="8" fill="#f5cd84" opacity="0.9" />
         {/* the gallery + lamp housing */}
         <rect x="446" y="676" width="108" height="30" rx="5" fill="#2f2740" />
         <rect x="462" y="628" width="76" height="52" rx="6" fill="#3a3050" stroke="#c9a86a" strokeWidth="4" />
-        {/* the lit lamp */}
-        <circle cx="500" cy="654" r="130" fill="url(#ov_lamp)" opacity="0.85" />
+        {/* THE LAMP — the one light, at the top */}
+        <circle cx="500" cy="654" r="134" fill="url(#ov_lamp)" opacity="0.9" />
         <circle cx="500" cy="654" r="27" fill="#ffe6a6" />
         <circle cx="500" cy="654" r="13" fill="#fff6df" />
         {/* the cap */}
         <path d="M456 628 L500 586 L544 628 Z" fill="#2a2236" stroke="#c9a86a" strokeWidth="3" />
         <circle cx="500" cy="582" r="6" fill="#c9a86a" />
       </g>
+
+      {/* small lanterns dotting the shore — warmth scattered through the world */}
+      <Lantern x={330} y={1030} s={0.85} />
+      <Lantern x={430} y={1044} s={0.7} />
+      <Lantern x={604} y={1040} s={0.8} />
+      <Lantern x={700} y={1064} s={0.9} />
     </>
   );
 }
