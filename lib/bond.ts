@@ -11,6 +11,9 @@ export type Member = {
   id: string;
   displayName: string;
   slot: Slot;
+  // Set once a keeper has left / been severed. Their logs still bucket into the
+  // slot (the keepsake), but the UI can tell an active partner from a former one.
+  leftAt: Date | null;
 };
 
 // A bond's two members, keyed by slot. Either side may be null while a bond is
@@ -27,13 +30,19 @@ export const getBondMembers = cache(
         id: profiles.id,
         displayName: profiles.displayName,
         slot: profiles.slot,
+        leftAt: profiles.leftAt,
       })
       .from(profiles)
       .where(eq(profiles.bondId, bondId));
     const members: BondMembers = { moss: null, ember: null };
     for (const r of rows) {
       if (r.slot === "moss" || r.slot === "ember") {
-        members[r.slot] = { id: r.id, displayName: r.displayName, slot: r.slot };
+        members[r.slot] = {
+          id: r.id,
+          displayName: r.displayName,
+          slot: r.slot,
+          leftAt: r.leftAt,
+        };
       }
     }
     return members;

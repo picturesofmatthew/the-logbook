@@ -2,7 +2,7 @@ import { cache } from "react";
 import { randomBytes } from "node:crypto";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { db } from "@/db";
 import { profiles, sessions } from "@/db/schema";
 import {
@@ -40,7 +40,13 @@ export const getSessionUser = cache(async (): Promise<CurrentUser | null> => {
     })
     .from(sessions)
     .innerJoin(profiles, eq(sessions.profileId, profiles.id))
-    .where(eq(sessions.tokenHash, await hashToken(token)));
+    // A departed keeper (left_at set) has no access, even with a live cookie.
+    .where(
+      and(
+        eq(sessions.tokenHash, await hashToken(token)),
+        isNull(profiles.leftAt),
+      ),
+    );
   if (!row || row.expiresAt.getTime() < Date.now()) return null;
   return {
     userId: row.profileId,

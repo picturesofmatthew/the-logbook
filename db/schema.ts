@@ -61,6 +61,10 @@ export const profiles = pgTable(
       enum: ["sedentary", "light", "moderate", "active", "very_active"],
     }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
+    // A departed keeper (they left, or were severed). PII is stripped and
+    // private notes removed, but their logs stay for the remaining keeper's
+    // keepsake. `left_at` gates access; null = an active keeper.
+    leftAt: timestamp("left_at"),
   },
   // A bond holds at most one keeper per slot (≤1 moss, ≤1 ember) — the belt to
   // the invite's single-use suspenders.

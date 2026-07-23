@@ -6,8 +6,9 @@ import { db } from "@/db";
 import { profiles, targets, weighIns } from "@/db/schema";
 import { decrypt } from "@/lib/crypto";
 import { todayIso } from "@/lib/dates";
-import { currentProfile } from "@/lib/session";
+import { partnerSlot, requireBond } from "@/lib/bond";
 import { logout } from "./actions";
+import { DangerZone } from "./danger-zone";
 import { SetupForm, type SetupInitial } from "./setup-form";
 
 export const metadata: Metadata = {
@@ -15,7 +16,9 @@ export const metadata: Metadata = {
 };
 
 export default async function SettingsPage() {
-  const profileId = await currentProfile();
+  const { userId: profileId, viewerSlot, members } = await requireBond();
+  const partner = members[partnerSlot(viewerSlot)];
+  const partnerName = partner && !partner.leftAt ? partner.displayName : null;
 
   const [profileRow] = await db
     .select()
@@ -78,6 +81,7 @@ export default async function SettingsPage() {
           sign out
         </button>
       </form>
+      <DangerZone partnerName={partnerName} />
     </main>
   );
 }

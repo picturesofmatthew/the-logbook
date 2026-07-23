@@ -1,13 +1,15 @@
 "use server";
 
 import { eq } from "drizzle-orm";
-import { revalidateTag } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/db";
 import { profiles, targets, weighIns } from "@/db/schema";
+import { partnerSlot, requireBond } from "@/lib/bond";
 import { LEDGER_TAG } from "@/lib/cache-tags";
 import { encrypt } from "@/lib/crypto";
 import { todayIso } from "@/lib/dates";
+import { anonymizeProfile, eraseProfile } from "@/lib/leave";
 import { safely } from "@/lib/safe";
 import { currentUser, destroySession } from "@/lib/session";
 import type { ActivityLevel, Sex } from "@/lib/engine/tdee";
@@ -16,6 +18,41 @@ export type SetupState = { error: string } | null;
 
 // End the session (logout) and return to the door.
 export async function logout(): Promise<void> {
+  await destroySession();
+  redirect("/enter");
+}
+
+// Leave the book: anonymize yourself (your partner keeps it as a keepsake — your
+// logs stay so the shared history holds) and sign out.
+export async function leaveBook(): Promise<void> {
+  const { userId } = await currentUser();
+  await anonymizeProfile(userId);
+  revalidateTag(LEDGER_TAG, { expire: 0 });
+  await destroySession();
+  redirect("/enter");
+}
+
+// Sever — instantly remove your partner's access to this book. A safety exit:
+// silent (no notification to them), immediate, and you keep the book.
+export async function removePartner(): Promise<{ error?: string }> {
+  const { viewerSlot, members } = await requireBond();
+  const partner = members[partnerSlot(viewerSlot)];
+  if (!partner || partner.leftAt) {
+    return { error: "There's no partner to remove." };
+  }
+  await anonymizeProfile(partner.id);
+  revalidateTag(LEDGER_TAG, { expire: 0 });
+  revalidatePath("/");
+  revalidatePath("/settings");
+  return {};
+}
+
+// Full erasure: delete everything you've logged (the shared seals recompute
+// without you), then sign out. Irreversible.
+export async function eraseMe(): Promise<void> {
+  const { userId } = await currentUser();
+  await eraseProfile(userId);
+  revalidateTag(LEDGER_TAG, { expire: 0 });
   await destroySession();
   redirect("/enter");
 }
