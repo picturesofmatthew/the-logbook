@@ -26,7 +26,8 @@ Expo + Convex + Rive rewrite (`LAUNCH-PATH.md`) is **PARKED until multiple users
 paying couples. Beachhead ICP = **long-distance couples** (the cross-distance "love-tap" is the hero
 there — and Matthew's own Oct-2026 Chiang Mai situation).
 
-**Orientation:** read **`PROJECT-BRAIN.md`** first (state, decision log, full doc map). **World canon:
+**Orientation:** read **`PROJECT-BRAIN.md`** first (state, decision log, full doc map). **Brand bedrock:
+`BRAND-BIBLE.md`** (essence, color, type, material, voice — the absolute source). **World canon:
 `THE-LIGHTHOUSE.md`** (the app is a lighthouse on an island — the current north star). Design canon:
 `THE-SIGIL-TURN.md` (thesis), `DIRECTION.md` + `art/ART-BIBLE.md` (art), `RISK-REGISTER.md` (the
 contingency findings to build around).

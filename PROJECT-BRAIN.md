@@ -53,6 +53,7 @@ stranded). Then the **boat-to-Kauai Phase 0** + a 30-day both-of-you retention t
 | Doc | What it is |
 |---|---|
 | **PROJECT-BRAIN.md** (this) | Orientation, state, decision log, doc map. Read first. |
+| **BRAND-BIBLE.md** | **The founding brand bedrock (2026-07-22).** Essence, color, type, material, lighting, motif, voice, motion, application, do-not. The absolute place; `ART-BIBLE` (art) and the world docs inherit from it. |
 | **THE-LIGHTHOUSE.md** | **The world canon (2026-07-22).** The app is a lighthouse on an island — spatial architecture (garden/hearth/docks + tower), the cast cinematics, the archipelago, the three discipline lines. Read for the world/experience. |
 | **ROADMAP.md** | The phased build plan (Foundation → Art/UI → Coffers → Multi-user v1) — "what we're building, in what order." |
 | **SIGIL-HANDOFF.md** | The developed seal: its grammar, the swappable parts registry (`components/sigil/glyphs.ts`), and what's next. **Read to continue the sigil/art work.** |
