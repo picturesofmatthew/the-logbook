@@ -219,7 +219,9 @@ export const weighIns = pgTable(
       .references(() => profiles.id)
       .notNull(),
     day: date("day").notNull(),
-    weightLb: real("weight_lb").notNull(),
+    // AES-GCM ciphertext of the weight (consumer-health data) — see lib/crypto.
+    // The app encrypts on write and decrypts to a number on read.
+    weightLb: text("weight_lb").notNull(),
   },
   (t) => [primaryKey({ columns: [t.profileId, t.day] })],
 );

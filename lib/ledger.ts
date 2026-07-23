@@ -16,6 +16,7 @@ import {
 } from "@/db/schema";
 import { getBondMembers, SLOTS, type Slot } from "@/lib/bond";
 import { LEDGER_TAG } from "@/lib/cache-tags";
+import { decryptOrNull } from "@/lib/crypto";
 import { bothLoggedDays, getActiveDream, type DreamRow } from "@/lib/data";
 import { beingStates, type BeingState, type LedgerDay } from "@/lib/engine/beings";
 import { boatState, type BoatDay, type BoatState } from "@/lib/engine/boat";
@@ -236,15 +237,19 @@ export async function buildLedgerRange(
   const keeperDayFor = (slot: Slot, day: string): KeeperDay => {
     const pid = members[slot]?.id;
     const f = (pid && facts.get(`${pid}:${day}`)) || emptyFacts();
-    const meta = pid
+    const rawMeta = pid
       ? metaRows.find((m) => m.profileId === pid && m.day === day)
       : undefined;
+    // Mood is encrypted at rest; the engine's low-mood signal needs plaintext.
+    const meta = rawMeta
+      ? { ...rawMeta, mood: decryptOrNull(rawMeta.mood) }
+      : null;
     return buildKeeperDay({
       calories: f.calories,
       proteinG: f.proteinG,
       halls: [...f.halls],
       target: targetFor(pid, day),
-      meta: meta ?? null,
+      meta,
       workouts: (pid && workoutsByKey.get(`${pid}:${day}`)) || [],
       historyBest:
         historyBefore.get(slot)?.get(day) ?? new Map<string, number>(),

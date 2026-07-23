@@ -4,6 +4,7 @@ import { desc, eq } from "drizzle-orm";
 import { SoundToggle } from "@/components/sound-toggle";
 import { db } from "@/db";
 import { profiles, targets, weighIns } from "@/db/schema";
+import { decrypt } from "@/lib/crypto";
 import { todayIso } from "@/lib/dates";
 import { currentProfile } from "@/lib/session";
 import { logout } from "./actions";
@@ -35,12 +36,16 @@ export default async function SettingsPage() {
     .orderBy(desc(targets.effectiveDate), desc(targets.id))
     .limit(1);
 
+  const decWeight = latestWeighIn?.weightLb
+    ? decrypt(latestWeighIn.weightLb)
+    : null;
+
   const initial: SetupInitial = {
     sex: profileRow?.sex ?? null,
     birthdate: profileRow?.birthdate ?? null,
     heightIn: profileRow?.heightIn ?? null,
     activityLevel: profileRow?.activityLevel ?? null,
-    weightLb: latestWeighIn?.weightLb ?? null,
+    weightLb: decWeight != null ? Number(decWeight) : null,
     calories: currentTarget?.calories ?? null,
     proteinG: currentTarget?.proteinG ?? null,
     carbsG: currentTarget?.carbsG ?? null,

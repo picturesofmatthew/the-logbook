@@ -26,6 +26,7 @@ import {
   workoutSets,
 } from "@/db/schema";
 import { getBondMembers, SLOTS, type Slot } from "@/lib/bond";
+import { decrypt, decryptOrNull } from "@/lib/crypto";
 import { diffDays } from "@/lib/dates";
 import { buildKeeperDay } from "@/lib/engine/keeper-day";
 import type { KeeperDay } from "@/lib/engine/sigil";
@@ -222,8 +223,8 @@ export async function getDayExtras(
     meta[slot] = {
       training: row?.training ?? null,
       waterCups: row?.waterCups ?? 0,
-      note: row?.note ?? null,
-      mood: row?.mood ?? null,
+      note: decryptOrNull(row?.note),
+      mood: decryptOrNull(row?.mood),
     };
   }
   return { meta, newSpecimens };
@@ -247,7 +248,9 @@ export async function getWeighIn(
         eq(weighIns.day, day),
       ),
     );
-  return row?.weightLb ?? null;
+  if (!row?.weightLb) return null;
+  const dec = decrypt(row.weightLb);
+  return dec != null ? Number(dec) : null;
 }
 
 export type WeighInPoint = { day: string; weightLb: number };
@@ -267,7 +270,11 @@ export async function getAllWeighIns(
     result[slot] = pid
       ? rows
           .filter((r) => r.profileId === pid)
-          .map((r) => ({ day: r.day, weightLb: r.weightLb }))
+          .map((r) => {
+            const dec = decrypt(r.weightLb);
+            return dec != null ? { day: r.day, weightLb: Number(dec) } : null;
+          })
+          .filter((p): p is WeighInPoint => p != null)
       : [];
   }
   return result;

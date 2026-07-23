@@ -4,6 +4,7 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { db } from "@/db";
 import { dayMeta, weighIns } from "@/db/schema";
 import { LEDGER_TAG } from "@/lib/cache-tags";
+import { encrypt, encryptOrNull } from "@/lib/crypto";
 import { safely } from "@/lib/safe";
 import { todayIso } from "@/lib/dates";
 import { currentUser } from "@/lib/session";
@@ -49,12 +50,13 @@ export async function saveWeighIn(input: {
     return { error: "That weight doesn't look right." };
   }
   return safely(async () => {
+    const encWeight = encrypt(String(input.weightLb));
     await db
       .insert(weighIns)
-      .values({ bondId, profileId, day, weightLb: input.weightLb })
+      .values({ bondId, profileId, day, weightLb: encWeight })
       .onConflictDoUpdate({
         target: [weighIns.profileId, weighIns.day],
-        set: { weightLb: input.weightLb },
+        set: { weightLb: encWeight },
       });
     revalidatePath("/");
     revalidatePath("/today");
@@ -112,7 +114,7 @@ export async function setMood(input: {
   if (!day) return { error: "Unknown day." };
   const mood = input.mood.trim().slice(0, 8) || null;
   return safely(async () => {
-    await upsertMeta(bondId, profileId, day, { mood });
+    await upsertMeta(bondId, profileId, day, { mood: encryptOrNull(mood) });
     revalidatePath("/");
     revalidatePath("/today");
     revalidateTag(LEDGER_TAG, { expire: 0 });
@@ -129,7 +131,7 @@ export async function saveNote(input: {
   if (!day) return { error: "Unknown day." };
   const note = input.note.trim().slice(0, 240) || null;
   return safely(async () => {
-    await upsertMeta(bondId, profileId, day, { note });
+    await upsertMeta(bondId, profileId, day, { note: encryptOrNull(note) });
     revalidatePath("/");
     revalidatePath("/today");
     revalidateTag(LEDGER_TAG, { expire: 0 });

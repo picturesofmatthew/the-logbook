@@ -57,6 +57,13 @@
       "when": 1784763755239,
       "tag": "0007_invites_and_pairing",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1784765113020,
+      "tag": "0008_encrypt_health_data",
+      "breakpoints": true
     }
   ]
 }

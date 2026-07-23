@@ -1,0 +1,1 @@
+ALTER TABLE "weigh_ins" ALTER COLUMN "weight_lb" SET DATA TYPE text USING "weight_lb"::text;

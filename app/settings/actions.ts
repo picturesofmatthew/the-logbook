@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { db } from "@/db";
 import { profiles, targets, weighIns } from "@/db/schema";
 import { LEDGER_TAG } from "@/lib/cache-tags";
+import { encrypt } from "@/lib/crypto";
 import { todayIso } from "@/lib/dates";
 import { safely } from "@/lib/safe";
 import { currentUser, destroySession } from "@/lib/session";
@@ -90,12 +91,13 @@ export async function saveSetup(
       })
       .where(eq(profiles.id, profileId));
 
+    const encWeight = encrypt(String(weightLb));
     await db
       .insert(weighIns)
-      .values({ bondId, profileId, day: today, weightLb })
+      .values({ bondId, profileId, day: today, weightLb: encWeight })
       .onConflictDoUpdate({
         target: [weighIns.profileId, weighIns.day],
-        set: { weightLb },
+        set: { weightLb: encWeight },
       });
 
     await db.insert(targets).values({
