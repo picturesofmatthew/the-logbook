@@ -18,6 +18,7 @@
 // stubs — except the Lantern, which already burns by the LIVE spell.
 
 import {
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -25,16 +26,17 @@ import {
   useSyncExternalStore,
 } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { composeSeal } from "@/components/sigil/glyphs";
 import type { SigilSpec } from "@/lib/engine/sigil";
 import { Atmosphere } from "./atmosphere";
 import { HearthDefs, HearthFar, HearthHeart, HearthMid } from "./rooms/hearth-scene";
 import { HEARTH_ATMOSPHERE } from "./rooms/hearth-atmosphere";
+import { LibraryRoom, type LibrarySnapshot } from "./rooms/library-room";
 import {
   DocksStub,
   GardenStub,
   LanternStub,
-  LibraryStub,
   STUB_VIEWBOX,
   docksAir,
   gardenAir,
@@ -109,10 +111,14 @@ function useReducedMotion(): boolean {
 export function WorldShell({
   spec,
   standingLine,
+  library,
 }: {
   spec: SigilSpec;
   standingLine: string | null;
+  library: LibrarySnapshot;
 }) {
+  const router = useRouter();
+  const openBook = useCallback((href: string) => router.push(href), [router]);
   const [cam, setCam] = useState<Cell>(HEARTH);
   const [moving, setMoving] = useState(false);
   const reduced = useReducedMotion();
@@ -131,6 +137,11 @@ export function WorldShell({
 
   const lit = spec.completed;
   const solo = !lit && spec.moss.inked !== spec.ember.inked;
+
+  const libraryLine =
+    library.days === 0
+      ? "five books, waiting for their first page."
+      : "your kept self — the silver waits to be inked to gold.";
 
   const slots: WorldSlot[] = useMemo(
     () => [
@@ -183,12 +194,12 @@ export function WorldShell({
         col: 0,
         row: 1,
         viewBox: STUB_VIEWBOX,
-        scene: <LibraryStub />,
+        scene: <LibraryRoom snapshot={library} onOpenBook={openBook} />,
         air: libraryAir,
-        eyebrow: "The Library · above",
-        line: "the Compendium, five books — coming into focus.",
+        eyebrow: "The Compendium · up the stair",
+        line: libraryLine,
         aria:
-          "The library up the spiral stair: warm shelves and the five books of the Compendium standing on a lectern. This room is coming into focus.",
+          "The library up the spiral stair: warm shelves and the five bound books of the Compendium — Book of Days, Legendarium, Bestiary, Apothecary, Almanac — each gold for what you have lived and silver for what still waits. A mantel above keeps the shores you have reached.",
       },
       {
         id: "lantern",
@@ -208,7 +219,7 @@ export function WorldShell({
           : "The lamp room at the top of the tower: the light is dark, waiting for the day's seal to close.",
       },
     ],
-    [sealHtml, standingLine, lit, solo, spec],
+    [sealHtml, standingLine, lit, solo, spec, library, libraryLine, openBook],
   );
 
   const active =
@@ -238,8 +249,8 @@ export function WorldShell({
   // ── swipe to travel — flick toward the room you want ──
   const onPointerDown = (e: React.PointerEvent) => {
     if (moving) return;
-    // let the affordance chips + the exit link take their own taps
-    if ((e.target as HTMLElement).closest("button, a")) return;
+    // let the affordance chips, the exit link, and the books take their own taps
+    if ((e.target as HTMLElement).closest("button, a, [data-hotspot]")) return;
     const d = drag.current;
     d.down = true;
     d.sx = e.clientX;

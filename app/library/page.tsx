@@ -14,7 +14,6 @@ import {
   getAllSpecimens,
   getArrivals,
   getDiscoveries,
-  getReachedShores,
 } from "@/lib/data";
 import { currentTz, friendlyDate, todayIso } from "@/lib/dates";
 import { HALLS } from "@/lib/halls";
@@ -52,12 +51,11 @@ export default async function LibraryPage() {
   const today = await todayIso();
   const tz = await currentTz();
 
-  const [specimens, glade, arrivals, discoveries, shores] = await Promise.all([
+  const [specimens, glade, arrivals, discoveries] = await Promise.all([
     getAllSpecimens(),
     getGladeState(bondId, today),
     getArrivals(bondId),
     getDiscoveries(bondId),
-    getReachedShores(bondId),
   ]);
 
   // Resolve donor names from THIS bond's members. The museum is shared across
@@ -106,10 +104,9 @@ export default async function LibraryPage() {
 
   // The section-jump — a live table of contents for the one book.
   const sections = [
-    { id: "pantry", label: "pantry", count: specimens.length },
+    { id: "apothecary", label: "apothecary", count: specimens.length },
     { id: "bestiary", label: "beasts", count: arrivedCount },
     { id: "legendarium", label: "legends", count: discoveries.size },
-    { id: "relics", label: "relics", count: shores.length },
   ];
 
   return (
@@ -141,14 +138,14 @@ export default async function LibraryPage() {
         </div>
       </nav>
 
-      {/* ── THE PANTRY ── */}
-      <section id="pantry" className="flex scroll-mt-32 flex-col gap-3">
+      {/* ── THE APOTHECARY ── (was the pantry/museum; materia, not specimens) */}
+      <section id="apothecary" className="flex scroll-mt-32 flex-col gap-3">
         <GiltHeading className="text-sm tracking-wide">
-          <PantryRune size={16} /> THE PANTRY
+          <PantryRune size={16} /> THE APOTHECARY
         </GiltHeading>
         <p className="-mt-2 text-center text-[10px] text-ink-soft">
           {specimens.length}{" "}
-          {specimens.length === 1 ? "specimen" : "specimens"} ·{" "}
+          {specimens.length === 1 ? "provision" : "provisions"} ·{" "}
           {SLOTS.map(
             (slot) =>
               `${members[slot]?.displayName ?? ""} ${donationCounts[slot]}`,
@@ -161,8 +158,8 @@ export default async function LibraryPage() {
               <PantryRune size={40} />
             </p>
             <p className="mt-2">
-              The halls are empty and echoing. Log your first meal to donate the
-              pantry&apos;s very first specimen.
+              The shelves stand empty and waiting. Log your first meal to lay in
+              the Apothecary&apos;s first provision.
             </p>
           </div>
         ) : (
@@ -319,56 +316,6 @@ export default async function LibraryPage() {
         </div>
       </section>
 
-      {/* ── RELICS ── the Dreams the two of you sailed to ── */}
-      <section id="relics" className="scroll-mt-32">
-        <GiltHeading className="mb-3 text-sm tracking-wide">
-          <StarMark size={15} /> RELICS
-        </GiltHeading>
-        <p className="-mt-2 mb-2 text-center text-[10px] text-ink-soft">
-          {shores.length} {shores.length === 1 ? "shore" : "shores"} reached
-        </p>
-        {shores.length === 0 ? (
-          <div className="wobbly border-2 border-dashed border-ink/25 p-6 text-center text-ink-soft">
-            <p className="flex justify-center text-gold/70">
-              <StarMark size={30} />
-            </p>
-            <p className="mt-2 text-sm">
-              No relics yet. The far shore is still ahead of you — the first
-              Dream you reach together will rest here, kept forever.
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-2">
-            {shores.map((shore) => (
-              <div
-                key={shore.id}
-                className="plate lantern-pool flex items-center gap-3 p-3"
-              >
-                <span className="plate-corner tl" aria-hidden />
-                <span className="plate-corner tr" aria-hidden />
-                <span className="plate-corner bl" aria-hidden />
-                <span className="plate-corner br" aria-hidden />
-                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full border-2 border-gold/50 bg-cream text-gold">
-                  <StarMark size={20} />
-                </span>
-                <div className="flex-1 text-left">
-                  <p className="font-display text-sm leading-tight text-gold">
-                    {shore.name}
-                  </p>
-                  <p className="mt-0.5 text-[11px] italic leading-tight text-ink-soft">
-                    a {shore.distanceDays}-day voyage, reached together
-                  </p>
-                  {shore.reachedDay ? (
-                    <p className="mt-0.5 text-[9px] text-ink-soft/70">
-                      {friendlyDate(shore.reachedDay, tz)}
-                    </p>
-                  ) : null}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
     </main>
   );
 }

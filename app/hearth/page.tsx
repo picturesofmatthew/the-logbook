@@ -2,16 +2,21 @@ import type { Metadata } from "next";
 import { WorldShell } from "@/components/world/world-shell";
 import { requireBond, SLOTS } from "@/lib/bond";
 import {
+  getAllSpecimens,
   getDayExtras,
+  getDiscoveries,
   getExerciseHistories,
+  getFamiliarState,
   getFirstLogTimes,
   getJournalDay,
+  getReachedShores,
   getWorkoutsForDay,
   keeperDayFromDay,
 } from "@/lib/data";
 import { todayIso } from "@/lib/dates";
 import { getGladeState } from "@/lib/ledger";
-import { composeSigil } from "@/lib/engine/sigil";
+import { BEINGS } from "@/lib/engine/beings";
+import { composeSigil, LEGENDARIES } from "@/lib/engine/sigil";
 
 // The Lighthouse — the whole inhabited world, entered at the hearth. The World
 // Shell holds all five rooms on one spatial canvas and moves a camera between
@@ -38,6 +43,32 @@ export default async function HearthPage() {
     getExerciseHistories(bondId, day),
     getGladeState(bondId, today),
   ]);
+
+  // The Compendium's live counts — the five books' gold-vs-silver progress,
+  // fetched here so the Library room up the stair reads the real bond.
+  const [familiarState, discoveries, specimens, shores] = await Promise.all([
+    getFamiliarState(bondId, today),
+    getDiscoveries(bondId),
+    getAllSpecimens(),
+    getReachedShores(bondId),
+  ]);
+  const library = {
+    days: familiarState.lifetimeDays,
+    legendary: {
+      got: discoveries.size,
+      total: Object.keys(LEGENDARIES).length,
+    },
+    beasts: {
+      got: glade.beings.filter((b) => b.arrived).length,
+      total: BEINGS.length,
+    },
+    provisions: specimens.length,
+    shores: shores.map((s) => ({
+      id: s.id,
+      name: s.name,
+      reachedDay: s.reachedDay,
+    })),
+  };
 
   const dayData = {
     journal,
@@ -78,5 +109,7 @@ export default async function HearthPage() {
         : `${keptName} kept their half — your hand closes it`
       : "an open page, still to keep together";
 
-  return <WorldShell spec={sigil} standingLine={standingLine} />;
+  return (
+    <WorldShell spec={sigil} standingLine={standingLine} library={library} />
+  );
 }
