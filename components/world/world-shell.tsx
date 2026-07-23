@@ -71,11 +71,11 @@ const HEARTH: Cell = { col: 0, row: 0 };
 const SWIPE_MIN = 42; // px of travel on release to count as a swipe
 const FLICK = 66; // px mid-gesture that fires the move instantly (snappy)
 
-// the cold open — the whole world, held a beat, then a fluid push-in to the
-// hearth. All contained; no route change, no loading.
+// the cold open — the whole world as a gate you choose to cross, then a fluid
+// push-in to the hearth. All contained; no route change, no loading, and no
+// auto-enter — you tap "begin".
 type Phase = "overview" | "entering" | "live";
-const HOLD_MS = 850; // the beat you see the whole world before the push-in
-const ZOOM_MS = 1300; // the fluid zoom through the warm window to the hearth
+const ZOOM_MS = 2000; // the (slower) fluid zoom through the warm window
 
 // a swipe means "travel the way you swiped" — turn your head across the world
 // (THE-LIGHTHOUSE.md): left → west/garden, right → east/docks, up → rise the
@@ -149,28 +149,18 @@ export function WorldShell({
 
   const ease = reduced ? "none" : "transform 560ms cubic-bezier(0.33, 1, 0.68, 1)";
 
-  // ── the materialize: hold on the whole world, then push in to the hearth ──
+  // ── the materialize: the whole world as a gate; tapping "begin" pushes in ──
   const [phase, setPhase] = useState<Phase>("overview");
 
-  useEffect(() => {
-    // reduced-motion skips straight in; otherwise hold, then begin the push-in
-    const t = setTimeout(
-      () =>
-        setPhase((p) =>
-          p === "overview" ? (reduced ? "live" : "entering") : p,
-        ),
-      reduced ? 0 : HOLD_MS,
-    );
-    return () => clearTimeout(t);
-  }, [reduced]);
-
+  // no auto-enter — the gate is a threshold you choose to cross
   useEffect(() => {
     if (phase !== "entering") return;
     const t = setTimeout(() => setPhase("live"), ZOOM_MS);
     return () => clearTimeout(t);
   }, [phase]);
 
-  const enter = () => setPhase((p) => (p === "overview" ? "entering" : p));
+  const enter = () =>
+    setPhase((p) => (p !== "overview" ? p : reduced ? "live" : "entering"));
 
   const sealHtml = useMemo(() => composeSeal(spec, { ground: "none" }), [spec]);
 
@@ -471,19 +461,26 @@ export function WorldShell({
           className={`world-coldopen${phase === "entering" ? " entering" : ""}`}
           onClick={enter}
           role={phase === "overview" ? "button" : undefined}
-          aria-label={phase === "overview" ? "Enter the lighthouse" : undefined}
+          aria-label={
+            phase === "overview" ? "Begin — enter the lighthouse" : undefined
+          }
         >
           <svg
             className="world-scene"
             viewBox={`0 0 ${OVERVIEW_VIEWBOX.width} ${OVERVIEW_VIEWBOX.height}`}
             preserveAspectRatio="xMidYMid meet"
             role="img"
-            aria-label="The whole world from afar: an island in a dark sea, the lighthouse rising with its lamp lit, a garden to the west, the docks and far shore to the east."
+            aria-label="The whole world from afar: the island in a dark sea, the lighthouse rising with its lamp lit, a garden to the west, the docks to the east, a far-off island on the horizon, and the stars strung into constellations."
           >
             <OverviewScene />
           </svg>
+          <div className="world-wordmark" aria-hidden>
+            <span>Signed</span>
+            <span className="world-wordmark-x">✕</span>
+            <span>Sealed</span>
+          </div>
           {phase === "overview" ? (
-            <span className="world-enter">enter</span>
+            <span className="world-begin">begin</span>
           ) : null}
         </div>
       ) : null}
