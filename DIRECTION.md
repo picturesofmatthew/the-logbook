@@ -2,6 +2,8 @@
 > `THE-SIGIL-TURN.md` — the **sigil is the hero**; the creatures (the familiar included) are demoted
 > to a quiet bonus. For art direction, **`art/ART-BIBLE.md` is now the single source of truth**. Kept
 > here for its research foundation, palette, and roster detail — but read those two first.
+> The **world/spatial** frame is now **`THE-LIGHTHOUSE.md`** (2026-07-22): the app is a lighthouse on
+> an island — the Glade becomes the **west garden**, a wing, not the home.
 
 # Inklight — Art Direction & Overhaul Plan (v3)
 

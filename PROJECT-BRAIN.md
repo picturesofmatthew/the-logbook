@@ -1,10 +1,15 @@
 # Signed × Sealed — Project Brain
 
 *The orientation index + current state + decision log. Read this FIRST on any cold start, then follow
-the doc map. Last updated 2026-07-21.*
+the doc map. Last updated 2026-07-22.*
 
 ## Status snapshot
 
+- **⚡ Update 2026-07-22 — voice shipped + a new world canon.** "Speak your day" voice logging is live
+  in prod; the B2–B4 cutover is deployed (DB clean-wiped, awaiting first signup). And the world has
+  been re-centered: **`THE-LIGHTHOUSE.md`** is the new canon — the app is a **lighthouse on an island**
+  (garden west, library up the stair, docks + far shore east; the cast rises to the lamp). See the doc
+  map + the 2026-07-22 decision log.
 - **Act One is LIVE** — a deployed Next.js 16 + Neon PWA at signedxsealed.com (serving from the
   `inklight-v1-polish` branch, prod on Vercel). The core loop works today on real phones: the
   two-keeper seal composing from both users' data, the full sigil engine (chords/tiers/legendaries),
@@ -48,6 +53,7 @@ stranded). Then the **boat-to-Kauai Phase 0** + a 30-day both-of-you retention t
 | Doc | What it is |
 |---|---|
 | **PROJECT-BRAIN.md** (this) | Orientation, state, decision log, doc map. Read first. |
+| **THE-LIGHTHOUSE.md** | **The world canon (2026-07-22).** The app is a lighthouse on an island — spatial architecture (garden/hearth/docks + tower), the cast cinematics, the archipelago, the three discipline lines. Read for the world/experience. |
 | **ROADMAP.md** | The phased build plan (Foundation → Art/UI → Coffers → Multi-user v1) — "what we're building, in what order." |
 | **SIGIL-HANDOFF.md** | The developed seal: its grammar, the swappable parts registry (`components/sigil/glyphs.ts`), and what's next. **Read to continue the sigil/art work.** |
 | **THE-SIGIL-TURN.md** | The current thesis: sigil-as-spell, the emblem ladder, the four books, creatures demoted to a summoned bonus. |
@@ -62,6 +68,21 @@ stranded). Then the **boat-to-Kauai Phase 0** + a 30-day both-of-you retention t
 | **lib/engine/sigil.ts** | The registry-driven sigil engine — adding a chord/legendary is one entry. |
 | **NEXT-SESSION.md** | Art tooling = resolved; **macro/calorie estimation logic is still open.** |
 | **CLAUDE.md** | Standing briefing + Quick Resume (points here). |
+
+## Decision log — 2026-07-22
+
+1. **Voice logging shipped** — "speak your day" (transcript → `parseDayDictation` → editable review →
+   `commitVoiceDay`) + an ephemeral partner-playable voice note (`voice_notes`, encrypted, couple-day
+   expiry). Deployed to prod on `main`; the B2–B4 cutover was already live, DB clean/empty awaiting
+   first signup. (Memory: `voice-logging-shipped`.)
+2. **The Lighthouse world canon** (`THE-LIGHTHOUSE.md`) — the app becomes one inhabited place: a
+   lighthouse on an island. Horizontal (swipe): Garden ← Hearth Hall → Docks + far shore. Vertical
+   (rise): Hearth → Library/Compendium → Lamp; the cast rises to the lamp and the beam reaches the
+   shore. Archipelago = private islands, shared heavens. The "museum" retires → the **Apothecary**,
+   one shelf of **five** books. Three discipline lines: game-*feel* not game-*scope*; the current web
+   stack, **NOT** the parked native rewrite; the spectacle stays *earned*.
+3. **Next** — a Fable-subagent implementation plan for the world's graphics (sigil-level, then polish),
+   architecting the Library/Compendium + Glade/Garden + Docks/ship (coffers-linked) alongside.
 
 ## Decision log — this session (2026-07-20 → 21)
 

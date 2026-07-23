@@ -97,6 +97,10 @@ Consequence of the magic, not a parallel toy.
 
 ## The four books — a shelf you keep
 
+> **Evolved 2026-07-22 by `THE-LIGHTHOUSE.md`** — the books are now **five**, and they live **up the
+> stairs in the Library** of the Lighthouse; the *hearth hall* is home, not the shelf. The human/arcane
+> split below still holds; the count and location changed.
+
 Navigation becomes **diegetic** (design law #4): a shelf of books; tap a spine to open. Keep the
 **shelf as home**; the open-flip is quick and **skippable after the first time** (it must not become
 a chore on a phone checked daily).

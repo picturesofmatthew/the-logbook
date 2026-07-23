@@ -24,7 +24,8 @@ fills beneath. Coarse cross-hatching only sparingly for shadow.
    only where they meet** (the union bloom, resonant/legendary illumination, the night sky). Never
    structural, never in day chrome.
 4. **Frames are diegetic** — windows, archways, the runic ring, the book's ornate borders, the shelf
-   of four books.
+   of five books — all now set within the **Lighthouse** world (`THE-LIGHTHOUSE.md`): the hearth-hall,
+   the tower, the island under a shared sky.
 5. **The world states the score wordlessly.** Growth blooms; lapses hush, never rot. No red numbers,
    ever. A hushed Glade is winter, not death. Over-target draws the *thickest* ring, celebrated.
 6. **Rituals are inscribed** — drawn, not tallied; child-simple gestures.
