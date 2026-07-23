@@ -1090,10 +1090,15 @@ html[data-light="night"] .glade-day-only {
   filter: drop-shadow(0 2px 18px rgba(217, 164, 65, 0.4));
 }
 .world-wordmark-x {
-  font-size: 0.72em;
+  font-size: 0.82em;
   font-style: normal;
-  transform: translateY(-0.05em) rotate(-8deg);
-  opacity: 0.92;
+  /* its own gilt fill: the rotate lifts it out of the parent's gradient-text
+     clip, so it must carry its own color or it paints transparent (invisible) */
+  color: #e3b76a;
+  -webkit-text-fill-color: #e3b76a;
+  transform: translateY(-0.04em) rotate(-8deg);
+  opacity: 0.95;
+  filter: drop-shadow(0 1px 10px rgba(217, 164, 65, 0.5));
 }
 /* the invitation, breathing at the foot of the vista */
 .world-begin {
