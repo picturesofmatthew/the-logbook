@@ -5,6 +5,8 @@ import { PartnerGlance } from "@/components/journal/partner-glance";
 import { TrainLog } from "@/components/journal/train-log";
 import { TodayRune } from "@/components/shell/rune-icons";
 import { partnerSlot, requireBond } from "@/lib/bond";
+import { getVoiceNoteForDay } from "@/app/voice/actions";
+import { VoiceNotePlayer } from "@/components/journal/voice-note-player";
 import {
   getAllSpecimens,
   getDayExtras,
@@ -45,6 +47,10 @@ export default async function TodayPage({
   const [dayWorkouts, histories] = await Promise.all([
     getWorkoutsForDay(bondId, day),
     getExerciseHistories(bondId, day),
+  ]);
+  const [ownNote, partnerNote] = await Promise.all([
+    getVoiceNoteForDay({ day, which: "self" }),
+    getVoiceNoteForDay({ day, which: "partner" }),
   ]);
 
   const ownMarks = newMarks(
@@ -107,6 +113,15 @@ export default async function TodayPage({
           specimens={specimens}
           recents={recents}
         />
+        {ownNote ? (
+          <div className="mt-3 border-t-2 border-dashed border-ink/15 pt-3">
+            <VoiceNotePlayer
+              dataUri={ownNote.dataUri}
+              downloadName={`voice-note-${day}.webm`}
+              mine
+            />
+          </div>
+        ) : null}
       </div>
       <PartnerGlance
         displayName={members[partner]?.displayName ?? "Your partner"}
@@ -114,6 +129,7 @@ export default async function TodayPage({
         target={journal[partner].target}
         mood={extras.meta[partner].mood}
         note={extras.meta[partner].note}
+        voiceNoteUri={partnerNote?.dataUri ?? null}
       />
 
       <DailyRituals

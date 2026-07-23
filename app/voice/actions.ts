@@ -53,6 +53,7 @@ export async function saveVoiceNote(input: {
   if (input.durationS != null && input.durationS > VOICE_MAX_DURATION_S) {
     return { error: "Keep the note under 30 seconds." };
   }
+  const today = await todayIso();
   return safely(async () => {
     const audio = encrypt(input.audioBase64);
     const transcript = encryptOrNull(input.transcript ?? null);
@@ -66,6 +67,11 @@ export async function saveVoiceNote(input: {
         // Re-recording replaces the note (createdAt bumps to the new take).
         set: { audio, mime: input.mime, transcript, durationS, createdAt: new Date() },
       });
+    // Reap on write, so the read path (a page render) stays side-effect-free:
+    // anything past the window is erased into the night — no cron.
+    await db
+      .delete(voiceNotes)
+      .where(and(eq(voiceNotes.bondId, bondId), lt(voiceNotes.day, voiceNoteLiveCutoff(today))));
     revalidatePath("/");
     revalidatePath("/today");
     return {};
@@ -83,22 +89,19 @@ export async function getVoiceNoteForDay(input: {
   day: string;
   which: "self" | "partner";
 }): Promise<VoiceNoteView | null> {
-  const { bondId, viewerSlot, members } = await requireBond();
+  const { viewerSlot, members } = await requireBond();
   if (!validDay(input.day)) return null;
   const targetSlot = input.which === "partner" ? partnerSlot(viewerSlot) : viewerSlot;
   const target = members[targetSlot];
   if (!target) return null;
 
   const today = await todayIso();
-  // Lazy reap: anything past the window is erased into the night (no cron).
-  await db
-    .delete(voiceNotes)
-    .where(and(eq(voiceNotes.bondId, bondId), lt(voiceNotes.day, voiceNoteLiveCutoff(today))));
-
   const [row] = await db
     .select()
     .from(voiceNotes)
     .where(and(eq(voiceNotes.profileId, target.id), eq(voiceNotes.day, input.day)));
+  // Read-only: a past-window note reads as gone; the hard delete happens on the
+  // next write (saveVoiceNote), so a page render never mutates.
   if (!row || !voiceNoteIsLive(row.day, today)) return null;
 
   const audioB64 = decrypt(row.audio);

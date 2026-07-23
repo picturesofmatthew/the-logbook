@@ -26,9 +26,10 @@ type Estimate = {
 import { inscribeTick, logChime, ritualChime } from "@/lib/sounds";
 import { EatGlyph, MealGlyph, WorkoutGlyph } from "@/components/glyphs";
 import { PantryRune, QuillRune } from "@/components/shell/rune-icons";
+import { VoicePane } from "./voice-pane";
 import { useShell } from "./shell-provider";
 
-type Pane = "eat" | "train";
+type Pane = "voice" | "eat" | "train";
 type CaptureData = {
   day: string;
   recents: Specimen[];
@@ -65,7 +66,7 @@ export function CaptureSheet() {
   const { captureOpen, preselectMeal, closeCapture } = useShell();
   const router = useRouter();
 
-  const [pane, setPane] = useState<Pane>("eat");
+  const [pane, setPane] = useState<Pane>("voice");
   const [data, setData] = useState<CaptureData | null>(null);
   const [meal, setMeal] = useState<Meal>(() => mealForHour(new Date().getHours()));
   const [prevOpen, setPrevOpen] = useState(false);
@@ -240,6 +241,17 @@ export function CaptureSheet() {
         <div className="mb-4 flex gap-2">
           <button
             type="button"
+            onClick={() => setPane("voice")}
+            className={`${seg} wobbly-sm ${
+              pane === "voice"
+                ? "border-moss-deep bg-moss-deep text-cream"
+                : "border-ink/20 bg-cream text-ink-soft"
+            }`}
+          >
+            <span aria-hidden>🎙</span> speak
+          </button>
+          <button
+            type="button"
             onClick={() => setPane("eat")}
             className={`${seg} wobbly-sm ${
               pane === "eat"
@@ -262,7 +274,14 @@ export function CaptureSheet() {
           </button>
         </div>
 
-        {pane === "eat" ? (
+        {pane === "voice" ? (
+          <VoicePane
+            day={data?.day ?? null}
+            active={captureOpen}
+            flash={flash}
+            onClose={closeCapture}
+          />
+        ) : pane === "eat" ? (
           <div className="flex flex-col gap-3">
             <div className="flex gap-1.5">
               {MEALS.map((m) => (

@@ -2,6 +2,7 @@ import { MoodFace } from "@/components/glyphs";
 import { totalOf } from "@/lib/engine/totals";
 import type { JournalEntry, Target } from "@/lib/meals";
 import { MacroBars } from "./macro-bars";
+import { VoiceNotePlayer } from "./voice-note-player";
 
 // The partner's day, at a glance — read-only, beneath your own full ledger.
 // Their macros, their mood, their one line; never the crammed meal column.
@@ -11,12 +12,14 @@ export function PartnerGlance({
   target,
   mood,
   note,
+  voiceNoteUri,
 }: {
   displayName: string;
   entries: JournalEntry[];
   target: Target;
   mood?: string | null;
   note?: string | null;
+  voiceNoteUri?: string | null;
 }) {
   const total = totalOf(
     entries.map((e) => ({ ...e.food, servings: e.servings })),
@@ -48,6 +51,13 @@ export function PartnerGlance({
           still an open page today
         </p>
       )}
+
+      {voiceNoteUri ? (
+        <VoiceNotePlayer
+          dataUri={voiceNoteUri}
+          downloadName={`${displayName.toLowerCase()}-voice-note.webm`}
+        />
+      ) : null}
     </section>
   );
 }
