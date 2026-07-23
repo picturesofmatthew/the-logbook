@@ -1860,3 +1860,132 @@ html[data-light="night"] .glade-day-only {
     transform: none;
   }
 }
+
+/* ── The Lantern room — its bespoke motion (art/proto/lantern-lamp.html) ──
+   The top of the tower: the one room where the light is truly alive. The great
+   lamp breathes and its halo pulses; when the day is sealed the BEAM sways as
+   slow as a turning lens and its lance shimmers on the far shore; the clockwork
+   glints cross the lens drum; the library's light breathes up through the stair
+   hatch; the small KINDLED icon on the watches plate keeps its little hope; the
+   stars twinkle. Everything else holds still (BRAND-BIBLE §9). Names are ln-* so
+   they never collide with the other rooms drawn into the shell's one shared svg. */
+.ln-breathe {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: ln-breathe 4.4s ease-in-out infinite;
+}
+@keyframes ln-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.018);
+  }
+}
+.ln-halo {
+  animation: ln-halopulse 4.4s ease-in-out infinite;
+}
+@keyframes ln-halopulse {
+  0%,
+  100% {
+    opacity: 0.82;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+/* the beam holds on the shore; it sways only as much as a turning lens breathes */
+.ln-beam-sway {
+  transform-box: fill-box;
+  transform-origin: 0% 50%;
+  animation: ln-beamsway 9s ease-in-out infinite;
+}
+@keyframes ln-beamsway {
+  0%,
+  100% {
+    transform: rotate(-0.7deg);
+  }
+  50% {
+    transform: rotate(0.7deg);
+  }
+}
+.ln-beam-shim {
+  animation: ln-beamshim 7s ease-in-out infinite;
+}
+@keyframes ln-beamshim {
+  0%,
+  100% {
+    opacity: 0.85;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+/* the lens turning: glints crossing the drum, slow as clockwork */
+.ln-glint {
+  animation: ln-glinta 5.2s ease-in-out infinite;
+}
+.ln-glint2 {
+  animation-delay: -2.6s;
+}
+@keyframes ln-glinta {
+  0%,
+  100% {
+    opacity: 0.05;
+  }
+  50% {
+    opacity: 0.17;
+  }
+}
+/* the library's light rising through the hatch; the spell's path up the spine */
+.ln-hatchbreath {
+  animation: ln-breathup 4.4s ease-in-out infinite;
+}
+@keyframes ln-breathup {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+/* the KINDLED vignette on the watches plate keeps its small hope */
+.ln-kindle {
+  animation: ln-kindleshim 5.6s ease-in-out infinite;
+}
+@keyframes ln-kindleshim {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+.ln-twinkle {
+  animation: ln-star 7s ease-in-out infinite;
+}
+@keyframes ln-star {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+/* stillness for those who ask for it */
+@media (prefers-reduced-motion: reduce) {
+  .ln-breathe,
+  .ln-halo,
+  .ln-beam-sway,
+  .ln-beam-shim,
+  .ln-glint,
+  .ln-hatchbreath,
+  .ln-kindle,
+  .ln-twinkle {
+    animation: none;
+  }
+}
