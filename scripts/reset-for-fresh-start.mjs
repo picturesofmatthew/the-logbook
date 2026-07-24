@@ -26,6 +26,7 @@ const sql = neon(process.env.DATABASE_URL);
 await sql`DELETE FROM sessions`;
 await sql`DELETE FROM invites`;
 await sql`DELETE FROM entries`;
+await sql`DELETE FROM voice_notes`;
 await sql`DELETE FROM weigh_ins`;
 await sql`DELETE FROM day_meta`;
 await sql`DELETE FROM targets`;

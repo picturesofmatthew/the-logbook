@@ -106,8 +106,9 @@ live app, not just the parked native build.*
 - **Per-chord specific connections** — bind each chord to the *specific* signs it aligned (Same-Table
   links the shared food; the Mirror draws a true reflection), replacing the density-by-count weave.
   Needs the engine to pass which halls each chord relates to.
-- **Bespoke legendary cores/frames** — each of the 10 legendaries earns its *own* face (they share the
-  5 nature-cores today). One module per legendary in the registry.
+- ~~**Bespoke legendary cores/frames**~~ — **DONE** (verified 2026-07-24): `LEGENDARY_FACES` in
+  `components/sigil/glyphs.ts` gives all 10 legendaries their own emblem + color cast; the 5
+  nature-cores now only serve non-legendary days.
 - **Wire the latent signals into `SigilSpec`** — absolute **time-of-day** (`lib/light.ts` exists),
   **day-of-week** (unused), a **long-distance / tz chord** (dead-on for the beachhead; tz plumbing
   exists, no chord yet), and expose **mood / moon / water** directly instead of deriving them.
