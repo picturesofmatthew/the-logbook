@@ -1,12 +1,12 @@
-import { ArrivalCeremony } from "@/components/glade/arrival-ceremony";
 import { LegendaryCeremony } from "@/components/sigil/legendary-ceremony";
 import { SealCeremony } from "@/components/sigil/seal-ceremony";
 import { ShoreArrivalCeremony } from "@/components/sigil/shore-arrival-ceremony";
+import { KeeperArrivalCeremony } from "@/components/world/keeper-arrival-ceremony";
 import { WorldShell } from "@/components/world/world-shell";
-import { requireBond, SLOTS, type Slot } from "@/lib/bond";
+import { partnerSlot, requireBond, SLOTS, type Slot } from "@/lib/bond";
+import { revealSealedWord } from "@/lib/sealed-word";
 import {
   getAllSpecimens,
-  getArrivals,
   getDayExtras,
   getDiscoveries,
   getExerciseHistories,
@@ -17,10 +17,9 @@ import {
   getWorkoutsForDay,
   keeperDayFromDay,
   reachShore,
-  recordArrival,
   recordLegendary,
 } from "@/lib/data";
-import { diffDays, todayIso } from "@/lib/dates";
+import { coupleDayOf, diffDays, inNightGrace, todayIso } from "@/lib/dates";
 import { getGladeState } from "@/lib/ledger";
 import { BEINGS, paleElkGlimpsed } from "@/lib/engine/beings";
 import { stageForDays } from "@/lib/engine/familiar";
@@ -48,14 +47,12 @@ export default async function Home() {
     getExerciseHistories(bondId, day),
     getGladeState(bondId, today),
   ]);
-  const [familiarState, discoveries, arrivals, specimens, shores] =
-    await Promise.all([
-      getFamiliarState(bondId, today),
-      getDiscoveries(bondId),
-      getArrivals(bondId),
-      getAllSpecimens(),
-      getReachedShores(bondId),
-    ]);
+  const [familiarState, discoveries, specimens, shores] = await Promise.all([
+    getFamiliarState(bondId, today),
+    getDiscoveries(bondId),
+    getAllSpecimens(),
+    getReachedShores(bondId),
+  ]);
 
   const dayData = {
     journal,
@@ -77,17 +74,24 @@ export default async function Home() {
     await recordLegendary(bondId, sigil.legendary, day);
     discoveries.set(sigil.legendary, day);
   }
-  for (const b of glade.beings.filter((b) => b.arrived && !arrivals.has(b.id))) {
-    await recordArrival(bondId, b.id, today);
-    arrivals.set(b.id, today);
-  }
+  // (Beings record nothing: their arrival day is derived from the ledger —
+  // lib/engine/beings `arrivedOn`. The Pale Elk is a live glimpse, never kept.)
   const paleElk = paleElkGlimpsed({
     gladeTier: glade.tier,
     daysSinceLegendary: glade.lastLegendaryDay
       ? diffDays(today, glade.lastLegendaryDay)
       : null,
   });
-  if (paleElk) await recordArrival(bondId, "pale-elk", today);
+  // The second keeper's arrival — the day the letter is answered. Greeted once
+  // per device (the component's own gate) and only on the couple-day they took
+  // the slot, so a long-whole book never greets anyone.
+  const newKeeper =
+    members.ember &&
+    !members.ember.leftAt &&
+    coupleDayOf(members.ember.createdAt) === today
+      ? members.ember
+      : null;
+
   const reachingNow =
     glade.boat?.complete === true &&
     glade.dream != null &&
@@ -100,9 +104,6 @@ export default async function Home() {
     sigil.legendary && discoveries.get(sigil.legendary) === today
       ? sigil.legendary
       : null;
-  const beingArrivedToday =
-    glade.beings.find((b) => b.arrived && arrivals.get(b.id) === today)?.id ??
-    null;
   const shoreReachedToday =
     !!glade.dream &&
     glade.boat?.complete === true &&
@@ -123,6 +124,17 @@ export default async function Home() {
         ? "you closed the ring"
         : `${members[closer]?.displayName ?? ""} closed the ring`;
 
+  // The Sealed Word your keeper pressed today — it opens only now that the ring
+  // has closed (the reveal law: lib/sealed-word). Withheld words never leave the
+  // server, so there is nothing in the payload to peek at.
+  const theirSlot = partnerSlot(viewerSlot);
+  const sealedWord = revealSealedWord({
+    word: extras.meta[theirSlot].sealedWord,
+    own: false,
+    sealed: sigil.completed,
+  });
+  const sealedWordFrom = members[theirSlot]?.displayName ?? null;
+
   // ── The standing line — warm, viewer-aware, never a scold. ──
   const notLogged = SLOTS.filter((slot) => journal[slot].entries.length === 0);
   const missingName =
@@ -136,13 +148,19 @@ export default async function Home() {
   const keptName = sigil.moss.inked
     ? (members.moss?.displayName ?? "")
     : (members.ember?.displayName ?? "");
+  // Past midnight, inside the patient day's grace hours: say so, or the extra
+  // time is a secret and a keeper who thinks the day is gone won't reach for it.
+  const nightGrace = !sigil.completed && (await inNightGrace());
+  const openLine = soloKept
+    ? viewerKept
+      ? `your half is kept — ${missingName} closes the ring`
+      : `${keptName} kept their half — your hand closes it`
+    : "an open page, still to keep together";
   const standingLine = sigil.completed
     ? "the day is sealed — the light is yours to keep, together"
-    : soloKept
-      ? viewerKept
-        ? `your half is kept — ${missingName} closes the ring`
-        : `${keptName} kept their half — your hand closes it`
-      : "an open page, still to keep together";
+    : nightGrace
+      ? `past midnight, and the day is still open — ${openLine}`
+      : openLine;
 
   // ── The five books' live gold-vs-silver progress (the Library room). ──
   const library = {
@@ -208,9 +226,20 @@ export default async function Home() {
         needsKeeper={!members.ember}
       />
 
+      {/* the letter, answered — the rarest overlay of all: it happens once per
+          book. It owns the night it lands (the seal ceremony stands down). */}
+      {newKeeper ? (
+        <KeeperArrivalCeremony
+          keeperId={newKeeper.id}
+          name={newKeeper.displayName}
+          character={newKeeper.character}
+          viewerIsThem={viewerSlot === "ember"}
+        />
+      ) : null}
+
       {/* the completion ceremonies — overlays that fire over the world, grandest
-          first (shore > legendary > being > seal); a grander one suppresses the
-          rest for the night. Each then gates itself once-per-device. */}
+          first (shore > legendary > seal); a grander one suppresses the rest for
+          the night. Each then gates itself once-per-device. */}
       {shoreReachedToday && glade.dream ? (
         <ShoreArrivalCeremony dreamName={glade.dream.name} day={today} />
       ) : null}
@@ -224,21 +253,18 @@ export default async function Home() {
           remaining={glade.boat?.remaining}
         />
       ) : null}
-      {!shoreReachedToday && !legendaryToday && beingArrivedToday ? (
-        <ArrivalCeremony being={beingArrivedToday} day={today} />
-      ) : null}
       {sigil.completed ? (
         <SealCeremony
           spec={sigil}
           day={day}
           closerLine={closerLine}
           sealedCount={familiarState.lifetimeDays}
-          suppressed={
-            shoreReachedToday || !!legendaryToday || !!beingArrivedToday
-          }
+          suppressed={shoreReachedToday || !!legendaryToday || !!newKeeper}
           dreamName={glade.dream?.name}
           planksLaid={glade.boat?.planksLaid}
           remaining={glade.boat?.remaining}
+          word={sealedWord}
+          wordFrom={sealedWordFrom}
         />
       ) : null}
     </>

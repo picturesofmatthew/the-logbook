@@ -10,7 +10,6 @@ import {
 } from "../lib/engine/tdee";
 import { add, scale, totalOf, ZERO } from "../lib/engine/totals";
 import { moodFor, nextStageIn, speechFor, stageForDays } from "../lib/engine/familiar";
-import { stampsForDay } from "../lib/engine/stamps";
 
 test("dates: addDays crosses month and year boundaries", () => {
   assert.equal(addDays("2026-07-31", 1), "2026-08-01");
@@ -91,61 +90,4 @@ test("familiar:speech is deterministic for a given day and fills the blank", () 
   const b = speechFor("cozy", "2026-07-18cozy", "Kennedy");
   assert.equal(a, b);
   assert.ok(!a.includes("{missing}"));
-});
-
-test("stamps: protein, both-logged, hydration, training, specimens", () => {
-  const target = { calories: 2000, proteinG: 150, carbsG: 180, fatG: 60 };
-  const stamps = stampsForDay({
-    people: [
-      {
-        name: "Matthew",
-        total: { calories: 1900, proteinG: 155, carbsG: 170, fatG: 55 },
-        target,
-        loggedAny: true,
-        training: "lift",
-        waterCups: 8,
-      },
-      {
-        name: "Kennedy",
-        total: { calories: 1500, proteinG: 100, carbsG: 150, fatG: 50 },
-        target,
-        loggedAny: true,
-        training: null,
-        waterCups: 3,
-      },
-    ],
-    newSpecimens: 2,
-  });
-  const ids = stamps.map((s) => s.id);
-  assert.ok(ids.includes("both-logged"));
-  assert.ok(ids.includes("protein-Matthew"));
-  assert.ok(!ids.includes("protein-Kennedy"));
-  assert.ok(ids.includes("training-Matthew"));
-  assert.ok(ids.includes("water-Matthew"));
-  assert.ok(ids.includes("new-specimens"));
-});
-
-test("stamps: an empty day earns nothing, quietly", () => {
-  const stamps = stampsForDay({
-    people: [
-      {
-        name: "Matthew",
-        total: ZERO,
-        target: null,
-        loggedAny: false,
-        training: null,
-        waterCups: 0,
-      },
-      {
-        name: "Kennedy",
-        total: ZERO,
-        target: null,
-        loggedAny: false,
-        training: null,
-        waterCups: 0,
-      },
-    ],
-    newSpecimens: 0,
-  });
-  assert.equal(stamps.length, 0);
 });

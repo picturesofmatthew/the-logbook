@@ -19,11 +19,18 @@ in-app today:
   day **logged at the hearth**; the **lamp lit by the live spell**; the four completion ceremonies; the
   library's five books + reached-shores mantel; the docks vessel + far shore; the Garden's living glade
   (the old home's glade, relocated).
-- **Canon-only (not yet built):** the **ornate hero art** (today's rooms are v1 CSS/SVG, not the painterly
-  `hearth-hall.html` bar); the full **cast cinematic** (the two keepers rising to the lamp, beam sweeping the
-  shore); **in-world book/vessel interiors** (they route OUT to sub-pages today, breaking immersion); the
-  **archipelago** (private islands, shared heavens); a world-wide **day/night cycle** (only the Garden rides
-  the light-script now).
+- **Canon-only / still-pending (updated 2026-07-24):** the **painterly hero masters** — the four island
+  rooms (Library · Lantern · Docks · Garden) since shipped **ornate procedural-SVG hero art** (Fable proto
+  → hand port, World Engine 12–14), so the *ornate* bar is met; what's still canon-only is the
+  hand-painted/raster master pass **beyond** procedural SVG (the hearth is still v1 against
+  `hearth-hall.html`). The **in-world book/vessel interiors** are **cut back to the real pages**
+  (2026-07-24, the atoms audit): the v1 title-page overlay was a stub nobody read that added a tap on
+  the way to the actual book, so a room hotspot now opens `/book`, `/library#…`, `/trends`, `/shore`
+  directly. The "interior opens in place" pattern returns when a **deep, rereadable** spread exists to
+  put in it (frozen until a paying couple says the world is why they stay). Also pending: the full
+  **cast cinematic** (the two keepers rising to the lamp, beam sweeping the shore); the **archipelago**
+  (private islands, shared heavens); a world-wide **day/night cycle** (only the Garden rides the
+  light-script now).
 
 Everything below is the target; iterate the built world toward it.
 
@@ -190,6 +197,12 @@ island** — private, intimate, two-player, the way it must be. But all keepers 
 sky** — the same constellations of legendaries not yet struck, the same sea, the same far stars to
 steer by. The **shared canon** (all possible foods, beings, legendaries) is the heavens; your lived
 pages are your island's own illumination. Everyone taps into one world; no one reads your diary.
+
+**The lamp makes this archipelago *inhabited* → `THE-BEACON.md` (canon, 2026-07-24).** From the lamp
+you can aim your beam across the water to a neighbor bond's island and send them light (encouragement
+now — a being to their glade, only on days you kept your own; a money pledge toward their Dream,
+later). You send warmth, never entry: still private islands, shared heavens. This is the Lantern's
+future verb and the social organ of the app — catalogued now, built later.
 
 ## Nothing is thrown away — how it maps to what exists
 

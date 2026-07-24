@@ -10,14 +10,10 @@ import { LibraryRune, PantryRune, BestiaryRune } from "@/components/shell/rune-i
 import { StarMark } from "@/components/glyphs";
 import { GiltHeading } from "@/components/shell/plate";
 import { requireBond, SLOTS, type Slot } from "@/lib/bond";
-import {
-  getAllSpecimens,
-  getArrivals,
-  getDiscoveries,
-} from "@/lib/data";
-import { currentTz, friendlyDate, todayIso } from "@/lib/dates";
+import { getAllSpecimens, getDiscoveries } from "@/lib/data";
+import { currentTz, diffDays, friendlyDate, todayIso } from "@/lib/dates";
 import { HALLS } from "@/lib/halls";
-import { BEINGS } from "@/lib/engine/beings";
+import { BEINGS, paleElkGlimpsed } from "@/lib/engine/beings";
 import { LEGENDARIES, type LegendaryId, type SigilSpec } from "@/lib/engine/sigil";
 import { getGladeState } from "@/lib/ledger";
 
@@ -51,10 +47,9 @@ export default async function LibraryPage() {
   const today = await todayIso();
   const tz = await currentTz();
 
-  const [specimens, glade, arrivals, discoveries] = await Promise.all([
+  const [specimens, glade, discoveries] = await Promise.all([
     getAllSpecimens(),
     getGladeState(bondId, today),
-    getArrivals(bondId),
     getDiscoveries(bondId),
   ]);
 
@@ -100,7 +95,14 @@ export default async function LibraryPage() {
   // ── Bestiary ──
   const beingById = new Map(glade.beings.map((b) => [b.id, b]));
   const arrivedCount = glade.beings.filter((b) => b.arrived).length;
-  const elkGlimpsedOn = arrivals.get("pale-elk");
+  // The Pale Elk is a live glimpse, not a record — it shows while the glade is
+  // radiant in a legendary's wake, and is gone again after. It did not stay.
+  const elkGlimpsed = paleElkGlimpsed({
+    gladeTier: glade.tier,
+    daysSinceLegendary: glade.lastLegendaryDay
+      ? diffDays(today, glade.lastLegendaryDay)
+      : null,
+  });
 
   // The section-jump — a live table of contents for the one book.
   const sections = [
@@ -205,7 +207,7 @@ export default async function LibraryPage() {
           {BEINGS.map((def) => {
             const state = beingById.get(def.id);
             const stage = state?.stage ?? 0;
-            const arrivedOn = arrivals.get(def.id);
+            const arrivedOn = state?.arrivedOn ?? null;
             return stage >= 1 ? (
               <div
                 key={def.id}
@@ -254,15 +256,14 @@ export default async function LibraryPage() {
               </div>
             );
           })}
-          {elkGlimpsedOn ? (
+          {elkGlimpsed ? (
             <div className="wobbly-sm lantern-pool col-span-2 flex flex-col items-center border-2 border-violet/50 bg-cream/70 p-3 text-center shadow-card">
               <BeingPortrait being="pale-elk" />
               <p className="mt-1 font-display text-[10px] capitalize leading-tight text-violet">
                 the Pale Elk
               </p>
               <p className="mt-0.5 text-[10px] italic leading-tight text-ink-soft">
-                Glimpsed {friendlyDate(elkGlimpsedOn, tz)}. It did not stay. They
-                never do.
+                Glimpsed at the wood’s edge. It will not stay. They never do.
               </p>
             </div>
           ) : null}

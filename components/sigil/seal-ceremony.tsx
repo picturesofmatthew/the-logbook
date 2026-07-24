@@ -58,6 +58,8 @@ export function SealCeremony({
   dreamName,
   planksLaid,
   remaining,
+  word,
+  wordFrom,
 }: {
   spec: SigilSpec;
   day: string;
@@ -68,6 +70,10 @@ export function SealCeremony({
   dreamName?: string;
   planksLaid?: number | null;
   remaining?: number | null;
+  // The Sealed Word your keeper pressed today — the third beat. The parent
+  // hands it over only once the ring has closed (lib/sealed-word).
+  word?: string | null;
+  wordFrom?: string | null;
 }) {
   const [stage, setStage] = useState<"hidden" | "shown" | "fading">("hidden");
   const milestone = sealedCount != null ? MILESTONES[sealedCount] : undefined;
@@ -147,6 +153,18 @@ export function SealCeremony({
             remaining={remaining}
             golden={spec.tier === "legendary" || spec.tier === "resonant"}
           />
+          {word ? (
+            <div className="mt-3 border-t border-dashed border-violet/40 pt-2">
+              <p className="font-display text-[10px] tracking-widest text-violet">
+                {wordFrom
+                  ? `${wordFrom.toLowerCase()} pressed a word`
+                  : "a word was pressed"}
+              </p>
+              <p className="mt-1 text-sm italic leading-snug text-ink">
+                “{word}”
+              </p>
+            </div>
+          ) : null}
           <p className="mt-3 text-xs italic text-ink-soft">
             another page kept, together
           </p>

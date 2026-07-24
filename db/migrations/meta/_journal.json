@@ -78,6 +78,13 @@
       "when": 1784775087867,
       "tag": "0010_fuzzy_gunslinger",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1784921867204,
+      "tag": "0011_sealed_word_and_cold_open",
+      "breakpoints": true
     }
   ]
 }

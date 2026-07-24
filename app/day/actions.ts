@@ -6,6 +6,7 @@ import { dayMeta, weighIns } from "@/db/schema";
 import { LEDGER_TAG } from "@/lib/cache-tags";
 import { encrypt, encryptOrNull } from "@/lib/crypto";
 import { safely } from "@/lib/safe";
+import { trimSealedWord } from "@/lib/sealed-word";
 import { todayIso } from "@/lib/dates";
 import { currentUser } from "@/lib/session";
 
@@ -28,6 +29,7 @@ async function upsertMeta(
     waterCups: number;
     note: string | null;
     mood: string | null;
+    sealedWord: string | null;
   }>,
 ) {
   await db
@@ -118,6 +120,28 @@ export async function setMood(input: {
     revalidatePath("/");
     revalidatePath("/today");
     revalidateTag(LEDGER_TAG, { expire: 0 });
+    return {};
+  });
+}
+
+// The Sealed Word — one line pressed to the OTHER keeper. Stored encrypted
+// beside the private note, but it is not the same thing: the note is to
+// yourself, this is to them, and it stays shut until the ring closes (the
+// reveal law lives in lib/sealed-word, read at every render boundary).
+export async function pressSealedWord(input: {
+  day: string;
+  word: string;
+}): Promise<{ error?: string }> {
+  const { userId: profileId, bondId } = await currentUser();
+  const day = await guardedDay(input.day);
+  if (!day) return { error: "Unknown day." };
+  const word = trimSealedWord(input.word);
+  return safely(async () => {
+    await upsertMeta(bondId, profileId, day, {
+      sealedWord: encryptOrNull(word),
+    });
+    revalidatePath("/");
+    revalidatePath("/today");
     return {};
   });
 }

@@ -60,6 +60,17 @@ export const profiles = pgTable(
     activityLevel: text("activity_level", {
       enum: ["sedentary", "light", "moderate", "active", "very_active"],
     }),
+    // The keeper's chosen self (onboarding cold-open). `character` is the elected
+    // keeper sprite that stands at the hearth mantle (validated in app against
+    // KEEPER_ARCHETYPES; kept as text so the cast can grow without a migration).
+    // `vow`/`vowKind` are why they keep the light — a compass, never a scored
+    // target (tone law). All optional: backfillable in settings if a signup
+    // predates the cold-open onboarding.
+    character: text("character"),
+    vow: text("vow"),
+    vowKind: text("vow_kind", {
+      enum: ["grow", "learn", "tend", "steady", "other"],
+    }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     // A departed keeper (they left, or were severed). PII is stripped and
     // private notes removed, but their logs stay for the remaining keeper's
@@ -100,6 +111,10 @@ export const invites = pgTable("invites", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   expiresAt: timestamp("expires_at").notNull(),
   acceptedAt: timestamp("accepted_at"),
+  // The summons line the inviter presses into the letter — shown when the
+  // partner opens the $0 share-link (the letter that unfurls). Personal, not
+  // health-tier; stored plain. Optional (a letter can be sealed wordless).
+  message: text("message"),
 });
 
 // Daily calorie/macro targets. New rows are appended when targets change so
@@ -231,7 +246,7 @@ export const weighIns = pgTable(
 );
 
 // One row per person per day for everything that isn't food:
-// training stamp, water cups, a one-line note, a mood.
+// training stamp, water cups, a one-line note, a mood, a sealed word.
 export const dayMeta = pgTable(
   "day_meta",
   {
@@ -246,6 +261,11 @@ export const dayMeta = pgTable(
     waterCups: integer("water_cups").notNull().default(0),
     note: text("note"),
     mood: text("mood"),
+    // The Sealed Word: one line pressed to the OTHER keeper, kept forever in
+    // the book. AES-GCM ciphertext like note/mood (see lib/crypto), but a
+    // different thing from `note` — the note is to yourself, this is to them,
+    // and it opens only when the day's ring closes (lib/sealed-word).
+    sealedWord: text("sealed_word"),
   },
   // The composite PK covers (profile, day) lookups, but the ledger reads meta
   // by day-range across both keepers — a leading-day index the PK can't serve.
@@ -328,8 +348,10 @@ export const sigilDiscoveries = pgTable(
   (t) => [unique("sigil_discoveries_bond_sigil").on(t.bondId, t.sigilId)],
 );
 
-// First witnessing of an anchor being — one arrival ceremony each, ever.
-// Being state itself is always derived from chord history.
+// RETIRED (2026-07-24): first witnessing of an anchor being. Being state — and
+// now the arrival DAY too — is derived from chord history (lib/engine/beings
+// `arrivedOn`), so nothing reads or writes this table any more. The definition
+// stays so the old rows are never dropped; delete it only with a real migration.
 export const beingArrivals = pgTable(
   "being_arrivals",
   {

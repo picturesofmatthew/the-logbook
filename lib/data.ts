@@ -13,7 +13,6 @@ import {
 } from "drizzle-orm";
 import { db } from "@/db";
 import {
-  beingArrivals,
   dayMeta,
   dreams,
   entries,
@@ -190,6 +189,10 @@ export type DayMetaRow = {
   waterCups: number;
   note: string | null;
   mood: string | null;
+  // Decrypted here; the REVEAL gate (own vs. theirs, ring open vs. closed) is
+  // the renderer's job — see lib/sealed-word. Never hand a keeper's word to the
+  // client without passing it through revealSealedWord() first.
+  sealedWord: string | null;
 };
 
 export async function getDayExtras(
@@ -225,6 +228,7 @@ export async function getDayExtras(
       waterCups: row?.waterCups ?? 0,
       note: decryptOrNull(row?.note),
       mood: decryptOrNull(row?.mood),
+      sealedWord: decryptOrNull(row?.sealedWord),
     };
   }
   return { meta, newSpecimens };
@@ -544,30 +548,11 @@ export async function getDiscoveries(
   return new Map(rows.map((r) => [r.sigilId, r.day]));
 }
 
-// Same gate for beings, per bond: the request that lands the unique row
-// witnesses the arrival and throws the ceremony.
-export async function recordArrival(
-  bondId: string,
-  beingId: string,
-  day: string,
-): Promise<boolean> {
-  const rows = await db
-    .insert(beingArrivals)
-    .values({ bondId, beingId, day })
-    .onConflictDoNothing({
-      target: [beingArrivals.bondId, beingArrivals.beingId],
-    })
-    .returning({ id: beingArrivals.id });
-  return rows.length > 0;
-}
-
-export async function getArrivals(bondId: string): Promise<Map<string, string>> {
-  const rows = await db
-    .select()
-    .from(beingArrivals)
-    .where(eq(beingArrivals.bondId, bondId));
-  return new Map(rows.map((r) => [r.beingId, r.day]));
-}
+// (Beings used to record arrivals here, mirroring the legendary gate above.
+// They no longer do: the ledger already knows the day each being's threshold
+// was crossed, so the Bestiary reads `arrivedOn` from lib/engine/beings and the
+// home render writes nothing. The `being_arrivals` table is retired — kept in
+// the schema so old rows aren't dropped, read by nothing.)
 
 // ── The Dream / the boat to the far shore ──
 // Exactly one shore is `active` at a time PER BOND; reached shores are kept as

@@ -44,7 +44,7 @@
 
 ## Sigil parts (SVG, later — placeholder geometry works)
 
-Ring halves ×3 weights · 7 radicals (anchor bar, leaf curl, sheaf ticks, crescent, spark, wave, knot) · 6 cardinal ornaments (pillars, hooks, roots, square, spiral, horizon) · tier cores (dot, diamond, cross-ring, illuminated double ring) · New Mark star · 10 legendary frames. Match the current `SigilGlyph` shapes one-for-one so the swap is invisible to code.
+Ring halves ×3 weights · 8 radicals (anchor bar, leaf curl, sheaf ticks, crescent, twist, spark, wave, knot) · 6 cardinal ornaments from 7 lift families (pillars, hooks, roots, square, spiral, bow — rest carries none) · tier cores (dot, diamond, cross-ring, illuminated double ring) · New Mark star · 10 legendary frames. Match the current `SigilGlyph` shapes one-for-one so the swap is invisible to code.
 
 ## IP guardrails
 

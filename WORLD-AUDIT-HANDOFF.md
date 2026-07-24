@@ -34,13 +34,14 @@ The **proto** is the feeling-target (populated, standalone); the **room** is the
 
 - `components/world/world-shell.tsx` — the camera + swipe/rise nav + the cold-open gate + slot layout
   + which overlay is open. Reads: `use-cold-open.ts`, `use-world-camera.ts`.
-- `components/world/world-spread.tsx` — the **in-world interior overlay** (a book/vessel opens IN PLACE,
-  closes back to the room). The reusable "interior" pattern.
+- ~~`components/world/world-spread.tsx`~~ — **cut 2026-07-24** (the atoms audit). Room hotspots now
+  route straight to the real pages; the "interior opens in place" overlay comes back when there is a
+  deep, rereadable spread to put in it. (In git history if the pattern is wanted again.)
 - `components/world/rooms/world-air.ts` — the one `roomAir` atmosphere factory + each room's air config.
 - `components/world/atmosphere.tsx` / `atmosphere-config.ts` — the shell-level particle/glow canvas.
 - `components/world/rooms/hotspot.tsx` — the shared tappable `<Hotspot>` (a11y-wired).
 - `app/globals.css` — all room motion lives here, prefixed per room: `.lib-*`, `.ln-*`, `.dk-*`,
-  `.gd-*`, plus `.world-*` (shell/gate/log/invite) and `.world-spread-*`. Each has a
+  `.gd-*`, plus `.world-*` (shell/gate/log/invite). Each has a
   `prefers-reduced-motion` off-switch.
 - Canon: `THE-LIGHTHOUSE.md` (world + the "each room is its own world" section), `BRAND-BIBLE.md`
   (the absolute color/type/material/light source), `WORLD-ENGINE.md` (build architecture),
@@ -115,9 +116,10 @@ per-room id-prefixing (`lib_`/`ln_`/`dk_`/`gd_`) against the shared svg, unchang
 and correct data-binding.
 
 **Port caveats / deferred (audit fodder):**
-- **In-world interiors are v1 title-pages** (an evocative page bound to the real counts + a deep-link to
-  the full page). Deepen the **Book of Days** into the true rereadable day-by-day (real sigils, both logs
-  facing); deepen the **shore interior** likewise. `world-spread.tsx` is the one place to grow both.
+- ~~**In-world interiors are v1 title-pages**~~ — **cut 2026-07-24**: the title-page overlay was
+  removed and hotspots now open the real pages. When the **Book of Days** becomes a true rereadable
+  day-by-day spread (real sigils, both logs facing) and the shore interior likewise, the in-place
+  pattern comes back with something worth opening. Frozen until then.
 - **Almanac data-truth**: gold tracks `days/1461` (a ~4-year arc), so it reads near-silver early — confirm
   or rebalance.
 - **The two roads** (Docks) and the **union rose-×** (Garden) are new inventions — keep/tune per Matthew.

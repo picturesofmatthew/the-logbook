@@ -11,7 +11,7 @@ Sigils are now the focal point of the app (see `THE-SIGIL-TURN.md`). Generate in
 
 1. **Board 5 — Sigil / Rune master** *(now #1)* — the parts library + composed seals + **chord-runes**.
 2. **Board 7 — The Completion Ceremony** *(new)* — the magic moment; the app's most important animation.
-3. **Board 8 — The Four Books** *(new)* — the shelf + spines + covers (diegetic navigation).
+3. **Board 8 — The Five Books** *(new)* — the shelf + spines + covers (diegetic navigation).
 4. **Board 6 — The Glade** — where summoned beings and collected details live.
 5. **Board 1 — The Fox** and **Boards 2–4 — Bestiary + Folk** *(now bonus priority)* — creatures are
    summoned by spells, not raised; still wanted, no longer the lead.
@@ -142,10 +142,11 @@ Cocoa-ink `#4a3b2a` single-weight strokes on flat cream `#fbf6ea`. **No fills, n
 Each mark isolated for tracing. This is the `SigilGlyph` parts library.
 - **Ring halves** — left + right half of a circular seal, each at **thin (deficit) · medium
   (maintenance) · bold (feast)** weight. All three handsome; none looks broken.
-- **7 radicals** — anchor bar (protein) · leaf curl (produce) · sheaf ticks (grains) · crescent
-  (dairy) · spark (sweets) · wave (drinks) · knot (dishes).
-- **6 cardinal ornaments** — twin pillars (push) · hooks (pull) · roots (legs) · square (full) · wind
-  spirals (cardio) · still horizon (rest).
+- **8 radicals** (per `lib/halls.ts`) — anchor bar (protein) · leaf curl (produce) · sheaf ticks
+  (grains) · crescent (dairy) · twist (snacks) · spark (sweets) · wave (drinks) · knot (dishes).
+- **7 lift-family ornaments** (one glyph per `SplitFamily` in `lib/engine/training.ts`; rest carries
+  none on the seal, so 6 seat) — twin pillars (push) · hooks (pull) · roots (legs) · square (full) ·
+  wind spirals (cardio) · a bow curve (mobility) · still horizon (rest).
 - **4 tier cores** — dot (common) · diamond (fine) · cross-ring (resonant) · illuminated double ring
   (legendary). Plus the **New Mark star**.
 - **Chord-runes** *(new — the cohesion marks)* — one distinct rune per chord that seats inside the
@@ -196,16 +197,27 @@ left→right) of a single seal casting, so we can time it in code:
 Also paint, isolated: a small library of **spark/mote shapes** (ink-dot bursts, gold flecks, a violet
 bloom) and **2–3 rotation frames of the full ring** for the orrery spin. Warm, reverent, alive.
 
-## BOARD 8 — The Four Books (diegetic navigation) · slate ground
+## BOARD 8 — The Five Books (diegetic navigation) · slate ground
+
+> **Updated 2026-07-22 → the FIVE books of the Library** (`THE-LIGHTHOUSE.md` §"The five books").
+> Supersedes the earlier four-book shelf; the shelf now lives **up the tower in the Library**, not at
+> home, and the museum became the **Apothecary**.
 
 The shelf and its books — tap a spine to open. Paint, isolated and spaced:
-1. **The shelf** — a warm carved wooden shelf holding four books, closed, spines out.
-2–5. Each book **closed (spine + cover)** and **open (first spread)**, in its own character:
-   - **The Scrapbook** — worn cloth cover, a pressed leaf, a ribbon marker; homely, human.
-   - **The Spellbook** — dark arcane grimoire, gilt-and-violet sigil embossed on the cover; the heart.
-   - **The Compendium** — a naturalist's field book, brass corners, a specimen pinned to the cover.
-   - **The Almanac** — a plain ledger, an engraved rule and a small sun/moon dial on the cover.
-6. A **page-flip pose** (a book mid-turn, one page lifting) for the quick open animation.
+1. **The shelf** — a warm carved wooden shelf holding five books, closed, spines out.
+2–6. Each book **closed (spine + cover)** and **open (first spread)**, in its own character:
+   - **The Book of Days** *(the Spellbook)* — dark arcane grimoire, gilt-and-violet sigil embossed on
+     the cover; the beating heart. Every sealed day as a spread, both logs facing, a voice-note wax-dot
+     pressed in the margin.
+   - **The Legendarium** — an ornate gilt-framed tome; one illuminated legendary seal on the cover, its
+     constellation of the rest in silver ghost-outline. Aspiration you can see.
+   - **The Bestiary** — a naturalist's field book, brass corners, the fox pinned as its cover specimen;
+     the living company of the Glade.
+   - **The Apothecary** *(was the museum)* — an apothecary's ledger: a pressed herb and a labelled phial
+     on the cover; provisions catalogued (still the shared food-DB underneath) — materia, not specimens.
+   - **The Almanac** — a plain ledger, an engraved rule and a small sun/moon dial on the cover; the long
+     arc of seasons, moons, and two people showing up.
+7. A **page-flip pose** (a book mid-turn, one page lifting) for the quick open animation.
 
 Each book distinct at a glance by silhouette, cover color, and ornament — but one family, one hand.
 

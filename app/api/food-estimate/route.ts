@@ -1,10 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { SESSION_COOKIE, readToken } from "@/lib/auth";
-import {
-  gramsFor,
-  parseFoodLine,
-  portionConfidence,
-} from "@/lib/engine/food-parse";
+import { gramsFor, portionConfidence } from "@/lib/engine/food-parse";
+import { parseFoodItems } from "@/lib/engine/food-parse-llm";
 import type { Hall } from "@/lib/halls";
 import { searchFoods, type FoodSearchResult } from "@/lib/usda";
 
@@ -104,7 +101,12 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Write in a meal to estimate." }, { status: 400 });
   }
 
-  const items = parseFoodLine(q).slice(0, 6);
+  // The parse step. With FOOD_PARSE_LLM off (default) this is exactly the
+  // deterministic `parseFoodLine`; with the flag + a key set it uses the LLM
+  // parser and falls back to deterministic on any error. Either way, the USDA
+  // grounding below is unchanged. The voice path grounds every spoken food line
+  // through this same route, so it is covered by this one seam.
+  const items = (await parseFoodItems(q)).slice(0, 6);
   if (items.length === 0) {
     return NextResponse.json({ error: "Couldn't read a food in that." });
   }

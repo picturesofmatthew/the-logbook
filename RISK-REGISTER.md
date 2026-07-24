@@ -5,9 +5,10 @@ Deduped and ranked by severity. Each item: the risk, the fix, and which phase it
 The striking result: four independent lenses (product, technical, business, scope) converged on one
 root — see below.*
 
-> **Code-verified refresh (2026-07-21):** a second 3-lens audit (`AUDIT.md`) read the *current build*
+> **Code-verified refresh (2026-07-21):** a second 3-lens, code-verified audit read the *current build*
 > and confirmed Tiers 1, 5, and 6 are still live (with file:line evidence), and found new technical
-> items — see **`## Audit refresh`** at the foot of this doc.
+> items — its findings are **folded into `## Audit refresh`** at the foot of this doc (there is no
+> standalone audit file).
 
 ## The convergent finding
 
@@ -28,8 +29,10 @@ breakup as a first-class state** solves the top finding of three agents at once.
 ## Tier 1 — Core-loop fragility (fix the DESIGN before validating anything)
 
 - **No standalone value for one person.** Logging your own half must be a complete, satisfying artifact
-  — lights your side, lays a *personal* plank — even if your partner never shows. The joint ceremony
-  *fuses* two halves into something rarer. Magic still gated; engaged partner never left with nothing.
+  — lights your side, lays a *personal* plank **(superseded — see Audit refresh: the solo log kindles the
+  glade + lights the lantern, but is *deliberately NOT* a boat plank; the boat stays two-player)** — even
+  if your partner never shows. The joint ceremony *fuses* two halves into something rarer. Magic still
+  gated; engaged partner never left with nothing.
 - **Same-day-mandatory close → async rolling window (~36–48h).** "Together" = both *eventually*, not
   both before midnight. Fixes the timezone bug AND the least-engaged-partner problem in one move.
 - **The app must survive one person leaving.** A solo "tend the flame" fallback; re-pair later without
@@ -127,7 +130,8 @@ breakup as a first-class state** solves the top finding of three agents at once.
 
 ## Audit refresh (2026-07-21 — code-verified)
 
-A second adversarial audit (`AUDIT.md`) read the current build. It **confirmed against live code**:
+A second adversarial, code-verified audit read the current build (its findings are folded in here; there
+is no standalone `AUDIT.md`). It **confirmed against live code**:
 
 - **Tier 1 (core-loop fragility) — partly addressed.** **Solo standalone value: DECIDED + shipped
   (2026-07-21)** — a solo log kindles the glade firepit + lights that keeper's lantern and the seal

@@ -11,6 +11,37 @@ export function isoDateInTz(d: Date, tz: string): string {
   }).format(d);
 }
 
+// ── The PATIENT day ──
+// The couple-day does not turn at midnight; it turns at a grace hour after it
+// (default 4am couple-time). Two reasons, both about the seal:
+//   · a keeper logging at 1am is still keeping the day they just lived — the
+//     night belongs to the day it grew out of, not the one it technically is;
+//   · it hands the ring a few more hours to close, which is the whole point for
+//     a couple whose evenings don't overlap (the long-distance beachhead).
+// The invariant is UNCHANGED: one shared clock still buckets every `day` key,
+// so the two halves can never file under different keys. This only moves where
+// that one clock's day begins. Pure — the primitive todayIso() is built on.
+export const DEFAULT_ROLLOVER_HOUR = 4;
+
+// 0 = midnight (the old behaviour); capped at 8 so a "day" can never swallow a
+// real morning. Anything bogus falls back to the default.
+export function clampRolloverHour(h: number | undefined): number {
+  if (h == null || !Number.isFinite(h)) return DEFAULT_ROLLOVER_HOUR;
+  return Math.min(8, Math.max(0, Math.trunc(h)));
+}
+
+export function coupleDayFor(
+  now: Date,
+  tz: string,
+  rolloverHour: number = DEFAULT_ROLLOVER_HOUR,
+): string {
+  const hours = clampRolloverHour(rolloverHour);
+  // Shift the instant back, then read the date in the couple's zone: the small
+  // hours land on yesterday's key, everything else on today's. Shifting the
+  // instant (not the wall clock) keeps DST honest at the boundary.
+  return isoDateInTz(new Date(now.getTime() - hours * 3_600_000), tz);
+}
+
 // A validated IANA tz, or the fallback if the candidate is missing/bogus.
 // Shared by both the couple tz (env) and the device tz (cookie).
 export function resolveTz(candidate: string | undefined, fallback: string): string {

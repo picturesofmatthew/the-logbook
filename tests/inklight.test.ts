@@ -184,6 +184,39 @@ test("sigil: the Twin Split subsumes the Anvil; Twin Peaks subsumes the New Mark
   assert.ok(!twoPr.includes("new-mark"));
 });
 
+test("sigil: the Carry strikes on asymmetry — one low, one strong", () => {
+  const low = quietDay({ mood: "🥲" });
+  const strong = quietDay({ mood: "😊", proteinG: 160 });
+
+  // the strong light reaches over — and it reads the same from either seat
+  assert.ok(chordsForDay(low, strong).includes("carry"));
+  assert.ok(chordsForDay(strong, low).includes("carry"));
+
+  // both low is the Ember Vigil's register, not the Carry's
+  assert.ok(
+    !chordsForDay(low, quietDay({ mood: "😤", proteinG: 160 })).includes("carry"),
+  );
+  // two good days: nobody needed carrying
+  assert.ok(
+    !chordsForDay(strong, quietDay({ mood: "😊", proteinG: 155 })).includes("carry"),
+  );
+  // a hard day with no strong shoulder beside it doesn't strike either
+  assert.ok(!chordsForDay(low, quietDay({ mood: "😊" })).includes("carry"));
+  // training counts as showing up strong, not just protein
+  const trained = quietDay({
+    mood: "😊",
+    training: {
+      trained: true,
+      families: ["push"],
+      primaryFamily: "push",
+      volumeLb: 4000,
+      cardioMin: 0,
+      prCount: 0,
+    },
+  });
+  assert.ok(chordsForDay(low, trained).includes("carry"));
+});
+
 test("sigil: tiers climb with chords and yield to legendaries", () => {
   assert.equal(tierFor({ completed: false, chordCount: 3, legendary: null }), "open");
   assert.equal(tierFor({ completed: true, chordCount: 0, legendary: null }), "common");
@@ -358,6 +391,25 @@ test("beings: the crow comes to hard days, the moth to rest", () => {
   const states = new Map(beingStates(days).map((s) => [s.id, s]));
   assert.equal(states.get("crow")?.arrived, true);
   assert.equal(states.get("moth")?.arrived, true);
+});
+
+test("beings: the arrival day is derived, not recorded", () => {
+  // five days of water; the Heron's threshold (5) falls on the fifth.
+  const days = ["07-15", "07-16", "07-17", "07-18", "07-19", "07-20"].map((d) =>
+    ledger({ day: `2026-${d}`, chords: ["spring"] }),
+  );
+  const heron = beingStates(days).find((s) => s.id === "heron");
+  assert.equal(heron?.arrivedOn, "2026-07-19");
+  // a being still in the wood has no arrival day
+  assert.equal(
+    beingStates(days).find((s) => s.id === "stag")?.arrivedOn,
+    null,
+  );
+  // and none at all before the wood stirs
+  assert.equal(
+    beingStates([]).find((s) => s.id === "heron")?.arrivedOn,
+    null,
+  );
 });
 
 test("beings: the pale elk is only ever glimpsed", () => {
