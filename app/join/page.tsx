@@ -9,6 +9,8 @@ import {
 import { SigilGlyph } from "@/components/sigil/sigil-glyph";
 import type { SigilSpec } from "@/lib/engine/sigil";
 import { invitePreview } from "@/lib/invites";
+import { getSessionUser } from "@/lib/session";
+import { logout } from "@/app/settings/actions";
 import { JoinForm } from "./join-form";
 
 export const metadata: Metadata = {
@@ -50,6 +52,47 @@ export default async function JoinPage({
   const { invite } = await searchParams;
   const preview = invite ? await invitePreview(invite) : null;
   const character = preview ? asArchetype(preview.inviterCharacter) : null;
+  // A letter that no longer opens — used, expired, or a mangled link. This page
+  // used to fall silently back to "begin your book", which is how a keeper ends
+  // up starting a SECOND book instead of joining the one they were called to.
+  const fadedLetter = !!invite && !preview;
+  // Already signed in? A keeper holds one book; accepting a letter from this
+  // seat would quietly start another. Say so instead of showing a signup form.
+  const viewer = await getSessionUser();
+
+  if (viewer) {
+    return (
+      <main className="flex flex-1 items-center justify-center p-6">
+        <div className="w-full max-w-sm">
+          <div className="wobbly border-2 border-ink/20 bg-cream/70 p-8 text-center shadow-card">
+            <h1 className="font-display text-2xl tracking-wide">
+              you already keep a book
+            </h1>
+            <p className="mt-2 text-sm text-ink-soft">
+              You&apos;re signed in as {viewer.displayName}.{" "}
+              {invite
+                ? "A letter can only be answered by a keeper who doesn't have a book yet — a keeper holds one, and two books can't be merged. Sign out to answer this one from a different account."
+                : "There's nothing to begin here."}
+            </p>
+            <Link
+              href="/"
+              className="mt-5 inline-block font-display text-sm tracking-wide text-terracotta underline underline-offset-4"
+            >
+              back to your world
+            </Link>
+            <form action={logout} className="mt-4 border-t border-ink/10 pt-4">
+              <button
+                type="submit"
+                className="cursor-pointer text-xs text-ink-soft underline decoration-dotted underline-offset-2"
+              >
+                sign out
+              </button>
+            </form>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="flex flex-1 items-center justify-center p-6">
@@ -109,6 +152,20 @@ export default async function JoinPage({
                 next.
               </p>
             </div>
+
+            {/* The fork that has to be unmissable: beginning here starts a
+                SEPARATE book, and two books can't be merged. */}
+            <div className="wobbly-sm mb-6 border-2 border-dashed border-terracotta/50 bg-gold-soft/25 p-3 text-center">
+              <p className="font-display text-[10px] tracking-widest text-terracotta">
+                {fadedLetter ? "THAT LETTER NO LONGER OPENS" : "WERE YOU SENT A LETTER?"}
+              </p>
+              <p className="mt-1 text-xs leading-snug text-ink-soft">
+                {fadedLetter
+                  ? "It was already opened, or it faded — letters last a week. Ask them to press a new seal and send it again. Beginning below starts a separate book instead of joining theirs, and two books can't be merged."
+                  : "Open their link instead — it carries their half of the seal. Beginning here starts a separate book, and two books can't be merged."}
+              </p>
+            </div>
+
             <JoinForm invite={invite} />
           </div>
         )}

@@ -6,7 +6,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { bonds, familiar, profiles } from "@/db/schema";
 import { KEEPER_ARCHETYPES } from "@/components/keeper/keeper-glyph";
-import { redeemInvite } from "@/lib/invites";
+import { redeemInvite, releaseInvite } from "@/lib/invites";
 import { hashPassword } from "@/lib/passwords";
 import { createSession } from "@/lib/session";
 
@@ -77,7 +77,11 @@ export async function signup(
         .from(profiles)
         .where(eq(profiles.email, email));
       if (existing) {
-        return { error: "That email is already in a book — try signing in." };
+        return {
+          error: invite
+            ? "That email already keeps a book, and a keeper holds only one. Sign in to that book, or answer this letter with a different email."
+            : "That email is already in a book — try signing in.",
+        };
       }
 
       const passwordHash = await hashPassword(password);
@@ -90,17 +94,25 @@ export async function signup(
         if (!redeemed) {
           return { error: "That invitation has expired or was already used." };
         }
-        await db.insert(profiles).values({
-          id: userId,
-          bondId: redeemed.bondId,
-          slot: "ember",
-          displayName,
-          email,
-          passwordHash,
-          character,
-          vow,
-          vowKind,
-        });
+        try {
+          await db.insert(profiles).values({
+            id: userId,
+            bondId: redeemed.bondId,
+            slot: "ember",
+            displayName,
+            email,
+            passwordHash,
+            character,
+            vow,
+            vowKind,
+          });
+        } catch (e) {
+          // The letter was consumed a moment ago; if the keeper couldn't be
+          // written (a taken slot, a transient failure), hand it back rather
+          // than burning their only way in.
+          await releaseInvite(invite);
+          throw e;
+        }
       } else {
         const kind: Kind = (KINDS as readonly string[]).includes(kindRaw)
           ? (kindRaw as Kind)

@@ -65,6 +65,18 @@ export async function redeemInvite(
   return rows[0] ?? null;
 }
 
+// Hand a letter back. Redeeming is atomic and happens BEFORE the new keeper's
+// profile is written; if that write fails, the letter would otherwise be burned
+// for good and the pair would be stuck with no way in. Only ever called on that
+// failure path, so it can't weaken single-use.
+export async function releaseInvite(token: string): Promise<void> {
+  if (!token) return;
+  await db
+    .update(invites)
+    .set({ acceptedAt: null })
+    .where(eq(invites.tokenHash, await hashToken(token)));
+}
+
 // A read-only peek at an invite — everything the LETTER unfurls with, without
 // consuming the token: who is calling you, the line they pressed, the self they
 // elected at the mantle, and the seed their half-lit seal is drawn from. Null if
