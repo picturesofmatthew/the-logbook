@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { FamiliarGlyph } from "@/components/familiar/familiar-glyph";
+import { DoorGround } from "@/components/world/door-ground";
 import { EnterForm } from "./enter-form";
 
 export const metadata: Metadata = {
@@ -9,33 +9,24 @@ export const metadata: Metadata = {
 
 export default function EnterPage() {
   return (
-    <main className="flex flex-1 items-center justify-center p-6">
-      <div className="w-full max-w-sm">
-        <div className="wobbly border-2 border-ink/20 bg-cream/70 p-8 shadow-card">
-          <div className="mb-6 flex flex-col items-center gap-3 text-center">
-            <FamiliarGlyph stage="kit" size={88} title="A small arctic fox kit" />
-            <h1 className="font-display text-3xl tracking-wide">
-              signed<span className="text-violet"> × </span>sealed
-            </h1>
-            <p className="text-ink-soft">a spellbook for two</p>
-          </div>
-          <EnterForm />
-        </div>
-        <p className="mt-4 text-center text-sm text-ink-soft">
-          new here?{" "}
-          <Link
-            href="/join"
-            className="text-terracotta underline underline-offset-4"
-          >
-            begin a book
-          </Link>
+    <DoorGround
+      footer={
+        <>
+          <p>
+            new here? <Link href="/join">begin a book</Link>
+          </p>
+          <p className="mt-2 text-xs opacity-75">
+            <Link href="/privacy">privacy &amp; your health data</Link>
+          </p>
+        </>
+      }
+    >
+      <div className="wobbly border-2 border-gold/30 bg-cream/90 p-7 shadow-card">
+        <p className="mb-5 text-center font-display text-[11px] tracking-[0.18em] text-ink-soft">
+          THE LAMP IS LIT · COME IN
         </p>
-        <p className="mt-2 text-center text-xs text-ink-soft/70">
-          <Link href="/privacy" className="underline underline-offset-4">
-            privacy &amp; your health data
-          </Link>
-        </p>
+        <EnterForm />
       </div>
-    </main>
+    </DoorGround>
   );
 }

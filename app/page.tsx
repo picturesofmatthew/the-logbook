@@ -223,6 +223,10 @@ export default async function Home() {
         library={library}
         docks={docks}
         garden={garden}
+        keepers={{
+          moss: members.moss?.character ?? null,
+          ember: members.ember?.character ?? null,
+        }}
         needsKeeper={!members.ember}
       />
 

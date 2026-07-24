@@ -7,6 +7,7 @@
 // (composeSeal), inside the proto's emanation (the halo, the shafts of light,
 // the press-bloom). See hearth-room.tsx for the composition + interaction.
 
+import { keeperAttrSvg } from "@/components/keeper/keeper-attrs";
 import { HEARTH_DEFS, HEARTH_FAR, HEARTH_MID } from "./hearth-svg";
 
 /** Shared gradients + clip-paths, rendered once atop the scene SVG. */
@@ -24,6 +25,35 @@ export function HearthFar() {
  *  the two keepers flanking the mantle, and the antlered fox on the warm stone. */
 export function HearthMid() {
   return <g dangerouslySetInnerHTML={{ __html: HEARTH_MID }} />;
+}
+
+/** The elected characters, worn by the two figures already at the mantle — the
+ *  smith's hammer, the navigator's sextant. Drawn over HearthMid and under the
+ *  seal's light. The ember side reuses the moss drawing inside the same mirror
+ *  transform the hearth art applies to the figure itself, so one fragment
+ *  serves both keepers (see components/keeper/keeper-attrs). */
+export function HearthKeepers({
+  moss,
+  ember,
+}: {
+  /** each keeper's elected character id, or null while unelected */
+  moss: string | null;
+  ember: string | null;
+}) {
+  const mossAttr = keeperAttrSvg(moss, "moss");
+  const emberAttr = keeperAttrSvg(ember, "ember");
+  if (!mossAttr && !emberAttr) return null;
+  return (
+    <>
+      {mossAttr ? <g dangerouslySetInnerHTML={{ __html: mossAttr }} /> : null}
+      {emberAttr ? (
+        <g
+          transform="translate(991 36) scale(-0.97 0.97)"
+          dangerouslySetInnerHTML={{ __html: emberAttr }}
+        />
+      ) : null}
+    </>
+  );
 }
 
 /** The heart — the seal that cannot close alone, raised over the open book and

@@ -7,6 +7,7 @@ import {
   type KeeperArchetype,
 } from "@/components/keeper/keeper-glyph";
 import { SigilGlyph } from "@/components/sigil/sigil-glyph";
+import { DoorGround } from "@/components/world/door-ground";
 import type { SigilSpec } from "@/lib/engine/sigil";
 import { invitePreview } from "@/lib/invites";
 import { getSessionUser } from "@/lib/session";
@@ -62,9 +63,8 @@ export default async function JoinPage({
 
   if (viewer) {
     return (
-      <main className="flex flex-1 items-center justify-center p-6">
-        <div className="w-full max-w-sm">
-          <div className="wobbly border-2 border-ink/20 bg-cream/70 p-8 text-center shadow-card">
+      <DoorGround>
+        <div className="wobbly border-2 border-gold/30 bg-cream/90 p-8 text-center shadow-card">
             <h1 className="font-display text-2xl tracking-wide">
               you already keep a book
             </h1>
@@ -80,23 +80,29 @@ export default async function JoinPage({
             >
               back to your world
             </Link>
-            <form action={logout} className="mt-4 border-t border-ink/10 pt-4">
-              <button
-                type="submit"
-                className="cursor-pointer text-xs text-ink-soft underline decoration-dotted underline-offset-2"
-              >
-                sign out
-              </button>
-            </form>
-          </div>
+          <form action={logout} className="mt-4 border-t border-ink/10 pt-4">
+            <button
+              type="submit"
+              className="cursor-pointer text-xs text-ink-soft underline decoration-dotted underline-offset-2"
+            >
+              sign out
+            </button>
+          </form>
         </div>
-      </main>
+      </DoorGround>
     );
   }
 
   return (
-    <main className="flex flex-1 items-center justify-center p-6">
-      <div className="w-full max-w-sm">
+    <DoorGround
+      wordmark={!preview}
+      footer={
+        <p>
+          already have a book? <Link href="/enter">come in</Link>
+        </p>
+      }
+    >
+      <>
         {preview ? (
           /* THE LETTER — it unfurls: the seal presses in, the page unrolls
              beneath it, then the hand-written line settles. */
@@ -141,7 +147,7 @@ export default async function JoinPage({
             </div>
           </div>
         ) : (
-          <div className="wobbly border-2 border-ink/20 bg-cream/70 p-8 shadow-card">
+          <div className="wobbly border-2 border-gold/30 bg-cream/90 p-8 shadow-card">
             <div className="mb-6 flex flex-col items-center gap-3 text-center">
               <FamiliarGlyph stage="kit" size={72} title="A small arctic fox kit" />
               <h1 className="font-display text-2xl tracking-wide">
@@ -169,13 +175,7 @@ export default async function JoinPage({
             <JoinForm invite={invite} />
           </div>
         )}
-        <p className="mt-4 text-center text-sm text-ink-soft">
-          already have a book?{" "}
-          <Link href="/enter" className="text-terracotta underline underline-offset-4">
-            come in
-          </Link>
-        </p>
-      </div>
-    </main>
+      </>
+    </DoorGround>
   );
 }

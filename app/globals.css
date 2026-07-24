@@ -2228,3 +2228,76 @@ html[data-light="night"] .glade-day-only {
     animation: none;
   }
 }
+
+/* ── THE DOOR (/enter, /join) ──
+   The pre-account ground: the cold-open vista dimmed behind a veil, the gilt
+   wordmark over it, and the business on warm paper in the middle. Same picture
+   as the world's front gate, so arriving at the site and arriving in the world
+   are one gesture (see components/world/door-ground.tsx). */
+.door {
+  position: relative;
+  display: flex;
+  min-height: 100dvh;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 2rem 1.25rem calc(2rem + env(safe-area-inset-bottom, 0px));
+  background: radial-gradient(120% 100% at 50% 38%, #1d1938 0%, #14112a 58%, #0d0b18 100%);
+}
+.door-vista {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.5;
+}
+.door-vista svg {
+  width: 100%;
+  height: 100%;
+}
+/* the night closes in around the paper, so the form never fights the stars */
+.door-veil {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    105% 78% at 50% 52%,
+    rgba(13, 11, 24, 0.62) 0%,
+    rgba(13, 11, 24, 0.82) 58%,
+    rgba(13, 11, 24, 0.95) 100%
+  );
+}
+.door-panel {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 24rem;
+}
+/* the wordmark, gilt — the gate's treatment, set in flow above the paper */
+.door-wordmark {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.45rem;
+  margin-bottom: 1.5rem;
+  font-family: var(--font-display), Georgia, serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(1.9rem, 1.1rem + 3.6vw, 2.7rem);
+  letter-spacing: 0.02em;
+  background: linear-gradient(180deg, #f6e6bd 0%, #e0b566 58%, #c98f4a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 18px rgba(217, 164, 65, 0.4));
+}
+.door-footer {
+  margin-top: 1.25rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: rgba(245, 237, 220, 0.66);
+}
+.door-footer a {
+  color: rgba(240, 200, 130, 0.92);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}

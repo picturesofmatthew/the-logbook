@@ -29,7 +29,13 @@ import { useShell } from "@/components/shell/shell-provider";
 import { composeSeal } from "@/components/sigil/glyphs";
 import type { SigilSpec } from "@/lib/engine/sigil";
 import { Atmosphere } from "./atmosphere";
-import { HearthDefs, HearthFar, HearthHeart, HearthMid } from "./rooms/hearth-scene";
+import {
+  HearthDefs,
+  HearthFar,
+  HearthHeart,
+  HearthKeepers,
+  HearthMid,
+} from "./rooms/hearth-scene";
 import { HEARTH_ATMOSPHERE } from "./rooms/hearth-atmosphere";
 import { LibraryRoom, type LibrarySnapshot } from "./rooms/library-room";
 import { DocksRoom, type DocksSnapshot } from "./rooms/docks-room";
@@ -90,6 +96,7 @@ export function WorldShell({
   library,
   docks,
   garden,
+  keepers,
   needsKeeper,
 }: {
   spec: SigilSpec;
@@ -97,6 +104,8 @@ export function WorldShell({
   library: LibrarySnapshot;
   docks: DocksSnapshot;
   garden: GardenSnapshot;
+  /** each keeper's elected character — worn by the figures at the mantle */
+  keepers: { moss: string | null; ember: string | null };
   /** the bond has no second keeper yet — surface the invite at the hearth. */
   needsKeeper: boolean;
 }) {
@@ -181,6 +190,7 @@ export function WorldShell({
             <HearthDefs />
             <HearthFar />
             <HearthMid />
+            <HearthKeepers moss={keepers.moss} ember={keepers.ember} />
             <HearthHeart sealHtml={sealHtml} bloom={false} />
           </>
         ),
@@ -235,6 +245,8 @@ export function WorldShell({
     [
       sealHtml,
       standingLine,
+      keepers.moss,
+      keepers.ember,
       lit,
       solo,
       spec,
