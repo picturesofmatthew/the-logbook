@@ -20,6 +20,7 @@ import { composeSigil } from "@/lib/engine/sigil";
 import { totalOf } from "@/lib/engine/totals";
 import { MEALS, type JournalEntry } from "@/lib/meals";
 import { getFirstBothDay } from "@/lib/ledger";
+import { revealSealedWord, wordWaits } from "@/lib/sealed-word";
 
 export const metadata: Metadata = {
   title: "A day's page - signed × sealed",
@@ -51,7 +52,7 @@ export default async function DayPage({
 }: {
   params: Promise<{ day: string }>;
 }) {
-  const { bondId, members } = await requireBond();
+  const { bondId, members, viewerSlot } = await requireBond();
   const { day } = await params;
   const today = await todayIso();
   if (!/^\d{4}-\d{2}-\d{2}$/.test(day) || day > today) notFound();
@@ -110,6 +111,25 @@ export default async function DayPage({
     : soloKept
       ? `${keptName} kept their half that day`
       : "an open page, unkept";
+
+  // The Sealed Words — what the two of you pressed to each other that day. Your
+  // own is always yours to reread; theirs opened when the ring closed, and stays
+  // open in the book forever. A word from a day that never closed still waits.
+  const sealedWords = SLOTS.map((slot) => {
+    const gate = {
+      word: extras.meta[slot].sealedWord,
+      own: slot === viewerSlot,
+      sealed: spec.completed,
+    };
+    return {
+      slot,
+      name: members[slot]?.displayName ?? "",
+      word: revealSealedWord(gate),
+      waits: wordWaits(gate),
+    };
+  });
+  const crossed = sealedWords.every((w) => w.word != null);
+  const hasWords = sealedWords.some((w) => w.word != null || w.waits);
 
   const mealsFor = (entriesList: JournalEntry[]) =>
     MEALS.map((meal) => ({
@@ -220,6 +240,43 @@ export default async function DayPage({
           );
         })}
       </div>
+
+      {hasWords ? (
+        <section className="wobbly flex flex-col gap-1.5 border-2 border-violet/40 bg-cream/70 p-4 shadow-card">
+          <p className="text-center font-display text-[10px] tracking-widest text-violet">
+            {crossed ? "THE WORDS CROSSED" : "THE SEALED WORD"}
+          </p>
+          {sealedWords.map((w, i) => (
+            <div key={w.slot}>
+              {crossed && i === 1 ? (
+                <p
+                  className="my-1 text-center font-display text-sm text-violet"
+                  aria-hidden
+                >
+                  ×
+                </p>
+              ) : null}
+              {w.word ? (
+                <p className="text-sm leading-snug">
+                  <span
+                    className={`font-display text-[10px] tracking-wide ${
+                      w.slot === "moss" ? "text-moss-deep" : "text-terracotta"
+                    }`}
+                  >
+                    {w.name.toLowerCase()} —{" "}
+                  </span>
+                  <span className="italic">“{w.word}”</span>
+                </p>
+              ) : w.waits ? (
+                <p className="text-xs italic leading-snug text-ink-soft">
+                  {w.name.toLowerCase()} left a word here — it opens when the
+                  ring closes.
+                </p>
+              ) : null}
+            </div>
+          ))}
+        </section>
+      ) : null}
 
       <nav className="flex items-center justify-between">
         <Link

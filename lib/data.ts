@@ -190,6 +190,10 @@ export type DayMetaRow = {
   waterCups: number;
   note: string | null;
   mood: string | null;
+  // Decrypted here; the REVEAL gate (own vs. theirs, ring open vs. closed) is
+  // the renderer's job — see lib/sealed-word. Never hand a keeper's word to the
+  // client without passing it through revealSealedWord() first.
+  sealedWord: string | null;
 };
 
 export async function getDayExtras(
@@ -225,6 +229,7 @@ export async function getDayExtras(
       waterCups: row?.waterCups ?? 0,
       note: decryptOrNull(row?.note),
       mood: decryptOrNull(row?.mood),
+      sealedWord: decryptOrNull(row?.sealedWord),
     };
   }
   return { meta, newSpecimens };

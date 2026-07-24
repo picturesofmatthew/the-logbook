@@ -3,7 +3,8 @@ import { LegendaryCeremony } from "@/components/sigil/legendary-ceremony";
 import { SealCeremony } from "@/components/sigil/seal-ceremony";
 import { ShoreArrivalCeremony } from "@/components/sigil/shore-arrival-ceremony";
 import { WorldShell } from "@/components/world/world-shell";
-import { requireBond, SLOTS, type Slot } from "@/lib/bond";
+import { partnerSlot, requireBond, SLOTS, type Slot } from "@/lib/bond";
+import { revealSealedWord } from "@/lib/sealed-word";
 import {
   getAllSpecimens,
   getArrivals,
@@ -123,6 +124,17 @@ export default async function Home() {
         ? "you closed the ring"
         : `${members[closer]?.displayName ?? ""} closed the ring`;
 
+  // The Sealed Word your keeper pressed today — it opens only now that the ring
+  // has closed (the reveal law: lib/sealed-word). Withheld words never leave the
+  // server, so there is nothing in the payload to peek at.
+  const theirSlot = partnerSlot(viewerSlot);
+  const sealedWord = revealSealedWord({
+    word: extras.meta[theirSlot].sealedWord,
+    own: false,
+    sealed: sigil.completed,
+  });
+  const sealedWordFrom = members[theirSlot]?.displayName ?? null;
+
   // ── The standing line — warm, viewer-aware, never a scold. ──
   const notLogged = SLOTS.filter((slot) => journal[slot].entries.length === 0);
   const missingName =
@@ -239,6 +251,8 @@ export default async function Home() {
           dreamName={glade.dream?.name}
           planksLaid={glade.boat?.planksLaid}
           remaining={glade.boat?.remaining}
+          word={sealedWord}
+          wordFrom={sealedWordFrom}
         />
       ) : null}
     </>

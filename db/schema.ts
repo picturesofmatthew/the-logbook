@@ -246,7 +246,7 @@ export const weighIns = pgTable(
 );
 
 // One row per person per day for everything that isn't food:
-// training stamp, water cups, a one-line note, a mood.
+// training stamp, water cups, a one-line note, a mood, a sealed word.
 export const dayMeta = pgTable(
   "day_meta",
   {
@@ -261,6 +261,11 @@ export const dayMeta = pgTable(
     waterCups: integer("water_cups").notNull().default(0),
     note: text("note"),
     mood: text("mood"),
+    // The Sealed Word: one line pressed to the OTHER keeper, kept forever in
+    // the book. AES-GCM ciphertext like note/mood (see lib/crypto), but a
+    // different thing from `note` — the note is to yourself, this is to them,
+    // and it opens only when the day's ring closes (lib/sealed-word).
+    sealedWord: text("sealed_word"),
   },
   // The composite PK covers (profile, day) lookups, but the ledger reads meta
   // by day-range across both keepers — a leading-day index the PK can't serve.

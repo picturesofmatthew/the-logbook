@@ -3,14 +3,15 @@
 import Link from "next/link";
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { setTraining } from "@/app/day/actions";
-import { loadCaptureData } from "@/app/capture/actions";
+import { pressSealedWord, setTraining } from "@/app/day/actions";
+import { loadCaptureData, type SealedWordState } from "@/app/capture/actions";
 import { donateSpecimen, logEntry } from "@/app/log/actions";
 import { logWorkout } from "@/app/train/actions";
 import type { RecentWorkout } from "@/lib/data";
 import { parseWorkoutLine, type ParsedSet } from "@/lib/engine/workout-parse";
 import type { Hall } from "@/lib/halls";
 import { MEALS, mealForHour, type Meal, type Specimen } from "@/lib/meals";
+import { SEALED_WORD_MAX } from "@/lib/sealed-word";
 
 type Estimate = {
   name: string;
@@ -34,6 +35,7 @@ type CaptureData = {
   day: string;
   recents: Specimen[];
   recentWorkouts: RecentWorkout[];
+  word: SealedWordState;
 };
 
 // One exercise's sets, folded for display: "185×8 · 185×6".
@@ -80,6 +82,11 @@ export function CaptureSheet() {
     sets: ParsedSet[];
   } | null>(null);
 
+  // The Sealed Word — the sheet's signature line, under every pane. Seeded from
+  // the server copy when the day's data lands.
+  const [wordText, setWordText] = useState("");
+  const [wordPressed, setWordPressed] = useState(false);
+
   // Eat pane (write-in estimator).
   const [eatText, setEatText] = useState("");
   const [estimating, setEstimating] = useState(false);
@@ -96,7 +103,13 @@ export function CaptureSheet() {
   }
 
   useEffect(() => {
-    if (captureOpen && !data) loadCaptureData().then(setData);
+    if (captureOpen && !data)
+      loadCaptureData().then((d) => {
+        setData(d);
+        // adopt the word this keeper already pressed today, if any
+        setWordText(d.word.mine ?? "");
+        setWordPressed(d.word.mine != null);
+      });
   }, [captureOpen, data]);
 
   function flash(message: string) {
@@ -154,6 +167,24 @@ export function CaptureSheet() {
         router.refresh();
         setPreview(null);
         setTrainText("");
+      }
+    });
+  }
+
+  function pressWord() {
+    if (!data) return;
+    startTransition(async () => {
+      const result = await pressSealedWord({ day: data.day, word: wordText });
+      if (result.error) flash(result.error);
+      else {
+        ritualChime();
+        setWordPressed(true);
+        flash(
+          wordText.trim()
+            ? "pressed — it opens when you both log"
+            : "the word is cleared",
+        );
+        router.refresh();
       }
     });
   }
@@ -536,6 +567,50 @@ export function CaptureSheet() {
             )}
           </div>
         )}
+
+        {/* THE SEALED WORD — the sheet's signature line, under every pane. One
+            line to your keeper, pressed into the day's seal; it opens for them
+            only when the ring closes. Hidden while a bond has one keeper. */}
+        {data?.word.partnerName ? (
+          <div className="mt-4 flex flex-col gap-1.5 border-t-2 border-dashed border-ink/15 pt-3">
+            <p className={label}>
+              A WORD FOR {data.word.partnerName.toUpperCase()}
+            </p>
+            <div className="flex items-center gap-1.5">
+              <input
+                value={wordText}
+                maxLength={SEALED_WORD_MAX}
+                onChange={(e) => {
+                  setWordText(e.target.value);
+                  setWordPressed(false);
+                }}
+                placeholder="one line — it opens when you both log"
+                className="wobbly-sm min-w-0 flex-1 border-2 border-ink/30 bg-cream px-2 py-1 text-sm outline-none focus:border-violet"
+              />
+              <button
+                type="button"
+                disabled={wordPressed || pending}
+                onClick={pressWord}
+                className="wobbly-sm cursor-pointer border-2 border-violet bg-cream px-2 py-1 font-display text-xs text-violet disabled:border-ink/20 disabled:bg-paper-deep disabled:text-ink-soft"
+              >
+                {wordPressed ? "✓" : "press"}
+              </button>
+            </div>
+            {data.word.theirs ? (
+              <p className="text-xs leading-snug text-ink-soft">
+                <span className="font-display text-[10px] tracking-wide text-violet">
+                  {data.word.partnerName.toLowerCase()} pressed —{" "}
+                </span>
+                <span className="italic text-ink">“{data.word.theirs}”</span>
+              </p>
+            ) : data.word.waiting ? (
+              <p className="text-xs italic leading-snug text-ink-soft">
+                {data.word.partnerName.toLowerCase()} left a word — it opens
+                when the ring closes.
+              </p>
+            ) : null}
+          </div>
+        ) : null}
 
         {toast ? (
           <p className="mt-3 text-center font-display text-xs text-moss-deep">{toast}</p>
