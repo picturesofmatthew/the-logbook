@@ -12,16 +12,14 @@
 // `composeSeal`): a PURE composer returning inner SVG markup, deterministic and
 // SSR-safe, swappable for a hand-drawn master.
 
+import type { Slot } from "@/lib/auth";
+import { lightFor } from "@/lib/keeper-light";
 import { KEEPER_ARCHETYPES, type KeeperArchetype } from "./keeper-glyph";
 
-// Each keeper's robe color, for attributes that need to match the cloth they
-// hang on. Fragments opt in with the {{ROBE}} / {{ROBE_LIGHT}} tokens.
-const ROBE = {
-  moss: { main: "#5b6b3c", light: "#7c8a4d" },
-  ember: { main: "#8a4c33", light: "#c4704b" },
-} as const;
-
-export type KeeperSide = keyof typeof ROBE;
+// Attributes that need to match the cloth they hang on take the keeper's light
+// through the {{ROBE}} / {{ROBE_LIGHT}} tokens. The hues are never written here
+// — they resolve through lib/keeper-light, the one place a keeper's color is
+// decided, so a chosen light (a later feature) reaches the mantle for free.
 
 // ── SWAPPABLE: the eight attributes, in hearth scene coordinates ──
 // Landmarks they hang on: the hand at (365, 918), the shoulder near (322, 870),
@@ -46,10 +44,11 @@ export function isKeeperArchetype(v: string | null): v is KeeperArchetype {
 // the two robed figures it has always had.
 export function keeperAttrSvg(
   character: string | null,
-  side: KeeperSide,
+  slot: Slot,
+  chosenLight?: string | null,
 ): string {
   if (!isKeeperArchetype(character)) return "";
-  const robe = ROBE[side];
+  const robe = lightFor(slot, chosenLight);
   return KEEPER_ATTRS[character]
     .replaceAll("{{ROBE_LIGHT}}", robe.light)
     .replaceAll("{{ROBE}}", robe.main);

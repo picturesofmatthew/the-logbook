@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { legendarySpec } from "@/components/sigil/display-spec";
+import { SigilGlyph } from "@/components/sigil/sigil-glyph";
 import { requireBond } from "@/lib/bond";
 import { InvitePanel } from "./invite-panel";
 
@@ -13,11 +15,21 @@ export default async function InvitePage() {
 
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-5 p-6">
-      <header className="text-center">
+      <header className="flex flex-col items-center gap-3 text-center">
+        {/* the mark: The Mirror at Dusk, turning slowly — two facing arcs, which
+            is the whole argument for sending this. */}
+        <div className="sigil-turn">
+          <SigilGlyph
+            spec={legendarySpec("mirror-at-dusk")}
+            size={104}
+            detail="full"
+            bloom
+          />
+        </div>
         <h1 className="font-display text-2xl tracking-wide">
           invite your partner
         </h1>
-        <p className="mt-1 text-sm text-ink-soft">
+        <p className="-mt-2 text-sm text-ink-soft">
           the seal can&apos;t close alone — bring the second keeper in
         </p>
       </header>

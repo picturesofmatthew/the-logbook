@@ -2301,3 +2301,25 @@ html[data-light="night"] .glade-day-only {
   text-decoration: underline;
   text-underline-offset: 4px;
 }
+
+/* the mark, turning — a legendary seal as the brand's face on the pre-account
+   surfaces. Slow enough to be a breath, not a spinner: a full turn is a minute
+   and a half, and it stops entirely for reduced motion. */
+.sigil-turn {
+  animation: sigil-turn 96s linear infinite;
+  transform-origin: 50% 50%;
+  filter: drop-shadow(0 3px 22px rgba(217, 164, 65, 0.28));
+}
+@keyframes sigil-turn {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sigil-turn {
+    animation: none;
+  }
+}

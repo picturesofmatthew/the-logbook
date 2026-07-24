@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { FamiliarGlyph } from "@/components/familiar/familiar-glyph";
+import { legendarySpec } from "@/components/sigil/display-spec";
 import {
   KEEPER_ARCHETYPES,
   KeeperGlyph,
@@ -149,7 +149,16 @@ export default async function JoinPage({
         ) : (
           <div className="wobbly border-2 border-gold/30 bg-cream/90 p-8 shadow-card">
             <div className="mb-6 flex flex-col items-center gap-3 text-center">
-              <FamiliarGlyph stage="kit" size={72} title="A small arctic fox kit" />
+              {/* the mark is the SEAL — The First Page, turning slowly: the day
+                  the book begins is the one you're standing at. */}
+              <div className="sigil-turn">
+                <SigilGlyph
+                  spec={legendarySpec("first-page")}
+                  size={96}
+                  detail="full"
+                  bloom
+                />
+              </div>
               <h1 className="font-display text-2xl tracking-wide">
                 begin your book
               </h1>

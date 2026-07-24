@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BeingPortrait } from "@/components/glade/being-portrait";
+import { legendarySpec } from "@/components/sigil/display-spec";
 import { SigilGlyph } from "@/components/sigil/sigil-glyph";
 import {
   SpecimenCard,
@@ -14,33 +15,12 @@ import { getAllSpecimens, getDiscoveries } from "@/lib/data";
 import { currentTz, diffDays, friendlyDate, todayIso } from "@/lib/dates";
 import { HALLS } from "@/lib/halls";
 import { BEINGS, paleElkGlimpsed } from "@/lib/engine/beings";
-import { LEGENDARIES, type LegendaryId, type SigilSpec } from "@/lib/engine/sigil";
+import { LEGENDARIES, type LegendaryId } from "@/lib/engine/sigil";
 import { getGladeState } from "@/lib/ledger";
 
 export const metadata: Metadata = {
   title: "The Field Book - signed × sealed",
 };
-
-// A display-only spec for a discovered legendary's plate in the Legendarium.
-function legendarySpec(id: LegendaryId): SigilSpec {
-  let seed = 0;
-  for (const ch of id) seed = (seed * 31 + ch.charCodeAt(0)) >>> 0;
-  return {
-    completed: true,
-    moss: { inked: true, weight: "even" },
-    ember: { inked: true, weight: "even" },
-    radicals: [],
-    ornaments: [],
-    newMark: false,
-    chords: [],
-    legendary: id,
-    tier: "legendary",
-    seed,
-    moon: false,
-    water: false,
-    lowMood: false,
-  };
-}
 
 export default async function LibraryPage() {
   const { bondId, members } = await requireBond();
