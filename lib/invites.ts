@@ -3,6 +3,7 @@ import { and, eq, gt, isNull } from "drizzle-orm";
 import { db } from "@/db";
 import { invites, profiles } from "@/db/schema";
 import { hashToken } from "@/lib/auth";
+import { letterSeed, summonsLine } from "@/lib/letter";
 
 const INVITE_TTL_MS = 1000 * 60 * 60 * 24 * 7; // 7 days
 
@@ -25,24 +26,11 @@ export async function createInvite(
   return token;
 }
 
-// The summons line pressed into the letter — one line, trimmed. Personal, not
-// health-tier, so it is stored plain (it travels in a link the recipient opens
-// before they have an account; there is no key to read it with yet).
-export const SUMMONS_MAX = 200;
-
-export function summonsLine(raw: string | null | undefined): string | null {
-  if (raw == null) return null;
-  const oneLine = raw.replace(/\s+/g, " ").trim();
-  return oneLine ? oneLine.slice(0, SUMMONS_MAX) : null;
-}
-
-// A stable visual seed for a bond's letter — the same bond always presses the
-// same seal. (Not a secret: it only picks which flecks fall where.)
-export function letterSeed(bondId: string): number {
-  let hash = 0;
-  for (const ch of bondId) hash = (hash * 31 + ch.charCodeAt(0)) >>> 0;
-  return hash;
-}
+// The summons line's length law and the letter's seed are PURE and shared with
+// the client-side compose UI — they live in lib/letter, because importing them
+// from HERE drags node:crypto + the database into the browser bundle (which is
+// what made /invite throw). Re-exported so server callers keep one import.
+export { SUMMONS_MAX, summonsLine, letterSeed } from "@/lib/letter";
 
 // Redeem atomically: one UPDATE that sets accepted_at only if the invite is
 // still open and unexpired, RETURNING the bond. Single-use is guaranteed — a

@@ -6,7 +6,7 @@
 // unfurls for them (app/join). The transport stays a $0 share link.
 
 import { useState } from "react";
-import { SUMMONS_MAX } from "@/lib/invites";
+import { SUMMONS_MAX } from "@/lib/letter";
 import { ritualChime } from "@/lib/sounds";
 import { makeInvite } from "./actions";
 
