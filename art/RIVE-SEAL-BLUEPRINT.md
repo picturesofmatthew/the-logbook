@@ -33,8 +33,8 @@ Author one **view model** (`SealVM`) whose properties mirror the engine type. Da
 | `mossWeight` | enum `open,lean,even,feast` | `moss.weight` | left ring stroke weight |
 | `emberInked` | boolean | `ember.inked` | right half visible |
 | `emberWeight` | enum `open,lean,even,feast` | `ember.weight` | right ring stroke weight |
-| `radical_{hall}` ×7 | boolean | `radicals[]` includes hall | each radical's visibility |
-| `ornament_{family}` ×5 | boolean | `ornaments[]` includes family | each cardinal ornament |
+| `radical_{hall}` ×8 | boolean | `radicals[]` includes hall | each radical's visibility |
+| `ornament_{family}` ×6 | boolean | `ornaments[]` includes family | each cardinal ornament (rest carries none) |
 | `chord_{id}` ×12 | boolean | `chords[]` includes id | each chord-rune's visibility + glow |
 | `newMark` | boolean | `newMark` | the New Mark star |
 | `legendary` | enum `none` + 10 ids | `legendary` | which legendary frame |
@@ -45,8 +45,8 @@ Author one **view model** (`SealVM`) whose properties mirror the engine type. Da
 Enum values and ids are the **engine's literal strings** — don't rename:
 - tiers: `open, common, fine, resonant, legendary`
 - weights: `open, lean, even, feast`
-- halls (radicals): `protein, produce, grains, dairy, sweets, drinks, dishes` *(confirm exact ids in `lib/halls.ts` when wiring)*
-- split families (ornaments): `push, pull, legs, full, cardio` *(rest carries no ornament)*
+- halls (radicals, ×8): `protein, produce, grains, dairy, snacks, sweets, drinks, dishes` *(per `lib/halls.ts`)*
+- split families (7 total, ×6 drawn): `push, pull, legs, full, cardio, mobility` *(rest carries no ornament; per `lib/engine/training.ts`)*
 - chords: `lean, iron, anvil, twin-split, long-road, spring, green, hearth, mirror, scribe, new-mark, twin-peaks`
 - legendaries: `first-page, quiet-moon, twin-foxes, twin-peaks, green-cathedral, long-road-home, mirror-at-dusk, still-water, ember-vigil, feast-seal`
 
@@ -56,8 +56,8 @@ Enable "retain IDs/names on export" so the runtime targets these directly.
 
 - **`Seal`** — the main artboard.
   - `ring/half-moss`, `ring/half-ember` — each with the 4 weight states (`open/lean/even/feast`) as nested states or a blend input.
-  - `radical/{protein,produce,grains,dairy,sweets,drinks,dishes}` — 7, seated around the ring.
-  - `ornament/{push,pull,legs,full,cardio}` — 5, at the compass points.
+  - `radical/{protein,produce,grains,dairy,snacks,sweets,drinks,dishes}` — 8, seated around the ring.
+  - `ornament/{push,pull,legs,full,cardio,mobility}` — 6, at the compass points (rest carries none).
   - `chord/{...12 ids...}` — 12 chord-runes, each a small self-contained mark with an unlit + lit state.
   - `mark/new-mark-star` — the PR apex mark.
   - `core/{open,common,fine,resonant,legendary}` — the center mark per tier.

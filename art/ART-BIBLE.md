@@ -76,10 +76,12 @@ boat**, drawn in the same ink. Magical, unmistakably our book.
 
 - **Two halves** — `moss` (keeper A) + `ember` (keeper B); each `inked` or not, weight `lean / even /
   feast / open`.
-- **7 radicals** (food halls): protein = anchor bar · produce = leaf curl · grains = sheaf ticks ·
-  dairy = crescent · sweets = spark · drinks = wave · dishes = knot.
-- **5 cardinal ornaments** (training split; rest carries none): push = twin pillars · pull = hooks ·
-  legs = roots · full = the square · cardio = wind spirals.
+- **8 radicals** (food halls, per `lib/halls.ts`): protein = anchor bar · produce = leaf curl ·
+  grains = sheaf ticks · dairy = crescent · snacks = twist · sweets = spark · drinks = wave ·
+  dishes = knot.
+- **6 cardinal ornaments** (drawn from the **7 lift families** in `lib/engine/training.ts`; rest
+  carries none): push = twin pillars · pull = hooks · legs = roots · full = the square ·
+  cardio = wind spirals · mobility = a bow curve.
 - **12 chord-runes** (cohesion made legible): lean, iron, anvil, twin-split, long-road, spring, green,
   hearth, mirror, scribe, new-mark, twin-peaks — each a small self-contained mark that ignites when
   both logs align.

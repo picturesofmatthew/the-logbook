@@ -30,7 +30,7 @@ Act Two is additive — it presumes and protects everything below:
 
 - **The living world (Inklight):** crisp ink over gouache wash; one ~20-swatch earth palette in three light states (day/dusk/night from a tz cookie); **violet reserved for union moments only**.
 - **The daily seal:** each day composes a deterministic sigil from **both** keepers' data. *The seal cannot close alone.* This is the two-player-mandatory moat.
-- **The Glade:** a living scene whose vitality = the couple's consistency; ~9 beings + 10 legendaries arrive slowly and never leave; drifting **motes** of light in the sky.
+- **The Glade:** a living scene whose vitality = the couple's consistency; ~10 beings + 10 legendaries arrive slowly and never leave; drifting **motes** of light in the sky. *(Roster of record: `DIRECTION.md` — the fox familiar + 10 wandering beings.)*
 - **The retention spine (non-negotiable):**
   - **No streaks, ever.** A streak is a debt you default on. We run on *accumulating memory* + *two-player accountability*.
   - **The world states the score wordlessly and never scolds.** No red numbers; over-target is soft terracotta; a hushed Glade is winter, not death.
@@ -102,6 +102,13 @@ Every Dream has a **Coffer** — the couple's fund toward it — that fills from
 
 ### 5 · The Commons — community as love made visible
 
+> **Evolved 2026-07-24 by `THE-BEACON.md`** (the social canon). The Commons became the **Beacon** — the
+> lamp aimed across dark water to a neighbor bond's island. Two ideas below are carried forward there as
+> catalogued future: the **persistent signature mote** (the lingering, fading encouragement-light) and
+> **Twinned Pacts** (partnering with one specific couple for a season). The money side (backing a Dream)
+> lives in `COFFERS.md` + the Beacon's plank tier. Read the Beacon first for current shape; this section
+> is the origin.
+
 Beyond your Glade is a **village of other couples' Glades** — Matthew's Animal-Crossing instinct, made native. You wander in, and you witness.
 
 - **Blessing = a mote of light.** Each blesser leaves a **unique, persistent mote** — a signature hue and drift that is *theirs*. Tap it and you see who, and when. A well-loved Glade holds a *constellation of everyone rooting for you* — **this is the universe conspiring**, rendered. Design rules:
@@ -142,6 +149,11 @@ The day real money is on the line, **fraud is guaranteed.** Keeping the Pact mus
 ---
 
 ## The niche (decided)
+
+> **Superseded 2026-07-24.** Current canon narrows the beachhead to **long-distance couples** — the
+> cross-distance love-tap is the native hero there (`RISK-REGISTER.md` Tier 7, `PROJECT-BRAIN.md`,
+> `AGENTS.md`). **Gym-partners are a second wedge after PMF,** not the launch target. The
+> "keeper ≠ spouse" flexibility below still holds.
 
 **Beachhead: romantic partners prioritizing their gym health** — couples who already track, are motivated, and *want* accountability, for whom two-player-lock is a feature not friction. **Allow, don't chase:** competitive gym friends and supportive (non-romantic) partners can use the same machine — "keeper" is deliberately not "spouse." Don't dilute the beachhead trying to be for everyone at launch.
 

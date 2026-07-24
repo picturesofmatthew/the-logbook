@@ -19,11 +19,15 @@ in-app today:
   day **logged at the hearth**; the **lamp lit by the live spell**; the four completion ceremonies; the
   library's five books + reached-shores mantel; the docks vessel + far shore; the Garden's living glade
   (the old home's glade, relocated).
-- **Canon-only (not yet built):** the **ornate hero art** (today's rooms are v1 CSS/SVG, not the painterly
-  `hearth-hall.html` bar); the full **cast cinematic** (the two keepers rising to the lamp, beam sweeping the
-  shore); **in-world book/vessel interiors** (they route OUT to sub-pages today, breaking immersion); the
-  **archipelago** (private islands, shared heavens); a world-wide **day/night cycle** (only the Garden rides
-  the light-script now).
+- **Canon-only / still-pending (updated 2026-07-24):** the **painterly hero masters** — the four island
+  rooms (Library · Lantern · Docks · Garden) since shipped **ornate procedural-SVG hero art** (Fable proto
+  → hand port, World Engine 12–14), so the *ornate* bar is met; what's still canon-only is the
+  hand-painted/raster master pass **beyond** procedural SVG (the hearth is still v1 against
+  `hearth-hall.html`). The **in-world book/vessel interiors** now open **in place** (`world-spread.tsx`)
+  as **v1 title-pages** — the deep, rereadable spreads are the pending part. Also pending: the full
+  **cast cinematic** (the two keepers rising to the lamp, beam sweeping the shore); the **archipelago**
+  (private islands, shared heavens); a world-wide **day/night cycle** (only the Garden rides the
+  light-script now).
 
 Everything below is the target; iterate the built world toward it.
 
