@@ -58,7 +58,7 @@ Real workout logging, not a toggle. Example day: **"Chest & Triceps"** — Bench
 
 Deterministic and pure: both keepers' day-data → one SigilSpec. Same day, same sigil. `lib/engine/sigil.ts` + `components/sigil/SigilGlyph.tsx` (SVG composer over the parts library) + `sigil_discoveries` table.
 
-**Grammar:** two-half base ring (moss/ember) closing when both log → **radicals** from food halls (protein = anchor bar · produce = leaf curl · grains = sheaf ticks · dairy = crescent · sweets = spark · drinks = wave · dishes = knot) → **cardinal ornaments** from the split family (push = twin pillars · pull = hooks · legs = roots · full = the square · cardio = wind spirals · rest = still horizon), weighted by training volume → **ink temperature** from moods → **ring weight** from calories vs. target (deficit / maintenance / feast — all three legitimate, none renders ugly) → **New Mark star** on PR days → date-seeded micro-variation.
+**Grammar:** two-half base ring (moss/ember) closing when both log → **radicals** from food halls (8, per `lib/halls.ts`: protein = anchor bar · produce = leaf curl · grains = sheaf ticks · dairy = crescent · snacks = twist · sweets = spark · drinks = wave · dishes = knot) → **cardinal ornaments** from the split family (7 lift families, per `lib/engine/training.ts`: push = twin pillars · pull = hooks · legs = roots · full = the square · cardio = wind spirals · mobility = a bow curve · rest = still horizon / carries none), weighted by training volume → **ink temperature** from moods → **ring weight** from calories vs. target (deficit / maintenance / feast — all three legitimate, none renders ugly) → **New Mark star** on PR days → date-seeded micro-variation.
 
 ### The chords (v3 full draft — iterate as we see them)
 
@@ -145,7 +145,7 @@ Consistency calls creatures; the *kind* of consistency decides who. Each being: 
 
 **Matthew produces masters via ChatGPT + human art direction.** What the engine needs from that pipeline:
 
-- **Sigil parts library — must be SVG** (procedurally composed): 2 ring halves × 3 weights, 7 radicals, 6 cardinal ornaments, 4 tier cores, New Mark star, legendary frames (10). Clean single-weight strokes, no fills dependency.
+- **Sigil parts library — must be SVG** (procedurally composed): 2 ring halves × 3 weights, 8 radicals, 6 cardinal ornaments (from 7 lift families — rest carries none), 4 tier cores, New Mark star, legendary frames (10). Clean single-weight strokes, no fills dependency.
 - **Beings — PNG sprite sheets ok** (transparent, 2x/3x): per being, per trust stage: 1 idle loop (2–4 frames, the snappy `steps()` cadence) + 1 arrival pose. First wave: Fox (5 stages, replacing string-map sprites) + Stag + Heron.
 - **Small folk**: 1 frame + 1 motion frame each family.
 - **Glade plates**: layered washes + silhouette bands per light state × vitality tier (layerable, not baked into one image), per the Oga large-to-small structure.

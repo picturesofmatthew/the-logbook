@@ -112,6 +112,10 @@ a chore on a phone checked daily).
 | **The Compendium** *(or "The Field Book")* | beings + pantry/museum + artifacts + glade details | everything collected by casting |
 | **The Almanac** *(or "The Ledger")* | trends, numbers, patterns over time | the quiet data book |
 
+*(Superseded → the current shelf is the **five** books in `THE-LIGHTHOUSE.md`: Book of Days ·
+Legendarium · Bestiary · Apothecary · Almanac — the museum/pantry folded into the **Apothecary**, the
+beings into the **Bestiary**.)*
+
 Deliberate split so two don't overlap: **Scrapbook = the human record** (what you ate, how you felt);
 **Spellbook = the arcane record** (the seal, the chords, the plank). Same day, two lenses.
 

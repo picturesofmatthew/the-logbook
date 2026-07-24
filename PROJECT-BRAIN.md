@@ -1,7 +1,7 @@
 # Signed × Sealed — Project Brain
 
 *The orientation index + current state + decision log. Read this FIRST on any cold start, then follow
-the doc map. Last updated 2026-07-22.*
+the doc map. Last updated 2026-07-24.*
 
 ## Status snapshot
 
@@ -40,36 +40,44 @@ users. This resolves the validate-first-vs-build-native fork: a 4-lens contingen
 native rewrite reaches parity with a *working* app while adding zero retention evidence and colliding
 with the STR launch + the Asia move + debt — so we build and validate on what already runs, for free.
 
-## Next up — polish the Lighthouse world
+## Next up — wire the world's verbs (+ the cohesive visual audit)
 
 The world is **built and live** as one inhabited place — a lighthouse on an island (`THE-LIGHTHOUSE.md`),
-built via **`WORLD-ENGINE.md`** ("engine once, rooms forever"; DOM/SVG-first, Pixi reserved). The shell,
-the five rooms, the swipe/rise camera, and the cold-open gate all ship. What remains is *polish + spectacle*,
-not structure:
+built via **`WORLD-ENGINE.md`** ("engine once, rooms forever"; DOM/SVG-first). All four island rooms since
+shipped their **ornate hero art** (Fable proto → hand port, World Engine 12–14). The structure and the
+ornate art are done; the work now is **verbs, not wiring** — the rooms are already data-bound. Two parallel
+tracks, both indexed in **`ROADMAP.md`**:
 
-1. **Ornate hero graphics** — a **Fable-subagent plan** for sigil-level art (hearth-hall mantle/cast with
-   two chosen sprites + splayed Spellbook, the tower, the island), then polish passes. Today's art is v1
-   CSS/SVG against the feeling-proof `art/proto/hearth-hall.html`.
-2. **In-world interiors + cinematics** — make the book/vessel open as in-world spreads (they route OUT to
-   sub-pages today); land the **cast cinematic** (rise to the lamp → beam sweeps the shore); bring
-   settings/invite fully in-world.
+1. **BUILD — give the world verbs (`WIRE-THE-WORLD-HANDOFF.md`).** Onboarding-as-cold-open + the beautiful
+   **Letter** (land *before* first signup so Matthew + Kennedy carry `character` + `vow`); the
+   **Apothecary's Counsel** (deterministic same-hall food alternatives, engine-first); **Beacon guardrails**
+   (`THE-BEACON.md` — keep the beam aimable, the coffer the pledge rail; the social feature itself is future).
+2. **POLISH — the cohesive visual audit (`WORLD-AUDIT-HANDOFF.md`).** Judge the four rooms **together as one
+   world of logic** — perspective, cross-room consistency (shared sky, travelling light, far shore, the
+   gold/silver grammar, relational violet, the one key), the emotional value of details per screen; iterate
+   live (cheap — DOM/SVG hot-reload). Queued alongside: **deepen the interiors** (the Book of Days → a true
+   rereadable day-by-day spread, both logs facing; the shore interior) and the **cast cinematic** (rise to
+   the lamp → beam sweeps the shore).
 
-In parallel: Matthew + Kennedy dogfood the world + voice logging; notes feed classifier tuning. Still-open logging
-friction to fold in when touched: water/mood/weight aren't in the fast capture path yet; meal could
-default by time of day; servings could remember last-used per food. Loop-reliability items (canonical
-couple-day is done; the async ~36–48h close window + love-tap/web-push remain) live in
-`RISK-REGISTER.md`.
+In parallel: Matthew + Kennedy dogfood the world + voice logging; notes feed classifier tuning + polish.
+Still-open logging friction to fold in when touched: water/mood/weight aren't in the fast capture path yet;
+meal could default by time of day; servings could remember last-used per food. Loop-reliability items
+(canonical couple-day = **Track A**; the async ~36–48h close window + love-tap/web-push remain) live in
+`RISK-REGISTER.md` + `ROADMAP.md`.
 
 ## The document map (read order)
 
 | Doc | What it is |
 |---|---|
 | **PROJECT-BRAIN.md** (this) | Orientation, state, decision log, doc map. Read first. |
+| **ROADMAP.md** | **The central register (2026-07-24).** Open decisions (Matthew's calls), the build backlog (incl. **Track A** + the seal-tech backlog), and deferred-with-reason. The phase/backlog index the other docs point to. |
 | **BRAND-BIBLE.md** | **The founding brand bedrock (2026-07-22).** Essence, color, type, material, lighting, motif, voice, motion, application, do-not. The absolute place; `ART-BIBLE` (art) and the world docs inherit from it. |
 | **THE-LIGHTHOUSE.md** | **The world canon (2026-07-22).** The app is a lighthouse on an island — spatial architecture (garden/hearth/docks + tower), the cast cinematics, the archipelago, the three discipline lines. Read for the world/experience. |
 | **WORLD-ENGINE.md** | **The build architecture (2026-07-22).** "Engine once, rooms forever" — the shared world engine + how rooms plug in; DOM/SVG-first (Pixi reserved). Read before building rooms. |
 | **THE-BEACON.md** | **The social canon (2026-07-24).** The lamp as the app's social organ — aim your beam at another bond's island to encourage them (a being, free, only on days you kept your own light) or pledge money (future). Catalogued now, built later; evolves the archipelago. |
 | **WIRE-THE-WORLD-HANDOFF.md** | **The interactivity handoff (2026-07-24).** Give the live world *verbs*: the Apothecary's Counsel (deterministic food alternatives), Beacon guardrails, onboarding-as-cold-open + the beautiful Letter. Speced to real code seams. |
+| **WORLD-AUDIT-HANDOFF.md** | **The visual-audit handoff (2026-07-23).** Assess the four ported rooms **together as one world** — perspective, cross-room coherence, the emotional value of details; imagery + code in unison. |
+| **REVIEW-PLAN.md** | The review + simplify pass over the World build (canon → review → simplify → punch list). Its §6 deferred items feed `ROADMAP.md`. |
 | **SIGIL-HANDOFF.md** | The developed seal: its grammar, the swappable parts registry (`components/sigil/glyphs.ts`), and what's next. **Read to continue the sigil/art work.** |
 | **THE-SIGIL-TURN.md** | The sigil-as-spell thesis, the emblem ladder, creatures-as-bonus. (The "four books" are now five, up the Lighthouse tower.) |
 | **RISK-REGISTER.md** | The 4-agent contingency findings, deduped + ranked by severity + phase. The "what to watch." |
@@ -81,7 +89,29 @@ couple-day is done; the async ~36–48h close window + love-tap/web-push remain)
 | **LAUNCH-PATH.md** | The **deferred** native build/ship plan (Expo + Convex + Rive, $0-until-users, reader-model billing). The "when we go native" playbook. |
 | **convex/schema.ts** | The backend spine — a **design artifact** (needs a real migration pass; RISK-REGISTER Tier 6). |
 | **lib/engine/sigil.ts** | The registry-driven sigil engine — adding a chord/legendary is one entry. |
-| **CLAUDE.md** | Standing briefing + Quick Resume (points here). |
+| **CLAUDE.md** | Standing briefing + Quick Resume (points here); imports `AGENTS.md`. |
+| **AGENTS.md** | The Next.js-version guardrail (imported by `CLAUDE.md`): this Next.js has breaking changes — read `node_modules/next/dist/docs/` before writing code. |
+| **README.md** | The public repo readme — what the app is, the stack, the commands, contributor orientation. |
+
+## Decision log — 2026-07-24
+
+1. **New social canon + interactivity handoff.** `THE-BEACON.md` (the lamp as the app's social organ —
+   aim your beam at a neighbor bond's island: a being to their glade, free, only on days you kept your own
+   light; a money pledge later) and `WIRE-THE-WORLD-HANDOFF.md` (give the live, data-bound rooms *verbs*)
+   were written. Reframe: **the rooms are live tableaux missing interactions — the work is verbs, not
+   wiring.**
+2. **Three calls locked.** (a) **Food alternatives = pure deterministic** — same hall, better macros
+   (protein density), **no curated seed, no LLM** in v1. (b) **Character = 6–8 Inklight keeper archetypes** —
+   a procedural-SVG composer (`keeper-glyph.tsx`) in the sigil/familiar lineage, fulfilling the canon "each
+   keeper elects their own sprite at the mantle." (c) **Partner invite = a $0 share-link Letter** — the
+   craft is in how the letter *unfurls when opened*, not the transport (no email in v1).
+3. **Interactivity build kicked off** (current web stack, `$0 until users`): onboarding-as-cold-open + the
+   **Letter** (land before first signup), the **character system**, and the **Apothecary's Counsel**. Any
+   LLM-assisted logging stays **behind a flag on the current stack** — the deterministic path is v1; the LLM
+   ideation layer is the catalogued-deferred long-tail (`WIRE-THE-WORLD-HANDOFF.md`). This does **not**
+   un-park the native rewrite; Beacon work is guardrails-only for now.
+4. **New central register.** Added `ROADMAP.md` — the open-decisions (Matthew's calls) + build-backlog +
+   deferred index the other docs point to (resolves the dangling `ROADMAP.md` / **Track A** pointers).
 
 ## Decision log — 2026-07-23
 

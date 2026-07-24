@@ -54,6 +54,10 @@ water. *Private islands, shared heavens — now with someone waving from the nex
   **The rule that makes it beautiful and on-thesis: you can only send light on a day you kept your
   own.** Generosity is earned by practice; no drive-by cheerleading, no empty taps. When your own
   lamp is dark, the beam won't reach.
+  **The mote is *yours*, and it lingers.** What you send carries your own signature hue and drift —
+  tap it and they see who, and when. It glows bright for a season, then **softens and fades unless
+  you keep showing up**, so a sky full of light means neighbors are *still* with them, not that they
+  once went viral. (The drifting sky-mote from `ACT-TWO §5`, made personal.)
 - **A plank (real money, future-era).** You pledge real money toward *their* Dream — a plank in
   *their* boat toward *their* far shore. This is `COFFERS.md`'s **witness-not-holder** model extended
   socially. It carries the most trust weight in the whole product and ships **last**, on the
@@ -108,3 +112,7 @@ water. *Private islands, shared heavens — now with someone waving from the nex
 - **The free gift's exact form** — a being to their glade, a mote to their sky, or both.
 - **The archipelago's v1 shape** — a full spatial pull-out view, or a simpler "neighbors" panel to
   start.
+- **Twinned Pacts (catalogued future).** Two couples who know each other **twin their Pacts for a
+  season** — push each other, visible to each other. The tightest on-ramp to community
+  (bring-your-own-rival) and a way past cold-start — still warmth, never a leaderboard. (From
+  `ACT-TWO §5`.)
