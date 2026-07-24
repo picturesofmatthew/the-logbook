@@ -191,6 +191,12 @@ sky** — the same constellations of legendaries not yet struck, the same sea, t
 steer by. The **shared canon** (all possible foods, beings, legendaries) is the heavens; your lived
 pages are your island's own illumination. Everyone taps into one world; no one reads your diary.
 
+**The lamp makes this archipelago *inhabited* → `THE-BEACON.md` (canon, 2026-07-24).** From the lamp
+you can aim your beam across the water to a neighbor bond's island and send them light (encouragement
+now — a being to their glade, only on days you kept your own; a money pledge toward their Dream,
+later). You send warmth, never entry: still private islands, shared heavens. This is the Lantern's
+future verb and the social organ of the app — catalogued now, built later.
+
 ## Nothing is thrown away — how it maps to what exists
 
 - **The sigil** (`lib/engine/sigil.ts`, `components/sigil/*`) — unchanged as the engine; it now

@@ -68,6 +68,8 @@ couple-day is done; the async ~36–48h close window + love-tap/web-push remain)
 | **BRAND-BIBLE.md** | **The founding brand bedrock (2026-07-22).** Essence, color, type, material, lighting, motif, voice, motion, application, do-not. The absolute place; `ART-BIBLE` (art) and the world docs inherit from it. |
 | **THE-LIGHTHOUSE.md** | **The world canon (2026-07-22).** The app is a lighthouse on an island — spatial architecture (garden/hearth/docks + tower), the cast cinematics, the archipelago, the three discipline lines. Read for the world/experience. |
 | **WORLD-ENGINE.md** | **The build architecture (2026-07-22).** "Engine once, rooms forever" — the shared world engine + how rooms plug in; DOM/SVG-first (Pixi reserved). Read before building rooms. |
+| **THE-BEACON.md** | **The social canon (2026-07-24).** The lamp as the app's social organ — aim your beam at another bond's island to encourage them (a being, free, only on days you kept your own light) or pledge money (future). Catalogued now, built later; evolves the archipelago. |
+| **WIRE-THE-WORLD-HANDOFF.md** | **The interactivity handoff (2026-07-24).** Give the live world *verbs*: the Apothecary's Counsel (deterministic food alternatives), Beacon guardrails, onboarding-as-cold-open + the beautiful Letter. Speced to real code seams. |
 | **SIGIL-HANDOFF.md** | The developed seal: its grammar, the swappable parts registry (`components/sigil/glyphs.ts`), and what's next. **Read to continue the sigil/art work.** |
 | **THE-SIGIL-TURN.md** | The sigil-as-spell thesis, the emblem ladder, creatures-as-bonus. (The "four books" are now five, up the Lighthouse tower.) |
 | **RISK-REGISTER.md** | The 4-agent contingency findings, deduped + ranked by severity + phase. The "what to watch." |
