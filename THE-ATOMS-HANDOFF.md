@@ -12,6 +12,43 @@ archipelago) becomes the reward you *visit*, not the daily toll. Build from this
 
 ---
 
+## BUILT — the evening run (2026-07-24 night, branch `feat/world-interactivity`)
+
+All five build-order items landed. `npm test` **89/89**, `tsc` clean, build green, lint back to its
+pre-existing 9. Migration `0011_sealed_word_and_cold_open` generated **and applied** (additive +
+nullable, so the deployed code was never affected). Still **not merged, not deployed.**
+
+1. **The Carry** ✅ — `"carry"` in `ChordId` + `CHORD_REGISTRY` (seated by the Mirror), its rune (a
+   shoulder under a leaning stroke) in `CHORD_GLYPHS`, tests for both seats + the both-low and
+   both-strong non-cases. Chord count reconciled 12 → **13** in `SIGIL-HANDOFF.md`.
+2. **The Sealed Word** ✅ (v1) — `day_meta.sealed_word`, AES-GCM at rest. The reveal law is one pure
+   tested module (`lib/sealed-word.ts`), applied server-side at every boundary, so an unopened word
+   never crosses to the client. Written in the capture sheet's new signature line; revealed as the
+   ceremony's third beat and permanently in `app/book/[day]` (both words cross at a violet ×).
+   `lib/leave.ts`: a word that OPENED was delivered and stays in the recipient's book; undelivered
+   ones leave with their writer. **v1.1 remains: the words crossing at the sigil's own union ×.**
+3. **The free cuts** ✅ — `world-spread.tsx` + its ~155 lines of CSS deleted (hotspots open the real
+   pages); the bestiary is pure — `beingStates()` now derives `arrivedOn`, so the render-time
+   `recordArrival` loop, `getArrivals`/`recordArrival` and the arrival ceremony are gone and the Pale
+   Elk is a live glimpse again. `being_arrivals` kept in-schema, marked retired.
+4. **The Letter** ✅ — write a line + **press the seal** (`invites.message`), and `/join?invite=`
+   unfurls: the living half-lit seal, their keeper figure, their line, wax → unroll → ink. Onboarding
+   went light with it: signup now elects a **character** (the 8 archetypes, drawn in the picker) and a
+   **vow**. Acceptance is a once-per-book greeting (`keeper-arrival-ceremony.tsx`).
+   **Remaining: the elected character at the hearth MANTLE** — surgery on the baked hearth art, i.e.
+   world-deepening, which is frozen.
+5. **The patient day** ✅ — the couple-day turns at a grace hour (default **4am**,
+   `COUPLE_DAY_ROLLOVER`; 0 = old behaviour), one chokepoint `coupleDayOf`/`coupleDayFor`,
+   unit-tested, invariant unchanged. The hearth says it out loud past midnight (`inNightGrace()`).
+   **Not done, wants Matthew's eye: the leaner `/` surface that is mostly the light** (a redesign of
+   the daily face — not a unilateral call while the world is frozen).
+
+**Next session:** dogfood the two atoms (the word + the patient night) before adding anything · the
+v1.1 crossing-at-the-× · the mantle character · the leaner daily face (Matthew's call) · then the
+strategic one below — the parallel screen-app (two nav systems, two logging UIs), still to discuss.
+
+---
+
 ## Already banked this session (don't redo)
 
 - **Schema contracts** — `profiles.character` / `vow` / `vowKind`, `invites.message` (for the Letter).
