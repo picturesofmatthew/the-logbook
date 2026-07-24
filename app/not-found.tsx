@@ -20,7 +20,7 @@ export default function NotFound() {
         href="/"
         className="wobbly mt-2 border-2 border-ink bg-cream px-5 py-2 font-display text-sm text-ink"
       >
-        back to the glade
+        back to the lighthouse
       </Link>
     </main>
   );

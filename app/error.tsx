@@ -6,8 +6,9 @@ import { useEffect } from "react";
 // The in-book fallback when a route segment throws — a Neon cold-start, a
 // timeout, a query that rejects. Never the raw Next stack trace: the grimoire
 // holds still for a beat, then offers to open the page again. Rendered inside
-// the chrome (top bar + ribbon stay), since error.tsx wraps the page, not the
-// root layout. Root-layout failures fall through to global-error.tsx.
+// the page column (the way back to the lighthouse stays), since error.tsx wraps
+// the page, not the root layout. Root-layout failures fall through to
+// global-error.tsx.
 export default function GladeError({
   error,
   unstable_retry,
@@ -52,7 +53,7 @@ export default function GladeError({
           href="/"
           className="font-sans text-sm text-terracotta underline-offset-4 hover:underline"
         >
-          back to the glade
+          back to the lighthouse
         </Link>
       </div>
     </main>

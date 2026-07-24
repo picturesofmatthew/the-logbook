@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { legendarySpec } from "@/components/sigil/display-spec";
 import { SigilGlyph } from "@/components/sigil/sigil-glyph";
 import { requireBond } from "@/lib/bond";
@@ -44,12 +43,6 @@ export default async function InvitePage() {
         </div>
       )}
 
-      <Link
-        href="/"
-        className="self-center font-display text-[11px] tracking-widest text-ink-soft"
-      >
-        ← back to the glade
-      </Link>
     </main>
   );
 }

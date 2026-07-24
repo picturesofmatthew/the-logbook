@@ -355,6 +355,19 @@ export function WorldShell({
         </button>
       ) : null}
 
+      {/* the keeper's key — settings, sound, the privacy of the book. The old
+          top bar carried this; now the hearth does, quietly, and only here. */}
+      {phase === "live" && cam.col === 0 && cam.row === 0 ? (
+        <button
+          type="button"
+          className="world-key"
+          aria-label="The keeper's key — settings"
+          onClick={() => navTo("/settings")}
+        >
+          <span aria-hidden>⚷</span>
+        </button>
+      ) : null}
+
       {/* the second keeper — a book can't seal alone, so a solo bond's first
           call is to invite. Shown at the hearth until the ember arrives. */}
       {phase === "live" && cam.col === 0 && cam.row === 0 && needsKeeper ? (

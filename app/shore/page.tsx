@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { DreamForm } from "@/components/shore/dream-form";
 import { ShoreScene } from "@/components/shore/shore-scene";
 import { requireBond } from "@/lib/bond";
@@ -146,12 +145,6 @@ export default async function ShorePage({
         </p>
       )}
 
-      <Link
-        href="/"
-        className="mt-auto self-center font-display text-[10px] tracking-widest text-ink-soft"
-      >
-        ← back to the glade
-      </Link>
     </main>
   );
 }

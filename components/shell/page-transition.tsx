@@ -8,8 +8,10 @@ import { ViewTransition } from "react";
 //   · nav-back → flip-back  (turn the page toward the front)
 //   · nav-home → bloom-home (close the book; the glade blooms back)
 //   · anything else (nav-forward / untyped) → flip-fwd (deeper into the book)
-// The keyframes live in globals.css; the top bar and ribbon are pinned by their
-// own view-transition-name, so only the page turns inside the chrome.
+// The keyframes live in globals.css. (The old top bar + ribbon used to set the
+// type on their own Links and stay pinned while the page turned; both are
+// retired — the world is the navigation — so untyped navigations simply take
+// the default flip-fwd.)
 export function PageTransition({ children }: { children: React.ReactNode }) {
   return (
     <ViewTransition
