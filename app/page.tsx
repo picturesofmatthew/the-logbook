@@ -1,6 +1,7 @@
 import { LegendaryCeremony } from "@/components/sigil/legendary-ceremony";
 import { SealCeremony } from "@/components/sigil/seal-ceremony";
 import { ShoreArrivalCeremony } from "@/components/sigil/shore-arrival-ceremony";
+import { KeeperArrivalCeremony } from "@/components/world/keeper-arrival-ceremony";
 import { WorldShell } from "@/components/world/world-shell";
 import { partnerSlot, requireBond, SLOTS, type Slot } from "@/lib/bond";
 import { revealSealedWord } from "@/lib/sealed-word";
@@ -18,7 +19,7 @@ import {
   reachShore,
   recordLegendary,
 } from "@/lib/data";
-import { diffDays, todayIso } from "@/lib/dates";
+import { coupleTz, diffDays, isoDateInTz, todayIso } from "@/lib/dates";
 import { getGladeState } from "@/lib/ledger";
 import { BEINGS, paleElkGlimpsed } from "@/lib/engine/beings";
 import { stageForDays } from "@/lib/engine/familiar";
@@ -81,6 +82,16 @@ export default async function Home() {
       ? diffDays(today, glade.lastLegendaryDay)
       : null,
   });
+  // The second keeper's arrival — the day the letter is answered. Greeted once
+  // per device (the component's own gate) and only on the couple-day they took
+  // the slot, so a long-whole book never greets anyone.
+  const newKeeper =
+    members.ember &&
+    !members.ember.leftAt &&
+    isoDateInTz(members.ember.createdAt, coupleTz()) === today
+      ? members.ember
+      : null;
+
   const reachingNow =
     glade.boat?.complete === true &&
     glade.dream != null &&
@@ -209,6 +220,17 @@ export default async function Home() {
         needsKeeper={!members.ember}
       />
 
+      {/* the letter, answered — the rarest overlay of all: it happens once per
+          book. It owns the night it lands (the seal ceremony stands down). */}
+      {newKeeper ? (
+        <KeeperArrivalCeremony
+          keeperId={newKeeper.id}
+          name={newKeeper.displayName}
+          character={newKeeper.character}
+          viewerIsThem={viewerSlot === "ember"}
+        />
+      ) : null}
+
       {/* the completion ceremonies — overlays that fire over the world, grandest
           first (shore > legendary > seal); a grander one suppresses the rest for
           the night. Each then gates itself once-per-device. */}
@@ -231,7 +253,7 @@ export default async function Home() {
           day={day}
           closerLine={closerLine}
           sealedCount={familiarState.lifetimeDays}
-          suppressed={shoreReachedToday || !!legendaryToday}
+          suppressed={shoreReachedToday || !!legendaryToday || !!newKeeper}
           dreamName={glade.dream?.name}
           planksLaid={glade.boat?.planksLaid}
           remaining={glade.boat?.remaining}

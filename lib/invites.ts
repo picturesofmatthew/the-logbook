@@ -12,15 +12,36 @@ const INVITE_TTL_MS = 1000 * 60 * 60 * 24 * 7; // 7 days
 export async function createInvite(
   bondId: string,
   createdBy: string,
+  message?: string | null,
 ): Promise<string> {
   const token = randomBytes(24).toString("base64url");
   await db.insert(invites).values({
     tokenHash: await hashToken(token),
     bondId,
     createdBy,
+    message: summonsLine(message),
     expiresAt: new Date(Date.now() + INVITE_TTL_MS),
   });
   return token;
+}
+
+// The summons line pressed into the letter — one line, trimmed. Personal, not
+// health-tier, so it is stored plain (it travels in a link the recipient opens
+// before they have an account; there is no key to read it with yet).
+export const SUMMONS_MAX = 200;
+
+export function summonsLine(raw: string | null | undefined): string | null {
+  if (raw == null) return null;
+  const oneLine = raw.replace(/\s+/g, " ").trim();
+  return oneLine ? oneLine.slice(0, SUMMONS_MAX) : null;
+}
+
+// A stable visual seed for a bond's letter — the same bond always presses the
+// same seal. (Not a secret: it only picks which flecks fall where.)
+export function letterSeed(bondId: string): number {
+  let hash = 0;
+  for (const ch of bondId) hash = (hash * 31 + ch.charCodeAt(0)) >>> 0;
+  return hash;
 }
 
 // Redeem atomically: one UPDATE that sets accepted_at only if the invite is
@@ -44,15 +65,26 @@ export async function redeemInvite(
   return rows[0] ?? null;
 }
 
-// A read-only peek at an invite (for the join page): who's inviting, without
-// consuming the token. Null if the token is unknown, expired, or already used.
+// A read-only peek at an invite — everything the LETTER unfurls with, without
+// consuming the token: who is calling you, the line they pressed, the self they
+// elected at the mantle, and the seed their half-lit seal is drawn from. Null if
+// the token is unknown, expired, or already used.
+export type InvitePreview = {
+  inviterName: string;
+  message: string | null;
+  inviterCharacter: string | null;
+  seed: number;
+};
+
 export async function invitePreview(
   token: string,
-): Promise<{ inviterName: string } | null> {
+): Promise<InvitePreview | null> {
   if (!token) return null;
   const [row] = await db
     .select({
       bondId: invites.bondId,
+      createdBy: invites.createdBy,
+      message: invites.message,
       expiresAt: invites.expiresAt,
       acceptedAt: invites.acceptedAt,
     })
@@ -61,9 +93,19 @@ export async function invitePreview(
   if (!row || row.acceptedAt || row.expiresAt.getTime() < Date.now()) {
     return null;
   }
-  const [moss] = await db
-    .select({ displayName: profiles.displayName })
+  // The keeper who sent it (not "whoever holds moss") — explicit, so a bond
+  // whose slots ever change can't misaddress a letter.
+  const [inviter] = await db
+    .select({
+      displayName: profiles.displayName,
+      character: profiles.character,
+    })
     .from(profiles)
-    .where(and(eq(profiles.bondId, row.bondId), eq(profiles.slot, "moss")));
-  return { inviterName: moss?.displayName ?? "someone" };
+    .where(eq(profiles.id, row.createdBy));
+  return {
+    inviterName: inviter?.displayName ?? "someone",
+    message: row.message,
+    inviterCharacter: inviter?.character ?? null,
+    seed: letterSeed(row.bondId),
+  };
 }

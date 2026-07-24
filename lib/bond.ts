@@ -11,6 +11,12 @@ export type Member = {
   id: string;
   displayName: string;
   slot: Slot;
+  // When they took the slot — the second keeper's arrival is a moment worth
+  // witnessing (the world greets a keeper who has just come).
+  createdAt: Date;
+  // The keeper sprite they elected at the mantle (null until onboarding sets
+  // one). Validated against KEEPER_ARCHETYPES where it's drawn, not here.
+  character: string | null;
   // Set once a keeper has left / been severed. Their logs still bucket into the
   // slot (the keepsake), but the UI can tell an active partner from a former one.
   leftAt: Date | null;
@@ -30,6 +36,8 @@ export const getBondMembers = cache(
         id: profiles.id,
         displayName: profiles.displayName,
         slot: profiles.slot,
+        createdAt: profiles.createdAt,
+        character: profiles.character,
         leftAt: profiles.leftAt,
       })
       .from(profiles)
@@ -41,6 +49,8 @@ export const getBondMembers = cache(
           id: r.id,
           displayName: r.displayName,
           slot: r.slot,
+          createdAt: r.createdAt,
+          character: r.character,
           leftAt: r.leftAt,
         };
       }

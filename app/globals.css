@@ -2169,3 +2169,62 @@ html[data-light="night"] .glade-day-only {
     animation: none;
   }
 }
+
+/* ── THE LETTER (app/join) ──
+   The invite is the growth engine, so the craft is in the UNFURL: the wax
+   presses in first, the page unrolls beneath it, and the sender's line settles
+   last, as if the ink were still drying. */
+.letter-wax {
+  animation: letter-press 0.5s cubic-bezier(0.2, 0.9, 0.25, 1) both;
+}
+@keyframes letter-press {
+  from {
+    opacity: 0;
+    transform: scale(1.28) rotate(-6deg);
+  }
+  60% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+.letter-page {
+  animation: letter-unfurl 0.62s cubic-bezier(0.22, 0.7, 0.2, 1) 0.34s both;
+  transform-origin: 50% 0%;
+}
+@keyframes letter-unfurl {
+  from {
+    opacity: 0;
+    clip-path: inset(0 0 100% 0);
+    transform: scaleY(0.94);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+    transform: scaleY(1);
+  }
+}
+.letter-line {
+  animation: letter-ink 0.7s ease both 1s;
+}
+@keyframes letter-ink {
+  from {
+    opacity: 0;
+    filter: blur(2px);
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .letter-wax,
+  .letter-page,
+  .letter-line {
+    animation: none;
+  }
+}

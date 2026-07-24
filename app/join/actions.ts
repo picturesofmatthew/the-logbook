@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { bonds, familiar, profiles } from "@/db/schema";
+import { KEEPER_ARCHETYPES } from "@/components/keeper/keeper-glyph";
 import { redeemInvite } from "@/lib/invites";
 import { hashPassword } from "@/lib/passwords";
 import { createSession } from "@/lib/session";
@@ -13,6 +14,28 @@ export type JoinState = { error: string } | null;
 
 const KINDS = ["couple", "gym_partners", "friends"] as const;
 type Kind = (typeof KINDS)[number];
+
+const VOW_KINDS = ["grow", "learn", "tend", "steady", "other"] as const;
+type VowKind = (typeof VOW_KINDS)[number];
+
+// The self a keeper elects at the mantle, and why they keep the light. Both are
+// optional — a book opens fine without them, and settings can fill them later.
+function readCharacter(form: FormData): string | null {
+  const v = String(form.get("character") ?? "");
+  return KEEPER_ARCHETYPES.some((a) => a.id === v) ? v : null;
+}
+
+function readVow(form: FormData): { vow: string | null; vowKind: VowKind | null } {
+  const line = String(form.get("vow") ?? "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 160);
+  const kindRaw = String(form.get("vowKind") ?? "");
+  const kind = (VOW_KINDS as readonly string[]).includes(kindRaw)
+    ? (kindRaw as VowKind)
+    : null;
+  return { vow: line || null, vowKind: kind };
+}
 
 function validEmail(e: string): boolean {
   return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e);
@@ -59,6 +82,8 @@ export async function signup(
 
       const passwordHash = await hashPassword(password);
       const userId = randomUUID();
+      const character = readCharacter(formData);
+      const { vow, vowKind } = readVow(formData);
 
       if (invite) {
         const redeemed = await redeemInvite(invite);
@@ -72,6 +97,9 @@ export async function signup(
           displayName,
           email,
           passwordHash,
+          character,
+          vow,
+          vowKind,
         });
       } else {
         const kind: Kind = (KINDS as readonly string[]).includes(kindRaw)
@@ -86,6 +114,9 @@ export async function signup(
           displayName,
           email,
           passwordHash,
+          character,
+          vow,
+          vowKind,
         });
         await db.insert(familiar).values({ bondId });
       }
