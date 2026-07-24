@@ -107,10 +107,19 @@ live app, not just the parked native build.*
   **day-of-week** (unused), a **long-distance / tz chord** (dead-on for the beachhead; tz plumbing
   exists, no chord yet), and expose **mood / moon / water** directly instead of deriving them.
 
-### Deepen the interiors (`WORLD-AUDIT-HANDOFF.md`, `WIRE-THE-WORLD-HANDOFF.md`)
-- The in-world spreads are v1 title-pages. Deepen the **Book of Days** into the true rereadable
-  day-by-day spread (real sigils, both logs facing) and the **shore interior** likewise — both grown
-  in `components/world/world-spread.tsx`.
+### Deepen the interiors — **FROZEN 2026-07-24** (`THE-ATOMS-HANDOFF.md`)
+- Both exploration lenses said stop growing the world; the v1 title-page overlay
+  (`world-spread.tsx`) was **cut** and room hotspots now open the real pages. When this thaws (a
+  paying couple says the world is why they stay), the work is the **Book of Days** as a true
+  rereadable day-by-day spread (real sigils, both logs facing) and the shore interior likewise — and
+  the in-place pattern returns with them.
+
+### The atoms (`THE-ATOMS-HANDOFF.md`) — the current arc
+- **Done 2026-07-24:** the **Carry** chord (asymmetric support) · the **Sealed Word** v1 (a line to
+  your keeper, opened when the ring closes, kept in the book) · the two free cuts (`world-spread`
+  stub, bestiary render-time writes → derived `arrivedOn`).
+- **Next:** the **Letter** (the invite made worthy — the growth engine) · the **patient day** + the
+  waiting light (the async close window; touches the ONE bucketing invariant — highest care).
 
 ---
 

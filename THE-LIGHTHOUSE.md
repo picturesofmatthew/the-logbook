@@ -23,8 +23,11 @@ in-app today:
   rooms (Library · Lantern · Docks · Garden) since shipped **ornate procedural-SVG hero art** (Fable proto
   → hand port, World Engine 12–14), so the *ornate* bar is met; what's still canon-only is the
   hand-painted/raster master pass **beyond** procedural SVG (the hearth is still v1 against
-  `hearth-hall.html`). The **in-world book/vessel interiors** now open **in place** (`world-spread.tsx`)
-  as **v1 title-pages** — the deep, rereadable spreads are the pending part. Also pending: the full
+  `hearth-hall.html`). The **in-world book/vessel interiors** are **cut back to the real pages**
+  (2026-07-24, the atoms audit): the v1 title-page overlay was a stub nobody read that added a tap on
+  the way to the actual book, so a room hotspot now opens `/book`, `/library#…`, `/trends`, `/shore`
+  directly. The "interior opens in place" pattern returns when a **deep, rereadable** spread exists to
+  put in it (frozen until a paying couple says the world is why they stay). Also pending: the full
   **cast cinematic** (the two keepers rising to the lamp, beam sweeping the shore); the **archipelago**
   (private islands, shared heavens); a world-wide **day/night cycle** (only the Garden rides the
   light-script now).

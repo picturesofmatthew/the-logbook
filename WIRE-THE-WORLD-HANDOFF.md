@@ -55,9 +55,9 @@ retired "food as the Library's star" — keep this a **whisper**, not the room's
    (`components/shell/capture-sheet.tsx`, which already holds `recents: Specimen[]`), when a food is
    picked, whisper *"a finer provision exists →"* — non-blocking, dismissible. This is where a swap
    actually changes a choice.
-3. **In-world Apothecary spread (later).** `components/world/world-spread.tsx`, the
-   `/library#apothecary` branch — deepen when the interiors get deepened (backbone below). Requires
-   widening `LibrarySnapshot` beyond the current `provisions: number` count.
+3. **In-world Apothecary spread (later).** ⚠ `world-spread.tsx` was **cut 2026-07-24** (hotspots open
+   the real pages now) — this surface returns only when the in-world interiors are rebuilt deep.
+   Requires widening `LibrarySnapshot` beyond the current `provisions: number` count.
 
 **v1 vs deferred.**
 - **v1:** the engine + surfaces 1 & 2. Pure deterministic protein-density ranking within a hall.
@@ -144,8 +144,9 @@ character/vow editable in `/settings` as a fallback (less magical).
 
 ## The backbone — deepen the interiors (carries all three)
 
-The reusable "interior opens in place" pattern is `components/world/world-spread.tsx` (v1
-title-pages that deep-link OUT). All three initiatives touch it or its neighbors:
+⚠ **Superseded 2026-07-24 (the atoms audit): the interiors are FROZEN and `world-spread.tsx` is cut**
+— room hotspots open the real pages. Kept here for when the deep spreads are built. All three
+initiatives touched it or its neighbors:
 - The Apothecary's in-world surface (A.3) lives here.
 - The Letter's unfurl is a cousin pattern (an overlay bound to real data).
 - Cross-ref `WORLD-AUDIT-HANDOFF.md` — the Book of Days → true rereadable spread, the shore interior —

@@ -138,12 +138,23 @@ export type BeingState = {
   stage: 0 | 1 | 2 | 3; // 0 = not yet arrived
   count: number;
   nextAt: number | null; // null once fully deepened
+  // The day this being's calls first reached its arrival threshold — DERIVED
+  // from the history, not stored. (There was a `being_arrivals` table written
+  // at render time; the ledger already knows when the wood stirred, so the
+  // bestiary reads the date from here instead. History is chronological.)
+  arrivedOn: string | null;
 };
 
 export function beingStates(history: LedgerDay[]): BeingState[] {
   return BEINGS.map((def) => {
-    const count = history.reduce((sum, d) => sum + def.countsFor(d), 0);
     const [t1, t2, t3] = def.thresholds;
+    let count = 0;
+    let arrivedOn: string | null = null;
+    for (const d of history) {
+      const before = count;
+      count += def.countsFor(d);
+      if (arrivedOn == null && before < t1 && count >= t1) arrivedOn = d.day;
+    }
     const stage = count >= t3 ? 3 : count >= t2 ? 2 : count >= t1 ? 1 : 0;
     const nextAt = stage === 3 ? null : stage === 2 ? t3 : stage === 1 ? t2 : t1;
     return {
@@ -152,6 +163,7 @@ export function beingStates(history: LedgerDay[]): BeingState[] {
       stage: stage as BeingState["stage"],
       count,
       nextAt,
+      arrivedOn,
     };
   });
 }

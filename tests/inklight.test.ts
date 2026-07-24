@@ -393,6 +393,25 @@ test("beings: the crow comes to hard days, the moth to rest", () => {
   assert.equal(states.get("moth")?.arrived, true);
 });
 
+test("beings: the arrival day is derived, not recorded", () => {
+  // five days of water; the Heron's threshold (5) falls on the fifth.
+  const days = ["07-15", "07-16", "07-17", "07-18", "07-19", "07-20"].map((d) =>
+    ledger({ day: `2026-${d}`, chords: ["spring"] }),
+  );
+  const heron = beingStates(days).find((s) => s.id === "heron");
+  assert.equal(heron?.arrivedOn, "2026-07-19");
+  // a being still in the wood has no arrival day
+  assert.equal(
+    beingStates(days).find((s) => s.id === "stag")?.arrivedOn,
+    null,
+  );
+  // and none at all before the wood stirs
+  assert.equal(
+    beingStates([]).find((s) => s.id === "heron")?.arrivedOn,
+    null,
+  );
+});
+
 test("beings: the pale elk is only ever glimpsed", () => {
   assert.equal(
     paleElkGlimpsed({ gladeTier: "radiant", daysSinceLegendary: 1 }),

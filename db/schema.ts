@@ -348,8 +348,10 @@ export const sigilDiscoveries = pgTable(
   (t) => [unique("sigil_discoveries_bond_sigil").on(t.bondId, t.sigilId)],
 );
 
-// First witnessing of an anchor being — one arrival ceremony each, ever.
-// Being state itself is always derived from chord history.
+// RETIRED (2026-07-24): first witnessing of an anchor being. Being state — and
+// now the arrival DAY too — is derived from chord history (lib/engine/beings
+// `arrivedOn`), so nothing reads or writes this table any more. The definition
+// stays so the old rows are never dropped; delete it only with a real migration.
 export const beingArrivals = pgTable(
   "being_arrivals",
   {
