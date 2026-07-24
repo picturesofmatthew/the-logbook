@@ -19,7 +19,7 @@ import {
   reachShore,
   recordLegendary,
 } from "@/lib/data";
-import { coupleTz, diffDays, isoDateInTz, todayIso } from "@/lib/dates";
+import { coupleDayOf, diffDays, inNightGrace, todayIso } from "@/lib/dates";
 import { getGladeState } from "@/lib/ledger";
 import { BEINGS, paleElkGlimpsed } from "@/lib/engine/beings";
 import { stageForDays } from "@/lib/engine/familiar";
@@ -88,7 +88,7 @@ export default async function Home() {
   const newKeeper =
     members.ember &&
     !members.ember.leftAt &&
-    isoDateInTz(members.ember.createdAt, coupleTz()) === today
+    coupleDayOf(members.ember.createdAt) === today
       ? members.ember
       : null;
 
@@ -148,13 +148,19 @@ export default async function Home() {
   const keptName = sigil.moss.inked
     ? (members.moss?.displayName ?? "")
     : (members.ember?.displayName ?? "");
+  // Past midnight, inside the patient day's grace hours: say so, or the extra
+  // time is a secret and a keeper who thinks the day is gone won't reach for it.
+  const nightGrace = !sigil.completed && (await inNightGrace());
+  const openLine = soloKept
+    ? viewerKept
+      ? `your half is kept — ${missingName} closes the ring`
+      : `${keptName} kept their half — your hand closes it`
+    : "an open page, still to keep together";
   const standingLine = sigil.completed
     ? "the day is sealed — the light is yours to keep, together"
-    : soloKept
-      ? viewerKept
-        ? `your half is kept — ${missingName} closes the ring`
-        : `${keptName} kept their half — your hand closes it`
-      : "an open page, still to keep together";
+    : nightGrace
+      ? `past midnight, and the day is still open — ${openLine}`
+      : openLine;
 
   // ── The five books' live gold-vs-silver progress (the Library room). ──
   const library = {

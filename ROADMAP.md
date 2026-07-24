@@ -90,7 +90,12 @@ live app, not just the parked native build.*
   split the seal. *(Auto-activates on the Oct-2026 Chiang Mai move — fix before long-distance
   dogfooding. `RISK-REGISTER.md` lists it "still live"; `CLAUDE.md` / `PROJECT-BRAIN.md` say
   `COUPLE_TZ` now buckets the day — confirm which, on the live engine.)*
-- **Remaining loop-reliability** — the async **~36–48h close window** and **love-tap / web-push**
+- **The patient day — DONE 2026-07-24.** The couple-day turns at a grace hour after midnight
+  (default 4am couple-time, `COUPLE_DAY_ROLLOVER`), so the small hours still keep the day they grew
+  out of and the ring gets those hours to close. One chokepoint (`coupleDayOf`/`coupleDayFor`),
+  unit-tested, invariant unchanged. The hearth line names the grace out loud past midnight.
+- **Remaining loop-reliability** — the deeper async **~36–48h close window** (a seal that can close
+  across day keys — a real engine change, not a grace hour) and **love-tap / web-push**
   (per `PROJECT-BRAIN.md` Next-up; the native-side plumbing is Tier 6, below).
 
 ### Seal-tech backlog (`SIGIL-HANDOFF.md` §What's next)
