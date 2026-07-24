@@ -184,6 +184,39 @@ test("sigil: the Twin Split subsumes the Anvil; Twin Peaks subsumes the New Mark
   assert.ok(!twoPr.includes("new-mark"));
 });
 
+test("sigil: the Carry strikes on asymmetry — one low, one strong", () => {
+  const low = quietDay({ mood: "🥲" });
+  const strong = quietDay({ mood: "😊", proteinG: 160 });
+
+  // the strong light reaches over — and it reads the same from either seat
+  assert.ok(chordsForDay(low, strong).includes("carry"));
+  assert.ok(chordsForDay(strong, low).includes("carry"));
+
+  // both low is the Ember Vigil's register, not the Carry's
+  assert.ok(
+    !chordsForDay(low, quietDay({ mood: "😤", proteinG: 160 })).includes("carry"),
+  );
+  // two good days: nobody needed carrying
+  assert.ok(
+    !chordsForDay(strong, quietDay({ mood: "😊", proteinG: 155 })).includes("carry"),
+  );
+  // a hard day with no strong shoulder beside it doesn't strike either
+  assert.ok(!chordsForDay(low, quietDay({ mood: "😊" })).includes("carry"));
+  // training counts as showing up strong, not just protein
+  const trained = quietDay({
+    mood: "😊",
+    training: {
+      trained: true,
+      families: ["push"],
+      primaryFamily: "push",
+      volumeLb: 4000,
+      cardioMin: 0,
+      prCount: 0,
+    },
+  });
+  assert.ok(chordsForDay(low, trained).includes("carry"));
+});
+
 test("sigil: tiers climb with chords and yield to legendaries", () => {
   assert.equal(tierFor({ completed: false, chordCount: 3, legendary: null }), "open");
   assert.equal(tierFor({ completed: true, chordCount: 0, legendary: null }), "common");

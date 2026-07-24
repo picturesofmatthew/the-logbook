@@ -59,7 +59,8 @@ readable interior spell. Anatomy, outer → inner:
 
 ### The grammar it speaks (already computed by the engine)
 - **8 halls** → 8 runes (`HALL_GLYPHS`). **7 lift families** → ornaments (`LIFT_GLYPHS`).
-- **12 chords** = the alignments between the two of you (the weave). **10 legendaries** = named
+- **13 chords** = the alignments between the two of you (the weave) — twelve sound on *sameness*, and
+  **the Carry** sounds on difference (one keeper low, the other strong). **10 legendaries** = named
   conjunctions ("when the stars align") — e.g. **Quiet Moon** (both low + a real full moon),
   **Green Cathedral** (both produce + both watered + both trained). Full catalogue in `lib/engine/sigil.ts`.
 
@@ -157,7 +158,7 @@ Multi-user v1 (Phase 3, onboarding/accounts/pairing).
 |---|---|
 | `components/sigil/glyphs.ts` | **the swappable parts registry + `composeSeal`** — where all seal art lives |
 | `components/sigil/sigil-glyph.tsx` | the thin renderer (interface: `{spec, size, bloom}`) |
-| `lib/engine/sigil.ts` | the engine grammar — 8 halls, 7 lifts, 12 chords, 10 legendaries, tiers |
+| `lib/engine/sigil.ts` | the engine grammar — 8 halls, 7 lifts, 13 chords, 10 legendaries, tiers |
 | `art/reference/hero-sigil.png` · `sigil-material-ladder.png` | Matthew's north-star references |
 | `art/ART-BIBLE.md` · `art/asset-sheets.md` | Inklight canon + the asset pipeline for real art |
 | scratchpad `sigil-preview.html` → artifact | the v4 living design proposal (the full grammar + key) |

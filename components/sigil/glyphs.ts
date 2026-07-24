@@ -114,6 +114,8 @@ export const CHORD_GLYPHS: Record<ChordId, Glyph> = {
   hearth: (x, y, s) => `<path d="M ${x} ${y + s} q ${-s * 0.78} ${-s * 0.35} ${-s * 0.42} ${-s} q ${-s * 0.04} ${s * 0.42} ${s * 0.26} ${s * 0.36} q ${s * 0.26} ${-s * 0.46} ${-s * 0.06} ${-s} q ${s * 0.86} ${s * 0.46} ${s * 0.5} ${s * 1.34} q ${-s * 0.16} ${s * 0.4} ${-s * 0.3} ${s * 0.3}"/>`,
   // the same mood, twice — two facing arcs
   mirror: (x, y, s) => `<path d="M ${x - s * 0.15} ${y - s} q ${-s * 0.68} ${s} 0 ${s * 2} M ${x + s * 0.15} ${y - s} q ${s * 0.68} ${s} 0 ${s * 2}"/>`,
+  // one hard day, carried by the other — a shoulder under a leaning stroke
+  carry: (x, y, s) => `<path d="M ${x + s * 0.7} ${y - s * 0.58} L ${x + s * 0.7} ${y + s * 0.86} M ${x - s * 0.7} ${y + s * 0.86} L ${x + s * 0.35} ${y - s * 0.86}"/><path d="M ${x + s * 0.13} ${y - s * 0.5} q ${s * 0.3} ${-s * 0.26} ${s * 0.57} ${-s * 0.06}"/>`,
   // both wrote it down — a quill nib
   scribe: (x, y, s) => `<path d="M ${x - s * 0.7} ${y + s} L ${x + s * 0.6} ${y - s * 0.8} M ${x + s * 0.18} ${y - s * 0.34} L ${x + s * 0.9} ${y - s * 0.5}"/>`,
   // a record fell — a spark star

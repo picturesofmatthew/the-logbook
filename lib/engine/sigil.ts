@@ -43,6 +43,7 @@ export type ChordId =
   | "green"
   | "hearth"
   | "mirror"
+  | "carry"
   | "scribe"
   | "new-mark"
   | "twin-peaks";
@@ -126,6 +127,24 @@ export const CHORD_REGISTRY: ChordDef[] = [
     name: "the Mirror",
     line: "the same mood, twice",
     detect: (a, b) => a.mood != null && a.mood === b.mood,
+  },
+  {
+    // Every other chord sounds on sameness. This one sounds on DIFFERENCE:
+    // one keeper is low and the other showed up strong, so the strong light
+    // reaches over. The day a couple most needs warmth is the asymmetric one
+    // — it should leave the tenderest mark in the book, not a missing chord.
+    // Both low is the Ember Vigil's register, not this one.
+    id: "carry",
+    name: "the Carry",
+    line: "one hard day, carried by the other",
+    detect: (a, b) => {
+      const strong = (k: KeeperDay) =>
+        k.training.trained ||
+        (k.targetProteinG != null && k.proteinG >= k.targetProteinG);
+      const carries = (lo: KeeperDay, hi: KeeperDay) =>
+        isLowMood(lo.mood) && !isLowMood(hi.mood) && strong(hi);
+      return carries(a, b) || carries(b, a);
+    },
   },
   {
     id: "scribe",
