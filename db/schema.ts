@@ -60,6 +60,17 @@ export const profiles = pgTable(
     activityLevel: text("activity_level", {
       enum: ["sedentary", "light", "moderate", "active", "very_active"],
     }),
+    // The keeper's chosen self (onboarding cold-open). `character` is the elected
+    // keeper sprite that stands at the hearth mantle (validated in app against
+    // KEEPER_ARCHETYPES; kept as text so the cast can grow without a migration).
+    // `vow`/`vowKind` are why they keep the light — a compass, never a scored
+    // target (tone law). All optional: backfillable in settings if a signup
+    // predates the cold-open onboarding.
+    character: text("character"),
+    vow: text("vow"),
+    vowKind: text("vow_kind", {
+      enum: ["grow", "learn", "tend", "steady", "other"],
+    }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     // A departed keeper (they left, or were severed). PII is stripped and
     // private notes removed, but their logs stay for the remaining keeper's
@@ -100,6 +111,10 @@ export const invites = pgTable("invites", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   expiresAt: timestamp("expires_at").notNull(),
   acceptedAt: timestamp("accepted_at"),
+  // The summons line the inviter presses into the letter — shown when the
+  // partner opens the $0 share-link (the letter that unfurls). Personal, not
+  // health-tier; stored plain. Optional (a letter can be sealed wordless).
+  message: text("message"),
 });
 
 // Daily calorie/macro targets. New rows are appended when targets change so
